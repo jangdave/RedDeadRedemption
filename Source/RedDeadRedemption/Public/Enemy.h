@@ -14,6 +14,24 @@ class REDDEADREDEMPTION_API AEnemy : public ACharacter
 public:
 	// Sets default values for this character's properties
 	AEnemy();
+	// 적 메쉬
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "EnemySettings")
+		class USkeletalMeshComponent* EnemyMesh;
+
+	// 적 체력
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemySettings")
+		float EnemyHealth;
+	// 적 걷는속도
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemySettings")
+		float EnemyWalkSpeed;
+	// 적 뛰는속도
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemySettings")
+		float EnemyRunSpeed;
+	// Track when enemies spot you
+	
+	
+	
+	
 
 protected:
 	// Called when the game starts or when spawned
@@ -25,6 +43,6 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-
+	
+	
 };
