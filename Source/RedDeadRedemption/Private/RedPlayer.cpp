@@ -5,6 +5,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Bullet.h"
 
 // Sets default values
 ARedPlayer::ARedPlayer()
@@ -32,6 +33,17 @@ ARedPlayer::ARedPlayer()
 	springComp->bUsePawnControlRotation = true;
 	cameraComp->bUsePawnControlRotation = true;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
+
+	gunMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("gunMeshComp"));
+	gunMeshComp->SetRelativeScale3D(FVector(0.5f));
+	gunMeshComp->SetupAttachment(GetMesh());
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempGunMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Asset/VintageRifle/Model/VintageRifleskeletal.VintageRifleskeletal_VintageRifle'"));
+	if (tempGunMesh.Succeeded())
+	{
+		gunMeshComp->SetSkeletalMesh(tempGunMesh.Object);
+
+		gunMeshComp->SetRelativeLocationAndRotation(FVector(-15.0f, 58.0f, 141.0f), FRotator(0, 180.0f, -90.0f));
+	}
 }
 
 // Called when the game starts or when spawned
@@ -46,6 +58,13 @@ void ARedPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	FTransform trans(GetControlRotation());
+	FVector resultDirection = trans.TransformVector(direction);
+	resultDirection.Z = 0;
+	resultDirection.Normalize();
+	AddMovementInput(resultDirection);
+	//방향 초기화
+	direction = FVector::ZeroVector;
 }
 
 // Called to bind functionality to input
@@ -57,7 +76,9 @@ void ARedPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	PlayerInputComponent->BindAxis(TEXT("Vertical"), this, &ARedPlayer::Vertical);
 	PlayerInputComponent->BindAxis(TEXT("Look Up"), this, &ARedPlayer::LookUp);
 	PlayerInputComponent->BindAxis(TEXT("Turn Right"), this, &ARedPlayer::TurnRight);
-	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &ARedPlayer::Jump);
+	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &ARedPlayer::Jumping);
+	PlayerInputComponent->BindAction(TEXT("FireBullet"), IE_Pressed, this, &ARedPlayer::FirePressed);
+	PlayerInputComponent->BindAction(TEXT("FireBullet"), IE_Released, this, &ARedPlayer::FireReleased);
 }
 
 void ARedPlayer::Horizontal(float value)
@@ -80,8 +101,20 @@ void ARedPlayer::TurnRight(float value)
 	AddControllerYawInput(value);
 }
 
-void ARedPlayer::Jump()
+void ARedPlayer::Jumping()
 {
 	Jump();
+}
+
+void ARedPlayer::FirePressed()
+{
+	FTransform t = gunMeshComp->GetSocketTransform(TEXT("FirePosition"));
+
+	GetWorld()->SpawnActor<ABullet>(bulletFactory, t);
+}
+
+void ARedPlayer::FireReleased()
+{
+
 }
 
