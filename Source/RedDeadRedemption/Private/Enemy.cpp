@@ -22,6 +22,17 @@ AEnemy::AEnemy()
 }
 
 
+void AEnemy::TakeDamage(float Damage)
+{
+	EnemyHealth -= Damage;
+
+	if (EnemyHealth <= 0.0f)
+	{
+		Destroy();
+	}
+	
+}
+
 // Called when the game starts or when spawned
 void AEnemy::BeginPlay()
 {

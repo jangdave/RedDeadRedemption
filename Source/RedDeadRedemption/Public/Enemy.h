@@ -27,8 +27,9 @@ public:
 	// 적 뛰는속도
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemySettings")
 		float EnemyRunSpeed;
-	// Track when enemies spot you
-	
+	// 적 받는 피해
+	UFUNCTION(BlueprintCallable, Category = "EnemySettings")
+		void TakeDamage(float Damage);
 	
 	
 	
