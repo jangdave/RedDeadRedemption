@@ -45,5 +45,10 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
+public:
+	// 적 AI 관리 컴포넌트 클래스
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "FMSComponent")
+		class UEnemyFSM* EnemyFSM;
+
 	
 };

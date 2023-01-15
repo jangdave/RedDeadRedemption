@@ -3,6 +3,7 @@
 
 #include "Enemy.h"
 #include <Components/SkeletalMeshComponent.h>
+#include "EnemyFSM.h"
 
 // Sets default values
 AEnemy::AEnemy()
@@ -19,6 +20,9 @@ AEnemy::AEnemy()
 	// enemy mesh
 	EnemyMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("EnemyMesh"));
 	EnemyMesh->SetupAttachment(RootComponent);
+
+	// enemy FSM 컴포넌트 추가
+	EnemyFSM = CreateDefaultSubobject<UEnemyFSM>(TEXT("EnemyFSM"));
 }
 
 
