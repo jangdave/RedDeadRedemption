@@ -3,6 +3,7 @@
 
 #include "Enemy.h"
 #include <Components/SkeletalMeshComponent.h>
+#include "EnemyFSM.h"
 
 // Sets default values
 AEnemy::AEnemy()
@@ -19,8 +20,22 @@ AEnemy::AEnemy()
 	// enemy mesh
 	EnemyMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("EnemyMesh"));
 	EnemyMesh->SetupAttachment(RootComponent);
+
+	// enemy FSM 컴포넌트 추가
+	myEnemyFSM = CreateDefaultSubobject<UEnemyFSM>(TEXT("EnemyFSM"));
 }
 
+
+void AEnemy::OnMyTakeDamage(float Damage)
+{
+	EnemyHealth -= Damage;
+
+	if (EnemyHealth <= 0.0f)
+	{
+		Destroy();
+	}
+	
+}
 
 // Called when the game starts or when spawned
 void AEnemy::BeginPlay()
@@ -42,14 +57,3 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 }
-// 적 체력 다닳았을때
-// void AEnemy::TakeDamage(float Damage)
-// {
-// 	EnemyHealth -= Damage;
-// 	// 적 피가 0보다 적거나 같으면
-// 	if (EnemyHealth <= 0.0f)
-// 	{
-// 		// 사망
-// 		Destroy();
-// 	}
-// }

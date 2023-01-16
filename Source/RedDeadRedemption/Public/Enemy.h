@@ -27,8 +27,9 @@ public:
 	// 적 뛰는속도
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemySettings")
 		float EnemyRunSpeed;
-	// Track when enemies spot you
-	
+	// 적 받는 피해
+	UFUNCTION(BlueprintCallable, Category = "EnemySettings")
+		void OnMyTakeDamage(float Damage);
 	
 	
 	
@@ -44,5 +45,10 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
+public:
+	// 적 AI 관리 컴포넌트 클래스
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "FMSComponent")
+		class UEnemyFSM* myEnemyFSM;
+
 	
 };
