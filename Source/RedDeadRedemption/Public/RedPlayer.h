@@ -32,6 +32,12 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UCameraComponent* cameraComp;
 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class ABullet> bulletFactory;
+
+	UPROPERTY(EditAnywhere)
+	class USkeletalMeshComponent* gunMeshComp;
+
 	void Horizontal(float value);
 
 	void Vertical(float value);
@@ -40,7 +46,13 @@ public:
 
 	void TurnRight(float value);
 
-	void Jump();
+	void Jumping();
+
+	void FirePressed();
+
+	void FireReleased();
+
+	void HorseRide();
 
 	FVector direction;
 };
