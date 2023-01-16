@@ -52,5 +52,7 @@ public:
 
 	void FireReleased();
 
+	void HorseRide();
+
 	FVector direction;
 };
