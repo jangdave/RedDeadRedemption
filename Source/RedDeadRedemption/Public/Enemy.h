@@ -29,7 +29,7 @@ public:
 		float EnemyRunSpeed;
 	// 적 받는 피해
 	UFUNCTION(BlueprintCallable, Category = "EnemySettings")
-		void TakeDamage(float Damage);
+		void OnMyTakeDamage(float Damage);
 	
 	
 	
@@ -48,7 +48,7 @@ public:
 public:
 	// 적 AI 관리 컴포넌트 클래스
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "FMSComponent")
-		class UEnemyFSM* EnemyFSM;
+		class UEnemyFSM* myEnemyFSM;
 
 	
 };

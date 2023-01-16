@@ -22,11 +22,11 @@ AEnemy::AEnemy()
 	EnemyMesh->SetupAttachment(RootComponent);
 
 	// enemy FSM 컴포넌트 추가
-	EnemyFSM = CreateDefaultSubobject<UEnemyFSM>(TEXT("EnemyFSM"));
+	myEnemyFSM = CreateDefaultSubobject<UEnemyFSM>(TEXT("EnemyFSM"));
 }
 
 
-void AEnemy::TakeDamage(float Damage)
+void AEnemy::OnMyTakeDamage(float Damage)
 {
 	EnemyHealth -= Damage;
 
@@ -57,14 +57,3 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 }
-// 적 체력 다닳았을때
-// void AEnemy::TakeDamage(float Damage)
-// {
-// 	EnemyHealth -= Damage;
-// 	// 적 피가 0보다 적거나 같으면
-// 	if (EnemyHealth <= 0.0f)
-// 	{
-// 		// 사망
-// 		Destroy();
-// 	}
-// }

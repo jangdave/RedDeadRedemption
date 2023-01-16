@@ -50,4 +50,29 @@ public:
 	// 사망 상태
 	void DeadState();
 
+	// 대기 시간
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "FSM")
+		float IdleDelayTime = 2.0f;
+	// 경과 시간
+	float currentTime = 0.0f;
+
+	// 타깃
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "FSM")
+		class ARedPlayer* target;
+
+	// 소유 액터
+	UPROPERTY()
+		class AEnemy* me;
+
+	// 공격 범위
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FSM")
+		float AttackRange = 400.0f;
+
+	// 공격 딜레이
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FSM")
+		float AttackDelayTime = 1.3f;
+
+	// 피격 알림 이벤트 함수
+	void OnDamageProcess();
+	
 };
