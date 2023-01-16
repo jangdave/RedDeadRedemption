@@ -84,6 +84,11 @@ void ARedPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	PlayerInputComponent->BindAction(TEXT("HorseRide"), IE_Pressed, this, &ARedPlayer::HorseRide);
 }
 
+//void ARedPlayer::HorseRiding(FDelegateEditorBinding IsTrue)
+//{
+//
+//}
+
 void ARedPlayer::Horizontal(float value)
 {
 	direction.Y = value;
@@ -123,6 +128,6 @@ void ARedPlayer::FireReleased()
 
 void ARedPlayer::HorseRide()
 {
-
+	
 }
 

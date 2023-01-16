@@ -32,7 +32,6 @@ void UEnemyFSM::BeginPlay()
 	
 }
 
-
 // Called every frame
 void UEnemyFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
@@ -101,7 +100,7 @@ void UEnemyFSM::AttackState()
 	if (currentTime > AttackDelayTime)
 	{
 		// 3. 공격
-		UE_LOG(LogTemp, Warning, TEXT("DIE!!"));
+		//UE_LOG(LogTemp, Warning, TEXT("DIE!!"));
 		// 4. 경과 시간 초기화
 		currentTime = 0.0f;
 		

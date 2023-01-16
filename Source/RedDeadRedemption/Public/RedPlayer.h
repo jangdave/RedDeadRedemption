@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "RedPlayer.generated.h"
 
+//DECLARE_DYNAMIC_DELEGATE_TwoParams(FDelegateEditorBinding, FName, functionName , bool, isSuccess);
+
 UCLASS()
 class REDDEADREDEMPTION_API ARedPlayer : public ACharacter
 {
@@ -37,6 +39,12 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class USkeletalMeshComponent* gunMeshComp;
+
+	//UPROPERTY()
+	//FDelegateEditorBinding isTrue;
+
+	//UFUNCTION()
+	//void HorseRiding(FDelegateEditorBinding IsTrue);
 
 	void Horizontal(float value);
 

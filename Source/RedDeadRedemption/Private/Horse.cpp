@@ -34,7 +34,7 @@ AHorse::AHorse()
 
 	springComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("springComp"));
 	springComp->SetupAttachment(RootComponent);
-	springComp->SetRelativeLocationAndRotation(FVector(0, 40.0f, 100.0f), FRotator(-30.0f, 0, 0));
+	springComp->SetRelativeLocationAndRotation(FVector(0, 0, 100.0f), FRotator(-30.0f, 0, 0));
 	springComp->TargetArmLength = 500.0f;
 
 	cameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("cameraComp"));
@@ -49,6 +49,7 @@ AHorse::AHorse()
 	attachComp->SetupAttachment(RootComponent);
 	detachComp = CreateDefaultSubobject<USceneComponent>(TEXT("detachComp"));
 	detachComp->SetupAttachment(RootComponent);
+	detachComp->SetRelativeLocation(FVector(0, -150.0f, -90.0f));
 	playerMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("playerMesh"));
 	playerMesh->SetupAttachment(attachComp);
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempPlayerMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Cowboy/Model/Cowboy_1_1.Cowboy_1_1'"));
@@ -67,6 +68,7 @@ void AHorse::BeginPlay()
 	Super::BeginPlay();
 	
 	boxComp->OnComponentBeginOverlap.AddDynamic(this, &AHorse::OverlapRide);
+	boxComp->OnComponentEndOverlap.AddDynamic(this, &AHorse::EndRide);
 	boxComp->SetGenerateOverlapEvents(true);
 }
 
@@ -93,12 +95,17 @@ void AHorse::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAxis(TEXT("Vertical"), this, &AHorse::Vertical);
 	PlayerInputComponent->BindAxis(TEXT("Look Up"), this, &AHorse::LookUp);
 	PlayerInputComponent->BindAxis(TEXT("Turn Right"), this, &AHorse::TurnRight);
-
+	PlayerInputComponent->BindAction(TEXT("HorseRide"), IE_Pressed, this, &AHorse::HorseRide);
 }
 
 void AHorse::OverlapRide(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	//ARedPlayer* player= Cast<ARedPlayer>(OtherActor)
+}
+
+void AHorse::EndRide(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	
 }
 
 void AHorse::Horizontal(float value)
@@ -119,5 +126,10 @@ void AHorse::LookUp(float value)
 void AHorse::TurnRight(float value)
 {
 	AddControllerYawInput(value);
+}
+
+void AHorse::HorseRide()
+{
+
 }
 
