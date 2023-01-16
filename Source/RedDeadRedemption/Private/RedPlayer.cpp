@@ -13,21 +13,23 @@ ARedPlayer::ARedPlayer()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Characters/Mannequins/Meshes/SKM_Manny.SKM_Manny'"));
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Cowboy/Model/Cowboy_1_1.Cowboy_1_1'"));
 
 	if (tempMesh.Succeeded())
 	{
 		GetMesh()->SetSkeletalMesh(tempMesh.Object);
 
-		GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -90.0f), FRotator(0, -90.0f, 0));
+		GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -72.0f), FRotator(0, -90.0f, 0));
 	}
+
 	springComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("springComp"));
 	springComp->SetupAttachment(RootComponent);
+	springComp->SetRelativeLocation(FVector(0, 40.0f, 100.0f));
+	springComp->TargetArmLength = 250.0f;
+
 	cameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("cameraComp"));
 	cameraComp->SetupAttachment(springComp);
 
-	springComp->SetRelativeLocation(FVector(0, 40.0f, 100.0f));
-	springComp->TargetArmLength = 250.0f;
 
 	bUseControllerRotationYaw = true;
 	springComp->bUsePawnControlRotation = true;
@@ -42,7 +44,7 @@ ARedPlayer::ARedPlayer()
 	{
 		gunMeshComp->SetSkeletalMesh(tempGunMesh.Object);
 
-		gunMeshComp->SetRelativeLocationAndRotation(FVector(-15.0f, 58.0f, 141.0f), FRotator(0, 180.0f, -90.0f));
+		gunMeshComp->SetRelativeLocationAndRotation(FVector(-13.0f, 47.0f, 109.0f), FRotator(0, 180.0f, -90.0f));
 	}
 }
 
@@ -79,6 +81,7 @@ void ARedPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &ARedPlayer::Jumping);
 	PlayerInputComponent->BindAction(TEXT("FireBullet"), IE_Pressed, this, &ARedPlayer::FirePressed);
 	PlayerInputComponent->BindAction(TEXT("FireBullet"), IE_Released, this, &ARedPlayer::FireReleased);
+	PlayerInputComponent->BindAction(TEXT("HorseRide"), IE_Pressed, this, &ARedPlayer::HorseRide);
 }
 
 void ARedPlayer::Horizontal(float value)
@@ -114,6 +117,11 @@ void ARedPlayer::FirePressed()
 }
 
 void ARedPlayer::FireReleased()
+{
+
+}
+
+void ARedPlayer::HorseRide()
 {
 
 }
