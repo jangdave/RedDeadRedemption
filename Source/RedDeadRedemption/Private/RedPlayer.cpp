@@ -6,6 +6,8 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Bullet.h"
+#include "Kismet/GameplayStatics.h"
+#include "Horse.h"
 
 // Sets default values
 ARedPlayer::ARedPlayer()
@@ -31,7 +33,7 @@ ARedPlayer::ARedPlayer()
 	cameraComp->SetupAttachment(springComp);
 
 
-	bUseControllerRotationYaw = true;
+	bUseControllerRotationYaw = false;
 	springComp->bUsePawnControlRotation = true;
 	cameraComp->bUsePawnControlRotation = true;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
@@ -46,12 +48,25 @@ ARedPlayer::ARedPlayer()
 
 		gunMeshComp->SetRelativeLocationAndRotation(FVector(-13.0f, 47.0f, 109.0f), FRotator(0, 180.0f, -90.0f));
 	}
+
+	revolMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("revolMeshComp"));
+	revolMeshComp->SetRelativeScale3D(FVector(0.15f));
+	revolMeshComp->SetupAttachment(GetMesh());
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempRevolMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Asset/pistol/WWGPistol_ss.WWGPistol_ss'"));
+	if (tempRevolMesh.Succeeded())
+	{
+		revolMeshComp->SetSkeletalMesh(tempRevolMesh.Object);
+
+		revolMeshComp->SetRelativeLocationAndRotation(FVector(-11.0, 27.0f, 110.0f), FRotator(0, -90.0f, 0));
+	}
 }
 
 // Called when the game starts or when spawned
 void ARedPlayer::BeginPlay()
 {
 	Super::BeginPlay();
+
+	horsePlayer = Cast<AHorse>(UGameplayStatics::GetActorOfClass(GetWorld(), AHorse::StaticClass()));
 	
 }
 
@@ -83,11 +98,6 @@ void ARedPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	PlayerInputComponent->BindAction(TEXT("FireBullet"), IE_Released, this, &ARedPlayer::FireReleased);
 	PlayerInputComponent->BindAction(TEXT("HorseRide"), IE_Pressed, this, &ARedPlayer::HorseRide);
 }
-
-//void ARedPlayer::HorseRiding(FDelegateEditorBinding IsTrue)
-//{
-//
-//}
 
 void ARedPlayer::Horizontal(float value)
 {
@@ -127,7 +137,38 @@ void ARedPlayer::FireReleased()
 }
 
 void ARedPlayer::HorseRide()
+{	
+	if (bPressed != false)
+	{
+		//플레이어 컨트롤러 넘기기
+		GetWorld()->GetFirstPlayerController()->Possess(horsePlayer);
+		//플레이어 메쉬 안보이게하기
+		GetMesh()->SetVisibility(false);
+		gunMeshComp->SetVisibility(false);
+		//플레이어 콜리젼 끄기
+		this->SetActorEnableCollision(false);
+		//홀스 메쉬 켜기
+		horsePlayer->ChangeMesh(false);
+	}
+}
+
+void ARedPlayer::ChooseWeapon(bool bRifle)
 {
-	
+
+}
+
+void ARedPlayer::ChangeFist()
+{
+
+}
+
+void ARedPlayer::ChangeRifle()
+{
+
+}
+
+void ARedPlayer::ChangePistol()
+{
+
 }
 
