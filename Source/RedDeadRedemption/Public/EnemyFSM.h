@@ -70,9 +70,13 @@ public:
 
 	// 공격 딜레이
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FSM")
-		float AttackDelayTime = 1.3f;
+		float AttackDelayTime = 1.5f;
 
 	// 피격 알림 이벤트 함수
 	void OnDamageProcess();
 	
+	// 콜리전 충돌 여부 함수
+//	UFUNCTION()
+	//	void OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* 
+	//		OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 };
