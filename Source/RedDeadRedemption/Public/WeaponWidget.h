@@ -16,18 +16,21 @@ class REDDEADREDEMPTION_API UWeaponWidget : public UUserWidget
 
 public:
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
 	class UButton* btn_Rifle;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
 	class UButton* btn_Fist;
 
-	UPROPERTY(EditDefaultsOnly)
-	class UButton* btn_Pistal;
+	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
+	class UButton* btn_Pistol;
 
 	virtual void NativeConstruct() override;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY()
 	class ARedPlayer* player;
-	
+
+	UPROPERTY()
+	TSubclassOf<class ARedPlayer> redPlayer;
+
 };

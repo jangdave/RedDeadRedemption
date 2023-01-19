@@ -8,6 +8,7 @@
 #include "Bullet.h"
 #include "Kismet/GameplayStatics.h"
 #include "Horse.h"
+#include "WeaponWidget.h"
 
 // Sets default values
 ARedPlayer::ARedPlayer()
@@ -68,6 +69,7 @@ void ARedPlayer::BeginPlay()
 
 	horsePlayer = Cast<AHorse>(UGameplayStatics::GetActorOfClass(GetWorld(), AHorse::StaticClass()));
 	
+	weapon_UI = CreateWidget<UWeaponWidget>(GetWorld(), weaponWidget);
 }
 
 // Called every frame
@@ -97,6 +99,8 @@ void ARedPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	PlayerInputComponent->BindAction(TEXT("FireBullet"), IE_Pressed, this, &ARedPlayer::FirePressed);
 	PlayerInputComponent->BindAction(TEXT("FireBullet"), IE_Released, this, &ARedPlayer::FireReleased);
 	PlayerInputComponent->BindAction(TEXT("HorseRide"), IE_Pressed, this, &ARedPlayer::HorseRide);
+	PlayerInputComponent->BindAction(TEXT("WeaponChange"), IE_Pressed, this, &ARedPlayer::WeaponChangePress);
+	PlayerInputComponent->BindAction(TEXT("WeaponChange"), IE_Released, this, &ARedPlayer::WeaponChangeRelease);
 }
 
 void ARedPlayer::Horizontal(float value)
@@ -150,6 +154,23 @@ void ARedPlayer::HorseRide()
 		//홀스 메쉬 켜기
 		horsePlayer->ChangeMesh(false);
 	}
+}
+
+void ARedPlayer::WeaponChangePress()
+{
+	if (weapon_UI != nullptr)
+	{
+		weapon_UI->AddToViewport();
+	}
+
+	GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(true);
+}
+
+void ARedPlayer::WeaponChangeRelease()
+{
+	GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(false);
+
+	weapon_UI->RemoveFromParent();
 }
 
 void ARedPlayer::ChooseWeapon(bool bRifle)
