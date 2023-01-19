@@ -5,7 +5,7 @@
 #include "Enemy.h"
 #include "RedPlayer.h"
 #include <Kismet/GameplayStatics.h>
-
+#include <Components/CapsuleComponent.h>
 
 // Sets default values for this component's properties
 UEnemyFSM::UEnemyFSM()
@@ -61,16 +61,42 @@ void UEnemyFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 // 대기 상태
 void UEnemyFSM::IdleState()
 {
-	// 1.시간이 흘렀으니까
-	currentTime += GetWorld()->DeltaTimeSeconds;
-	// 2.시간이 경과했는지 확인
-	if (currentTime > IdleDelayTime)
+	// 적의 플레이어 인지범위 생성
+	FCollisionShape shape;
+	shape.SetSphere(3000.0f);
+	// 적의 위치
+	FVector location = me->GetActorLocation();
+	// 적의 위치에서 플레이어 인지범위 생성
+	TArray<FHitResult> hits;
+	// 적의 위치에서 플레이어 인지범위 생성
+	GetWorld()->SweepMultiByChannel(hits, location, location, FQuat::Identity, ECollisionChannel::ECC_Pawn, shape);
+	// 플레이어가 인지범위에 있으면
+	for (auto hit : hits)
 	{
-		// 3.상태를 이동 상태로 변경
-		mState = EEnemyState::Move;
-		// 4.경과 시간 초기화
-		currentTime = 0.0f;
-	}
+		// 플레이어 타입으로 캐스팅
+		auto player = Cast<ARedPlayer>(hit.GetActor());
+		// 플레이어가 존재하면
+		if (player)
+		{
+			// 플레이어를 타깃으로 설정
+			target = player;
+			// 상태를 이동 상태로 변경
+			mState = EEnemyState::Move;
+			// 반복문 종료
+			break;
+		}
+	}	
+	
+	// 1.시간이 흘렀으니까
+	//currentTime += GetWorld()->DeltaTimeSeconds;
+	// 2.시간이 경과했는지 확인
+	//if (currentTime > IdleDelayTime)
+	//{
+	//	// 3.상태를 이동 상태로 변경
+	//	mState = EEnemyState::Move;
+	//	// 4.경과 시간 초기화
+	//	currentTime = 0.0f;
+	//}
 }
 // 이동 상태
 void UEnemyFSM::MoveState()
@@ -131,3 +157,4 @@ void UEnemyFSM::OnDamageProcess()
 {
 	me->Destroy();
 }
+
