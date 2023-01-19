@@ -60,6 +60,10 @@ public:
 
 	void HorseRide();
 
+	void WeaponChangePress();
+
+	void WeaponChangeRelease();
+
 	UFUNCTION()
 	void ChangeFist();
 
@@ -78,4 +82,9 @@ public:
 	bool bPressed = false;
 
 	bool bChooseRifle;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UWeaponWidget> weaponWidget;
+
+	class UWeaponWidget* weapon_UI;
 };

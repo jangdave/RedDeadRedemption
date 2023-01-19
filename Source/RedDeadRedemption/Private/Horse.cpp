@@ -96,10 +96,10 @@ void AHorse::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	PlayerInputComponent->BindAxis(TEXT("Horizontal"), this, &AHorse::Horizontal);
-	PlayerInputComponent->BindAxis(TEXT("Vertical"), this, &AHorse::Vertical);
-	PlayerInputComponent->BindAxis(TEXT("Look Up"), this, &AHorse::LookUp);
-	PlayerInputComponent->BindAxis(TEXT("Turn Right"), this, &AHorse::TurnRight);
+	PlayerInputComponent->BindAxis(TEXT("Horse Horizontal"), this, &AHorse::Horizontal);
+	PlayerInputComponent->BindAxis(TEXT("Horse Vertical"), this, &AHorse::Vertical);
+	PlayerInputComponent->BindAxis(TEXT("Horse Look Up"), this, &AHorse::LookUp);
+	PlayerInputComponent->BindAxis(TEXT("Horse Turn Right"), this, &AHorse::TurnRight);
 	PlayerInputComponent->BindAction(TEXT("HorseRide"), IE_Pressed, this, &AHorse::HorseRide);
 }
 
