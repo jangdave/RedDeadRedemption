@@ -8,6 +8,8 @@
 #include "Camera/CameraComponent.h"
 //#include "..\Public\Horse.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include <Components/SkeletalMeshComponent.h>
 
 // Sets default values
 AHorse::AHorse()
@@ -40,7 +42,7 @@ AHorse::AHorse()
 	cameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("cameraComp"));
 	cameraComp->SetupAttachment(springComp);
 
-	bUseControllerRotationYaw = true;
+	bUseControllerRotationYaw = false;
 	springComp->bUsePawnControlRotation = true;
 	cameraComp->bUsePawnControlRotation = true;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
@@ -59,7 +61,6 @@ AHorse::AHorse()
 
 		playerMesh->SetRelativeLocationAndRotation(FVector(5.0f, 0, 42.0f), FRotator(0, -90.0f, 0));
 	}
-	playerMesh->SetVisibility(false);
 }
 
 // Called when the game starts or when spawned
@@ -70,6 +71,10 @@ void AHorse::BeginPlay()
 	boxComp->OnComponentBeginOverlap.AddDynamic(this, &AHorse::OverlapRide);
 	boxComp->OnComponentEndOverlap.AddDynamic(this, &AHorse::EndRide);
 	boxComp->SetGenerateOverlapEvents(true);
+
+	playerMesh->SetVisibility(false);
+
+	player = Cast<ARedPlayer>(UGameplayStatics::GetActorOfClass(GetWorld(), ARedPlayer::StaticClass()));
 }
 
 // Called every frame
@@ -100,12 +105,22 @@ void AHorse::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void AHorse::OverlapRide(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	//ARedPlayer* player= Cast<ARedPlayer>(OtherActor)
+	if (player != nullptr)
+	{
+		player->bPressed = true;
+	}
+	else
+	{
+		return;
+	}
 }
 
 void AHorse::EndRide(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	
+	if (player != nullptr)
+	{
+		player->bPressed = false;
+	}
 }
 
 void AHorse::Horizontal(float value)
@@ -130,6 +145,28 @@ void AHorse::TurnRight(float value)
 
 void AHorse::HorseRide()
 {
+	player->SetActorTransform(detachComp->GetComponentTransform());
 
+	UGameplayStatics::GetPlayerController(this, 0)->Possess(player);
+
+	playerMesh->SetVisibility(false);
+
+	//플레이어 보이게 하기
+	player->GetMesh()->SetVisibility(true);
+	player->gunMeshComp->SetVisibility(true);
+	//플레이어 콜리젼 켜기
+	player->SetActorEnableCollision(true);
+}
+
+void AHorse::ChangeMesh(bool bChange)
+{
+	if (bChange != true)
+	{
+		playerMesh->SetVisibility(true);
+	}
+	else
+	{
+		return;
+	}
 }
 
