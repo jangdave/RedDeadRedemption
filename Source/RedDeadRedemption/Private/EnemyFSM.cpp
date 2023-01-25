@@ -6,6 +6,7 @@
 #include "RedPlayer.h"
 #include <Kismet/GameplayStatics.h>
 #include <Components/CapsuleComponent.h>
+#include	"EnemyAI.h"
 
 // Sets default values for this component's properties
 UEnemyFSM::UEnemyFSM()
@@ -55,7 +56,10 @@ void UEnemyFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 			DeadState();
 			break;
 		}
+		
+		
 	}
+	
 }
 
 // 대기 상태
@@ -106,7 +110,9 @@ void UEnemyFSM::MoveState()
 	// 2. 방향이 필요함.
 	FVector direction = destination - me->GetActorLocation();
 	// 3. 방향으로 이동하고 싶다.
+
 	me->AddMovementInput(direction.GetSafeNormal());
+
 	
 	// 타깃과 가까워 지면 공격 상태로 전환하고 싶다.
 	// 1. 만약 거리가 공격 범위 안에 들어오면..
@@ -155,6 +161,32 @@ void UEnemyFSM::DeadState()
 
 void UEnemyFSM::OnDamageProcess()
 {
+	//// 라인 트레이스로 데미지 입음
+	//// 1. 시작점
+	//FVector start = me->GetActorLocation();
+	//// 2. 끝점
+	//FVector end = start + me->GetActorForwardVector() * 10000.0f;
+	//// 3. 라인 트레이스 파라미터
+	//FCollisionQueryParams params;
+	//params.AddIgnoredActor(me);
+	//// 4. 라인 트레이스 실행
+	//FHitResult result;
+	//GetWorld()->LineTraceSingleByChannel(result, start, end, ECC_Visibility, params);
+	//// 5. 라인 트레이스 결과 확인
+	//if (result.bBlockingHit)
+	//{
+	//	// 6. 라인 트레이스에 맞은 액터가 적인지 확인
+	//	if (result.GetActor()->ActorHasTag("Enemy"))
+	//	{
+	//		// 7. 적에게 데미지 주기
+	//		result.GetActor()->TakeDamage(10.0f, FDamageEvent(), nullptr, me);
+	//	}
+	//}
 	me->Destroy();
 }
+
+//void UEnemyFSM::SetTargetLocation(FVector newTargetLocation)
+//{
+//	EnemyLocation = newTargetLocation;
+//}
 
