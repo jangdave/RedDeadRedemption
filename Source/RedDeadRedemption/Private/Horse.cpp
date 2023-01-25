@@ -61,6 +61,7 @@ AHorse::AHorse()
 
 		playerMesh->SetRelativeLocationAndRotation(FVector(5.0f, 0, 42.0f), FRotator(0, -90.0f, 0));
 	}
+	GetCharacterMovement()->MaxWalkSpeed = 50.0f;
 }
 
 // Called when the game starts or when spawned
@@ -131,6 +132,11 @@ void AHorse::Horizontal(float value)
 void AHorse::Vertical(float value)
 {
 	direction.X = value;
+
+	if(GetCharacterMovement()->MaxWalkSpeed < 1200.0f)
+	{
+		GetCharacterMovement()->MaxWalkSpeed += value;
+	}
 }
 
 void AHorse::LookUp(float value)
@@ -154,6 +160,7 @@ void AHorse::HorseRide()
 	//플레이어 보이게 하기
 	player->GetMesh()->SetVisibility(true);
 	player->gunMeshComp->SetVisibility(true);
+	player->revolMeshComp->SetVisibility(true);
 	//플레이어 콜리젼 켜기
 	player->SetActorEnableCollision(true);
 }

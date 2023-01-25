@@ -9,6 +9,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Horse.h"
 #include "WeaponWidget.h"
+//#include "Engine/SkeletalMeshSocket.h"
 
 // Sets default values
 ARedPlayer::ARedPlayer()
@@ -149,6 +150,7 @@ void ARedPlayer::HorseRide()
 		//플레이어 메쉬 안보이게하기
 		GetMesh()->SetVisibility(false);
 		gunMeshComp->SetVisibility(false);
+		revolMeshComp->SetVisibility(false);
 		//플레이어 콜리젼 끄기
 		this->SetActorEnableCollision(false);
 		//홀스 메쉬 켜기
@@ -162,14 +164,13 @@ void ARedPlayer::WeaponChangePress()
 	{
 		weapon_UI->AddToViewport();
 	}
-
+	//UGameplayStatics::SetGamePaused(GetWorld(), false);
 	GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(true);
 }
 
 void ARedPlayer::WeaponChangeRelease()
 {
 	GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(false);
-
 	weapon_UI->RemoveFromParent();
 }
 
