@@ -41,7 +41,16 @@ public:
 	class UCameraComponent* cameraComp;
 
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<class ABullet> bulletFactory;
+	class USpringArmComponent* springMapComp;
+
+	UPROPERTY(EditAnywhere)
+	class USceneCaptureComponent2D* miniMapComp;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class APlayerPistolBullet> pistolBulletFactory;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class APlayerRifleBullet> rifleBulletFactory;
 
 	UPROPERTY(EditAnywhere)
 	class USkeletalMeshComponent* gunMeshComp;
@@ -51,6 +60,12 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	class AHorse* horsePlayer;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UWeaponWidget> weaponWidget;
+
+	UPROPERTY()
+	class UWeaponWidget* weapon_UI;
 
 	void Horizontal(float value);
 
@@ -70,7 +85,7 @@ public:
 
 	void WeaponChangePress();
 
-	//void WeaponChangeRelease();
+	void WeaponChangeRelease();
 
 	UFUNCTION()
 	void ChangeFist();
@@ -80,6 +95,9 @@ public:
 
 	UFUNCTION()
 	void ChangePistol();
+
+	UFUNCTION()
+	void ControllerWidget();
 
 	void ChooseWeapon(EWeaponState val);
 
@@ -91,10 +109,11 @@ public:
 
 	bool bChooseRifle;
 
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<class UWeaponWidget> weaponWidget;
-
-	class UWeaponWidget* weapon_UI;
-
 	EWeaponState armWeapon;
+
+	void FirePistol();
+
+	void FireRifle();
+
+	void FireFist();
 };

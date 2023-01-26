@@ -168,6 +168,7 @@ void AHorse::HorseRide()
 	player->revolMeshComp->SetVisibility(true);
 	//플레이어 콜리젼 켜기
 	player->SetActorEnableCollision(true);
+	GetMovementComponent()->StopMovementImmediately();
 }
 
 void AHorse::ChangeMesh(bool bChange)

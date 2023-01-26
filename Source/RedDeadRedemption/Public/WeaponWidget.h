@@ -15,26 +15,26 @@ class REDDEADREDEMPTION_API UWeaponWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UButton* btn_Rifle;
 
-	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UButton* btn_Fist;
 
-	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UButton* btn_Pistol;
 
 	virtual void NativeConstruct() override;
-
+	
 	UPROPERTY()
 	class ARedPlayer* player;
 
-	/*UFUNCTION()
+	UFUNCTION()
 	void Rifle();
 
 	UFUNCTION()
 	void Pistol();
 
 	UFUNCTION()
-	void Fist();*/
+	void Fist();
 };

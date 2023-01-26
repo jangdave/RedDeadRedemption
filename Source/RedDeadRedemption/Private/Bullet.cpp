@@ -30,9 +30,9 @@ ABullet::ABullet()
 
 	movementComp = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("movementComp"));
 	movementComp->SetUpdatedComponent(sphereComp);
-	movementComp->InitialSpeed = 5000.0f;
-	movementComp->MaxSpeed = 5000.0f;
-
+	movementComp->InitialSpeed = 15000.0f;
+	movementComp->MaxSpeed = 15000.0f;
+	movementComp->ProjectileGravityScale = 0.2f;
 }
 
 // Called when the game starts or when spawned

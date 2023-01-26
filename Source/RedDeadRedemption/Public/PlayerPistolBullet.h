@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Bullet.h"
-#include "PlayerBullet.generated.h"
+#include "PlayerPistolBullet.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class REDDEADREDEMPTION_API APlayerBullet : public ABullet
+class REDDEADREDEMPTION_API APlayerPistolBullet : public ABullet
 {
 	GENERATED_BODY()
 	
