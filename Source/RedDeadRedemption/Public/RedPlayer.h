@@ -70,7 +70,7 @@ public:
 
 	void WeaponChangePress();
 
-	void WeaponChangeRelease();
+	//void WeaponChangeRelease();
 
 	UFUNCTION()
 	void ChangeFist();

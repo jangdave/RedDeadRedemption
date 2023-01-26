@@ -194,29 +194,29 @@ void ARedPlayer::WeaponChangePress()
 
 void ARedPlayer::ChangeFist()
 {
-	ChooseWeapon(EWeaponState::FIST);
 	GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(false);
 	GetWorld()->GetFirstPlayerController()->AController::SetIgnoreLookInput(false);
 	UWidgetBlueprintLibrary::SetInputMode_GameOnly(GetWorld()->GetFirstPlayerController());
 	weapon_UI->RemoveFromParent();
+	ChooseWeapon(EWeaponState::FIST);
 }
 
 void ARedPlayer::ChangeRifle()
 {
-	ChooseWeapon(EWeaponState::RIFLE);
 	GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(false);
 	GetWorld()->GetFirstPlayerController()->AController::SetIgnoreLookInput(false);
 	UWidgetBlueprintLibrary::SetInputMode_GameOnly(GetWorld()->GetFirstPlayerController());
 	weapon_UI->RemoveFromParent();
+	ChooseWeapon(EWeaponState::RIFLE);
 }
 
 void ARedPlayer::ChangePistol()
 {
-	ChooseWeapon(EWeaponState::PISTOL);
 	GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(false);
 	GetWorld()->GetFirstPlayerController()->AController::SetIgnoreLookInput(false);
 	UWidgetBlueprintLibrary::SetInputMode_GameOnly(GetWorld()->GetFirstPlayerController());
 	weapon_UI->RemoveFromParent();
+	ChooseWeapon(EWeaponState::PISTOL);
 }
 
 void ARedPlayer::ChooseWeapon(EWeaponState val)
