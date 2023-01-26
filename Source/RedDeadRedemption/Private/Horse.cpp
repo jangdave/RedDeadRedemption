@@ -118,6 +118,7 @@ void AHorse::OverlapRide(UPrimitiveComponent* OverlappedComponent, AActor* Other
 
 void AHorse::EndRide(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
+	GetCharacterMovement()->MaxWalkSpeed = 0.0f;
 	if (player != nullptr)
 	{
 		player->bPressed = false;
@@ -136,6 +137,10 @@ void AHorse::Vertical(float value)
 	if(GetCharacterMovement()->MaxWalkSpeed < 1200.0f)
 	{
 		GetCharacterMovement()->MaxWalkSpeed += value;
+	}
+	if(value <= 0.0f)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = 0.0f;
 	}
 }
 

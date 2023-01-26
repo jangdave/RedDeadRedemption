@@ -6,6 +6,14 @@
 #include "GameFramework/Character.h"
 #include "RedPlayer.generated.h"
 
+UENUM(BlueprintType)
+enum class EWeaponState : uint8
+{
+	FIST,
+	RIFLE,
+	PISTOL,
+};
+
 UCLASS()
 class REDDEADREDEMPTION_API ARedPlayer : public ACharacter
 {
@@ -25,7 +33,7 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
+	
 	UPROPERTY(EditAnywhere)
 	class USpringArmComponent* springComp;
 
@@ -73,8 +81,8 @@ public:
 	UFUNCTION()
 	void ChangePistol();
 
-	void ChooseWeapon(bool bRifle);
-	
+	void ChooseWeapon(EWeaponState val);
+
 	FVector direction;
 
 	bool bPossessed = true;
@@ -87,4 +95,6 @@ public:
 	TSubclassOf<class UWeaponWidget> weaponWidget;
 
 	class UWeaponWidget* weapon_UI;
+
+	EWeaponState armWeapon;
 };

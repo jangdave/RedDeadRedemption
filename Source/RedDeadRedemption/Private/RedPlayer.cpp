@@ -9,6 +9,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Horse.h"
 #include "WeaponWidget.h"
+#include "Blueprint/WidgetBlueprintLibrary.h"
+#include "GameFramework/Controller.h"
 //#include "Engine/SkeletalMeshSocket.h"
 
 // Sets default values
@@ -71,6 +73,8 @@ void ARedPlayer::BeginPlay()
 	horsePlayer = Cast<AHorse>(UGameplayStatics::GetActorOfClass(GetWorld(), AHorse::StaticClass()));
 	
 	weapon_UI = CreateWidget<UWeaponWidget>(GetWorld(), weaponWidget);
+
+	ChooseWeapon(EWeaponState::FIST);
 }
 
 // Called every frame
@@ -101,7 +105,7 @@ void ARedPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	PlayerInputComponent->BindAction(TEXT("FireBullet"), IE_Released, this, &ARedPlayer::FireReleased);
 	PlayerInputComponent->BindAction(TEXT("HorseRide"), IE_Pressed, this, &ARedPlayer::HorseRide);
 	PlayerInputComponent->BindAction(TEXT("WeaponChange"), IE_Pressed, this, &ARedPlayer::WeaponChangePress);
-	PlayerInputComponent->BindAction(TEXT("WeaponChange"), IE_Released, this, &ARedPlayer::WeaponChangeRelease);
+	//PlayerInputComponent->BindAction(TEXT("WeaponChange"), IE_Released, this, &ARedPlayer::WeaponChangeRelease);
 }
 
 void ARedPlayer::Horizontal(float value)
@@ -131,6 +135,15 @@ void ARedPlayer::Jumping()
 
 void ARedPlayer::FirePressed()
 {
+	//switch ()
+	//{
+	//case EWeaponState::FIST:
+	//	break;
+	//case EWeaponState::PISTOL:
+	//	break;
+	//case EWeaponState::RIFLE:
+	//	break;
+	//}
 	FTransform t = gunMeshComp->GetSocketTransform(TEXT("FirePosition"));
 
 	GetWorld()->SpawnActor<ABullet>(bulletFactory, t);
@@ -166,31 +179,60 @@ void ARedPlayer::WeaponChangePress()
 	}
 	//UGameplayStatics::SetGamePaused(GetWorld(), false);
 	GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(true);
+
+	GetWorld()->GetFirstPlayerController()->AController::SetIgnoreLookInput(true);
+	UWidgetBlueprintLibrary::SetInputMode_GameAndUIEx(GetWorld()->GetFirstPlayerController(), weapon_UI);
 }
 
-void ARedPlayer::WeaponChangeRelease()
+/*void ARedPlayer::WeaponChangeRelease()
 {
 	GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(false);
+	GetWorld()->GetFirstPlayerController()->AController::SetIgnoreLookInput(false);
+	UWidgetBlueprintLibrary::SetInputMode_GameOnly(GetWorld()->GetFirstPlayerController());
 	weapon_UI->RemoveFromParent();
-}
-
-void ARedPlayer::ChooseWeapon(bool bRifle)
-{
-
-}
+}*/
 
 void ARedPlayer::ChangeFist()
 {
-
+	ChooseWeapon(EWeaponState::FIST);
+	GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(false);
+	GetWorld()->GetFirstPlayerController()->AController::SetIgnoreLookInput(false);
+	UWidgetBlueprintLibrary::SetInputMode_GameOnly(GetWorld()->GetFirstPlayerController());
+	weapon_UI->RemoveFromParent();
 }
 
 void ARedPlayer::ChangeRifle()
 {
-
+	ChooseWeapon(EWeaponState::RIFLE);
+	GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(false);
+	GetWorld()->GetFirstPlayerController()->AController::SetIgnoreLookInput(false);
+	UWidgetBlueprintLibrary::SetInputMode_GameOnly(GetWorld()->GetFirstPlayerController());
+	weapon_UI->RemoveFromParent();
 }
 
 void ARedPlayer::ChangePistol()
 {
-
+	ChooseWeapon(EWeaponState::PISTOL);
+	GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(false);
+	GetWorld()->GetFirstPlayerController()->AController::SetIgnoreLookInput(false);
+	UWidgetBlueprintLibrary::SetInputMode_GameOnly(GetWorld()->GetFirstPlayerController());
+	weapon_UI->RemoveFromParent();
 }
 
+void ARedPlayer::ChooseWeapon(EWeaponState val)
+{
+	switch (val)
+	{
+	case EWeaponState::FIST:
+		gunMeshComp->SetVisibility(false);
+		revolMeshComp->SetVisibility(false);
+		armWeapon = val;
+		break;
+	case EWeaponState::PISTOL:
+		gunMeshComp->SetVisibility(false);
+		break;
+	case EWeaponState::RIFLE:
+		revolMeshComp->SetVisibility(false);
+		break;
+	}
+}

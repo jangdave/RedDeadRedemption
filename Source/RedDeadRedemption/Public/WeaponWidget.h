@@ -15,7 +15,6 @@ class REDDEADREDEMPTION_API UWeaponWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
-
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
 	class UButton* btn_Rifle;
 
@@ -30,7 +29,12 @@ public:
 	UPROPERTY()
 	class ARedPlayer* player;
 
-	UPROPERTY()
-	TSubclassOf<class ARedPlayer> redPlayer;
+	/*UFUNCTION()
+	void Rifle();
 
+	UFUNCTION()
+	void Pistol();
+
+	UFUNCTION()
+	void Fist();*/
 };
