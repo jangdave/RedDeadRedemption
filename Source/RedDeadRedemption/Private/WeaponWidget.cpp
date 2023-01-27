@@ -8,40 +8,35 @@
 
 void UWeaponWidget::NativeConstruct()
 {
-	player = Cast<ARedPlayer>(UGameplayStatics::GetActorOfClass(GetWorld(), ARedPlayer::StaticClass()));
+	Super::NativeConstruct();
 
-	if(player != nullptr)
+	player = Cast<ARedPlayer>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+
+	if (!btn_Rifle->OnClicked.IsAlreadyBound(this, &UWeaponWidget::Rifle))
 	{
-		btn_Rifle->OnClicked.AddDynamic(player, &ARedPlayer::ChangeRifle);
-		btn_Pistol->OnClicked.AddDynamic(player, &ARedPlayer::ChangePistol);
-		btn_Fist->OnClicked.AddDynamic(player, &ARedPlayer::ChangeFist);
+		btn_Rifle->OnClicked.AddDynamic(this, &UWeaponWidget::Rifle);
+	}
+	if (!btn_Pistol->OnClicked.IsAlreadyBound(this, &UWeaponWidget::Pistol))
+	{
+		btn_Pistol->OnClicked.AddDynamic(this, &UWeaponWidget::Pistol);
+	}
+	if (!btn_Fist->OnClicked.IsAlreadyBound(this, &UWeaponWidget::Fist))
+	{
+		btn_Fist->OnClicked.AddDynamic(this, &UWeaponWidget::Fist);
 	}
 }
 
-/*void UWeaponWidget::Rifle()
+void UWeaponWidget::Rifle()
 {
-	player->ChooseWeapon(EWeaponState::RIFLE);
-	GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(false);
-	GetWorld()->GetFirstPlayerController()->AController::SetIgnoreLookInput(false);
-	//GetWorld()->GetFirstPlayerController();
-	this->RemoveFromParent();
+	player->ChangeRifle();
 }
 
 void UWeaponWidget::Pistol()
 {
-	player->ChooseWeapon(EWeaponState::PISTOL);
-	GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(false);
-	GetWorld()->GetFirstPlayerController()->AController::SetIgnoreLookInput(false);
-	//GetWorld()->GetFirstPlayerController();
-	this->RemoveFromParent();
+	player->ChangePistol();
 }
 
 void UWeaponWidget::Fist()
 {
-	player->ChooseWeapon(EWeaponState::FIST);
-	GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(false);
-	GetWorld()->GetFirstPlayerController()->AController::SetIgnoreLookInput(false);
-	//GetWorld()->GetFirstPlayerController();
-	this->RemoveFromParent();
-}*/
-		
+	player->ChangeFist();
+}

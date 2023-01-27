@@ -8,10 +8,12 @@
 #include "Bullet.h"
 #include "Kismet/GameplayStatics.h"
 #include "Horse.h"
+#include "PlayerPistolBullet.h"
+#include "PlayerRifleBullet.h"
 #include "WeaponWidget.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
+#include "Components/SceneCaptureComponent2D.h"
 #include "GameFramework/Controller.h"
-//#include "Engine/SkeletalMeshSocket.h"
 
 // Sets default values
 ARedPlayer::ARedPlayer()
@@ -36,6 +38,13 @@ ARedPlayer::ARedPlayer()
 	cameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("cameraComp"));
 	cameraComp->SetupAttachment(springComp);
 
+	springMapComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("springMapComp"));
+	springMapComp->SetupAttachment(RootComponent);
+	springMapComp->SetRelativeLocation(FVector(0, 0, 0));
+	springMapComp->TargetArmLength = 500.0f;
+
+	miniMapComp = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("miniMapComp"));
+	miniMapComp->SetupAttachment(springMapComp);
 
 	bUseControllerRotationYaw = false;
 	springComp->bUsePawnControlRotation = true;
@@ -105,7 +114,6 @@ void ARedPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	PlayerInputComponent->BindAction(TEXT("FireBullet"), IE_Released, this, &ARedPlayer::FireReleased);
 	PlayerInputComponent->BindAction(TEXT("HorseRide"), IE_Pressed, this, &ARedPlayer::HorseRide);
 	PlayerInputComponent->BindAction(TEXT("WeaponChange"), IE_Pressed, this, &ARedPlayer::WeaponChangePress);
-	//PlayerInputComponent->BindAction(TEXT("WeaponChange"), IE_Released, this, &ARedPlayer::WeaponChangeRelease);
 }
 
 void ARedPlayer::Horizontal(float value)
@@ -135,18 +143,23 @@ void ARedPlayer::Jumping()
 
 void ARedPlayer::FirePressed()
 {
-	//switch ()
-	//{
-	//case EWeaponState::FIST:
-	//	break;
-	//case EWeaponState::PISTOL:
-	//	break;
-	//case EWeaponState::RIFLE:
-	//	break;
-	//}
-	FTransform t = gunMeshComp->GetSocketTransform(TEXT("FirePosition"));
+	switch (armWeapon)
+	{
+	case EWeaponState::FIST:
+		FireFist();
+		break;
 
-	GetWorld()->SpawnActor<ABullet>(bulletFactory, t);
+	case EWeaponState::PISTOL:
+		FirePistol();
+		break;
+
+	case EWeaponState::RIFLE:
+		FireRifle();
+		break;
+
+	default:
+		break;
+	}
 }
 
 void ARedPlayer::FireReleased()
@@ -173,50 +186,52 @@ void ARedPlayer::HorseRide()
 
 void ARedPlayer::WeaponChangePress()
 {
-	if (weapon_UI != nullptr)
+	if (weapon_UI && false == weapon_UI->IsInViewport())
 	{
 		weapon_UI->AddToViewport();
+		UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetShowMouseCursor(true);
+		GetWorld()->GetFirstPlayerController()->AController::SetIgnoreLookInput(true);
+		UWidgetBlueprintLibrary::SetInputMode_GameAndUIEx(GetWorld()->GetFirstPlayerController(), weapon_UI);
 	}
 	//UGameplayStatics::SetGamePaused(GetWorld(), false);
-	GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(true);
-
-	GetWorld()->GetFirstPlayerController()->AController::SetIgnoreLookInput(true);
-	UWidgetBlueprintLibrary::SetInputMode_GameAndUIEx(GetWorld()->GetFirstPlayerController(), weapon_UI);
 }
-
-/*void ARedPlayer::WeaponChangeRelease()
-{
-	GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(false);
-	GetWorld()->GetFirstPlayerController()->AController::SetIgnoreLookInput(false);
-	UWidgetBlueprintLibrary::SetInputMode_GameOnly(GetWorld()->GetFirstPlayerController());
-	weapon_UI->RemoveFromParent();
-}*/
 
 void ARedPlayer::ChangeFist()
 {
-	GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(false);
-	GetWorld()->GetFirstPlayerController()->AController::SetIgnoreLookInput(false);
-	UWidgetBlueprintLibrary::SetInputMode_GameOnly(GetWorld()->GetFirstPlayerController());
-	weapon_UI->RemoveFromParent();
-	ChooseWeapon(EWeaponState::FIST);
+	if (weapon_UI && true == weapon_UI->IsInViewport())
+	{
+		weapon_UI->RemoveFromParent();
+		ControllerWidget();
+		ChooseWeapon(EWeaponState::FIST);
+	}
 }
 
 void ARedPlayer::ChangeRifle()
 {
-	GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(false);
-	GetWorld()->GetFirstPlayerController()->AController::SetIgnoreLookInput(false);
-	UWidgetBlueprintLibrary::SetInputMode_GameOnly(GetWorld()->GetFirstPlayerController());
-	weapon_UI->RemoveFromParent();
-	ChooseWeapon(EWeaponState::RIFLE);
+	UE_LOG(LogTemp, Warning, TEXT("Rifle"));
+	if (weapon_UI && true == weapon_UI->IsInViewport())
+	{
+		weapon_UI->RemoveFromParent();
+		ControllerWidget();
+		ChooseWeapon(EWeaponState::RIFLE);
+	}
 }
 
 void ARedPlayer::ChangePistol()
 {
-	GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(false);
+	if (weapon_UI && true == weapon_UI->IsInViewport())
+	{
+		weapon_UI->RemoveFromParent();
+		ControllerWidget();
+		ChooseWeapon(EWeaponState::PISTOL);
+	}
+}
+
+void ARedPlayer::ControllerWidget()
+{
+	UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetShowMouseCursor(false);
 	GetWorld()->GetFirstPlayerController()->AController::SetIgnoreLookInput(false);
 	UWidgetBlueprintLibrary::SetInputMode_GameOnly(GetWorld()->GetFirstPlayerController());
-	weapon_UI->RemoveFromParent();
-	ChooseWeapon(EWeaponState::PISTOL);
 }
 
 void ARedPlayer::ChooseWeapon(EWeaponState val)
@@ -224,15 +239,40 @@ void ARedPlayer::ChooseWeapon(EWeaponState val)
 	switch (val)
 	{
 	case EWeaponState::FIST:
-		gunMeshComp->SetVisibility(false);
-		revolMeshComp->SetVisibility(false);
-		armWeapon = val;
+			gunMeshComp->SetVisibility(false);
+			revolMeshComp->SetVisibility(false);
+			armWeapon = val;
 		break;
+
 	case EWeaponState::PISTOL:
-		gunMeshComp->SetVisibility(false);
+			gunMeshComp->SetVisibility(false);
+			revolMeshComp->SetVisibility(true);
+			armWeapon = val;
 		break;
+
 	case EWeaponState::RIFLE:
-		revolMeshComp->SetVisibility(false);
+			gunMeshComp->SetVisibility(true);
+			revolMeshComp->SetVisibility(false);
+			armWeapon = val;
+		break;
+
+	default:
 		break;
 	}
+}
+
+void ARedPlayer::FirePistol()
+{
+	FTransform t = revolMeshComp->GetSocketTransform(TEXT("DrumSocket"));
+	GetWorld()->SpawnActor<APlayerPistolBullet>(pistolBulletFactory, t);
+}
+
+void ARedPlayer::FireRifle()
+{
+	FTransform t = gunMeshComp->GetSocketTransform(TEXT("FirePosition"));
+	GetWorld()->SpawnActor<APlayerRifleBullet>(rifleBulletFactory, t);
+}
+
+void ARedPlayer::FireFist()
+{
 }
