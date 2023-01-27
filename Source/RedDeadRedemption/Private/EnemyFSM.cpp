@@ -7,6 +7,7 @@
 #include <Kismet/GameplayStatics.h>
 #include <Components/CapsuleComponent.h>
 #include	"EnemyAI.h"
+#include "Bullet.h"
 
 // Sets default values for this component's properties
 UEnemyFSM::UEnemyFSM()
@@ -30,6 +31,9 @@ void UEnemyFSM::BeginPlay()
 	target = Cast<ARedPlayer>(actor);
 	// 소유 객체 가져오기
 	me = Cast<AEnemy>(GetOwner());
+
+	// 태어날때 현재 체력을 최대 체력으로 설정
+	EnemyHealth = EnemyMaxHealth;
 	
 }
 
@@ -125,6 +129,7 @@ void UEnemyFSM::MoveState()
 // 공격 상태
 void UEnemyFSM::AttackState()
 {
+
 	// 목표 : 일정시간 마다 한번씩 공격하고싶다.
 	// 1. 시간이 흘렀으니까
 	currentTime += GetWorld()->DeltaTimeSeconds;
@@ -151,39 +156,46 @@ void UEnemyFSM::AttackState()
 // 피격 상태
 void UEnemyFSM::DamageState()
 {
-	// 피격 상태에서는 아무것도 하지 않는다.
+	currentTime += GetWorld()->GetDeltaSeconds();
+	// currentTime이 1초가 넘으면
+	if (currentTime > 1.0f)
+	{
+		// 상태를 이동 상태로 변경
+		mState = EEnemyState::Move;
+		// 경과 시간 초기화
+		currentTime = 0.0f;
+	}
 }
 // 사망 상태
 void UEnemyFSM::DeadState()
 {
-	// 사망 상태에서는 아무것도 하지 않는다.
+	currentTime += GetWorld()->GetDeltaSeconds();
+
+	// currentTime이 1초가 넘으면 사망
+	if (currentTime > 1.0f)
+	{
+		// 사망
+		me->Destroy();
+	}
 }
 
-void UEnemyFSM::OnDamageProcess()
+void UEnemyFSM::OnDamageProcess(int32 damage)
 {
-	//// 라인 트레이스로 데미지 입음
-	//// 1. 시작점
-	//FVector start = me->GetActorLocation();
-	//// 2. 끝점
-	//FVector end = start + me->GetActorForwardVector() * 10000.0f;
-	//// 3. 라인 트레이스 파라미터
-	//FCollisionQueryParams params;
-	//params.AddIgnoredActor(me);
-	//// 4. 라인 트레이스 실행
-	//FHitResult result;
-	//GetWorld()->LineTraceSingleByChannel(result, start, end, ECC_Visibility, params);
-	//// 5. 라인 트레이스 결과 확인
-	//if (result.bBlockingHit)
-	//{
-	//	// 6. 라인 트레이스에 맞은 액터가 적인지 확인
-	//	if (result.GetActor()->ActorHasTag("Enemy"))
-	//	{
-	//		// 7. 적에게 데미지 주기
-	//		result.GetActor()->TakeDamage(10.0f, FDamageEvent(), nullptr, me);
-	//	}
-	//}
-	me->Destroy();
+		EnemyHealth -= damage;
+	
+	// 체력이 0이하면
+	if (EnemyHealth <= 0)
+	{
+		// 상태를 사망 상태로 변경
+		mState = EEnemyState::Dead;
+	}
+	else
+	{
+		// 상태를 피격 상태로 변경
+		mState = EEnemyState::Damage;
+	}
 }
+
 
 //void UEnemyFSM::SetTargetLocation(FVector newTargetLocation)
 //{
