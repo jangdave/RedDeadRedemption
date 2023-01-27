@@ -39,13 +39,7 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class UCameraComponent* cameraComp;
-
-	UPROPERTY(EditAnywhere)
-	class USpringArmComponent* springMapComp;
-
-	UPROPERTY(EditAnywhere)
-	class USceneCaptureComponent2D* miniMapComp;
-
+	
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class APlayerPistolBullet> pistolBulletFactory;
 

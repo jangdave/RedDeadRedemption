@@ -12,7 +12,6 @@
 #include "PlayerRifleBullet.h"
 #include "WeaponWidget.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
-#include "Components/SceneCaptureComponent2D.h"
 #include "GameFramework/Controller.h"
 
 // Sets default values
@@ -37,14 +36,6 @@ ARedPlayer::ARedPlayer()
 
 	cameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("cameraComp"));
 	cameraComp->SetupAttachment(springComp);
-
-	springMapComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("springMapComp"));
-	springMapComp->SetupAttachment(RootComponent);
-	springMapComp->SetRelativeLocation(FVector(0, 0, 0));
-	springMapComp->TargetArmLength = 500.0f;
-
-	miniMapComp = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("miniMapComp"));
-	miniMapComp->SetupAttachment(springMapComp);
 
 	bUseControllerRotationYaw = false;
 	springComp->bUsePawnControlRotation = true;

@@ -13,5 +13,21 @@ UCLASS()
 class REDDEADREDEMPTION_API ARedDeadRedemptionGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
+
+public:
+	ARedDeadRedemptionGameModeBase();
+
+protected:
+	virtual void BeginPlay() override;
+
+public:
+	virtual void Tick(float DeltaTime) override;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UGamePlayWidget> gamePlayWidget;
+
+	UPROPERTY()
+	class UGamePlayWidget* play_UI;
 	
+	void OnGamePlayWidget();
 };
