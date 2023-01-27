@@ -30,7 +30,7 @@ public:
 	// 적 받는 피해
 	UFUNCTION(BlueprintCallable, Category = "EnemySettings")
 		void OnMyTakeDamage(float Damage);
-	
+
 	
 	
 
@@ -50,5 +50,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "FMSComponent")
 		class UEnemyFSM* myEnemyFSM;
 
-	
+	// 총알 오버랩 이벤트
+	UFUNCTION()
+		void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bBFromSweep, const FHitResult& SweepResult);
 };

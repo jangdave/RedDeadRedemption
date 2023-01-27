@@ -73,10 +73,14 @@ public:
 		float AttackDelayTime = 1.5f;
 
 	// 피격 알림 이벤트 함수
-	void OnDamageProcess();
+	void OnDamageProcess(int32 damage);
 	
 
 public:
+	// 체력을 표현 하고싶다.
+	int32 EnemyHealth;
+	int32 EnemyMaxHealth = 50;
+
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
 	//	FVector EnemyLocation;
 
