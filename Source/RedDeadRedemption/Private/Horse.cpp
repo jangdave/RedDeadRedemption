@@ -18,7 +18,6 @@ AHorse::AHorse()
 	PrimaryActorTick.bCanEverTick = true;
 
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/AfricanAnimalsPack/Zebra/Meshes/SK_Zebra.SK_Zebra'"));
-
 	if (tempMesh.Succeeded())
 	{
 		GetMesh()->SetSkeletalMesh(tempMesh.Object);
@@ -52,15 +51,17 @@ AHorse::AHorse()
 	detachComp = CreateDefaultSubobject<USceneComponent>(TEXT("detachComp"));
 	detachComp->SetupAttachment(RootComponent);
 	detachComp->SetRelativeLocation(FVector(0, -150.0f, -90.0f));
+
 	playerMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("playerMesh"));
 	playerMesh->SetupAttachment(attachComp);
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempPlayerMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Cowboy/Model/Cowboy_1_1.Cowboy_1_1'"));
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempPlayerMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/PolygonWestern/Meshes/Characters/SK_Character_Cowboy_01.SK_Character_Cowboy_01'"));
 	if (tempPlayerMesh.Succeeded())
 	{
 		playerMesh->SetSkeletalMesh(tempPlayerMesh.Object);
 
-		playerMesh->SetRelativeLocationAndRotation(FVector(5.0f, 0, 42.0f), FRotator(0, -90.0f, 0));
+		playerMesh->SetRelativeLocationAndRotation(FVector(5.0f, -5.0f, -65.0f), FRotator(0, -90.0f, 0));
 	}
+
 	GetCharacterMovement()->MaxWalkSpeed = 50.0f;
 }
 

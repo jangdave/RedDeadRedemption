@@ -78,9 +78,7 @@ public:
 	void HorseRide();
 
 	void WeaponChangePress();
-
-	void WeaponChangeRelease();
-
+	
 	UFUNCTION()
 	void ChangeFist();
 

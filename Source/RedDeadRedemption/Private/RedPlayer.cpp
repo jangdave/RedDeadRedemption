@@ -20,13 +20,34 @@ ARedPlayer::ARedPlayer()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Cowboy/Model/Cowboy_1_1.Cowboy_1_1'"));
-
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/PolygonWestern/Meshes/Characters/SK_Character_Cowboy_01.SK_Character_Cowboy_01'"));
 	if (tempMesh.Succeeded())
 	{
 		GetMesh()->SetSkeletalMesh(tempMesh.Object);
 
-		GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -72.0f), FRotator(0, -90.0f, 0));
+		GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -90.0f), FRotator(0, -90.0f, 0));
+	}
+
+	gunMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("gunMeshComp"));
+	gunMeshComp->SetRelativeScale3D(FVector(1));
+	gunMeshComp->SetupAttachment(GetMesh());
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempGunMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/PolygonWestern/Meshes/Weapons/SK_Wep_Rifle_01.SK_Wep_Rifle_01'"));
+	if (tempGunMesh.Succeeded())
+	{
+		gunMeshComp->SetSkeletalMesh(tempGunMesh.Object);
+
+		gunMeshComp->SetRelativeLocationAndRotation(FVector(-21.0f, 47.0f, 136.0f), FRotator(0, 0, 0));
+	}
+
+	revolMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("revolMeshComp"));
+	revolMeshComp->SetRelativeScale3D(FVector(1));
+	revolMeshComp->SetupAttachment(GetMesh());
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempRevolMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/PolygonWestern/Meshes/Weapons/SK_Wep_Revolver_01.SK_Wep_Revolver_01'"));
+	if (tempRevolMesh.Succeeded())
+	{
+		revolMeshComp->SetSkeletalMesh(tempRevolMesh.Object);
+
+		revolMeshComp->SetRelativeLocationAndRotation(FVector(-17.0, 50.0f, 134.0f), FRotator(0, 0, 0));
 	}
 
 	springComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("springComp"));
@@ -41,28 +62,6 @@ ARedPlayer::ARedPlayer()
 	springComp->bUsePawnControlRotation = true;
 	cameraComp->bUsePawnControlRotation = true;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
-
-	gunMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("gunMeshComp"));
-	gunMeshComp->SetRelativeScale3D(FVector(0.5f));
-	gunMeshComp->SetupAttachment(GetMesh());
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempGunMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Asset/VintageRifle/Model/VintageRifleskeletal.VintageRifleskeletal_VintageRifle'"));
-	if (tempGunMesh.Succeeded())
-	{
-		gunMeshComp->SetSkeletalMesh(tempGunMesh.Object);
-
-		gunMeshComp->SetRelativeLocationAndRotation(FVector(-13.0f, 47.0f, 109.0f), FRotator(0, 180.0f, -90.0f));
-	}
-
-	revolMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("revolMeshComp"));
-	revolMeshComp->SetRelativeScale3D(FVector(0.15f));
-	revolMeshComp->SetupAttachment(GetMesh());
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempRevolMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Asset/pistol/WWGPistol_ss.WWGPistol_ss'"));
-	if (tempRevolMesh.Succeeded())
-	{
-		revolMeshComp->SetSkeletalMesh(tempRevolMesh.Object);
-
-		revolMeshComp->SetRelativeLocationAndRotation(FVector(-11.0, 27.0f, 110.0f), FRotator(0, -90.0f, 0));
-	}
 }
 
 // Called when the game starts or when spawned
@@ -254,13 +253,15 @@ void ARedPlayer::ChooseWeapon(EWeaponState val)
 
 void ARedPlayer::FirePistol()
 {
-	FTransform t = revolMeshComp->GetSocketTransform(TEXT("DrumSocket"));
+	FTransform t = revolMeshComp->GetSocketTransform(TEXT("SK_Wep_Revolver_01_CylinderSocket"));
+	//t.SetScale3D(FVector(1));
 	GetWorld()->SpawnActor<APlayerPistolBullet>(pistolBulletFactory, t);
 }
 
 void ARedPlayer::FireRifle()
 {
-	FTransform t = gunMeshComp->GetSocketTransform(TEXT("FirePosition"));
+	FTransform t = gunMeshComp->GetSocketTransform(TEXT("SK_Wep_Rifle_01_SlideSocket"));
+	//t.SetScale3D(FVector(1));
 	GetWorld()->SpawnActor<APlayerRifleBullet>(rifleBulletFactory, t);
 }
 

@@ -23,5 +23,5 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 
-	class ARedPlayer* player;
+	//class ARedPlayer* player;
 };

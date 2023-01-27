@@ -22,7 +22,7 @@ void AMinimapCamera::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	player = Cast<ARedPlayer>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+	auto player = (UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 	if(player != nullptr)
 	{
 		FVector loc = FVector(player->GetActorLocation().X, player->GetActorLocation().Y, 480.0f);
