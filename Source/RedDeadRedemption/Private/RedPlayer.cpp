@@ -13,6 +13,7 @@
 #include "PlayerRifleBullet.h"
 #include "WeaponWidget.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
+#include "Engine/SkeletalMeshSocket.h"
 #include "GameFramework/Controller.h"
 
 // Sets default values
@@ -51,6 +52,11 @@ ARedPlayer::ARedPlayer()
 		revolMeshComp->SetRelativeLocationAndRotation(FVector(-17.0, 50.0f, 134.0f), FRotator(0, 0, 0));
 	}
 
+	bottleMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("bottleMeshComp"));
+	bottleMeshComp->SetupAttachment(GetMesh());
+	bottleFireMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("bottleFireMeshComp"));
+	bottleFireMeshComp->SetupAttachment(bottleMeshComp);
+
 	springComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("springComp"));
 	springComp->SetupAttachment(RootComponent);
 	springComp->SetRelativeLocation(FVector(0, 40.0f, 100.0f));
@@ -74,7 +80,7 @@ void ARedPlayer::BeginPlay()
 	
 	weapon_UI = CreateWidget<UWeaponWidget>(GetWorld(), weaponWidget);
 
-	fireBottle = Cast<AFireBottle>(UGameplayStatics::GetActorOfClass(this, AFireBottle::StaticClass()));
+	fireBottle = Cast<AFireBottle>(UGameplayStatics::GetActorOfClass(GetWorld(), fireBottleFactory));
 
 	ChooseWeapon(EWeaponState::FIST);
 }
@@ -247,28 +253,32 @@ void ARedPlayer::ChooseWeapon(EWeaponState val)
 	case EWeaponState::FIST:
 			gunMeshComp->SetVisibility(false);
 			revolMeshComp->SetVisibility(false);
-			
+			bottleMeshComp->SetVisibility(false);
+			bottleFireMeshComp->SetVisibility(false);
 			armWeapon = val;
 		break;
 
 	case EWeaponState::PISTOL:
 			gunMeshComp->SetVisibility(false);
 			revolMeshComp->SetVisibility(true);
-			
+			bottleMeshComp->SetVisibility(false);
+			bottleFireMeshComp->SetVisibility(false);
 			armWeapon = val;
 		break;
 
 	case EWeaponState::RIFLE:
 			gunMeshComp->SetVisibility(true);
 			revolMeshComp->SetVisibility(false);
-			
+			bottleMeshComp->SetVisibility(false);
+			bottleFireMeshComp->SetVisibility(false);
 			armWeapon = val;
 		break;
 
 	case EWeaponState::FIREBOTTLE:
 			gunMeshComp->SetVisibility(false);
 			revolMeshComp->SetVisibility(false);
-			
+			bottleMeshComp->SetVisibility(true);
+			bottleFireMeshComp->SetVisibility(true);
 			armWeapon = val;
 
 	default:
@@ -296,4 +306,5 @@ void ARedPlayer::FireFist()
 
 void ARedPlayer::FireBottle()
 {
+	GetWorld()->SpawnActor<AFireBottle>(fireBottleFactory, GetActorLocation() + (GetActorUpVector() * 10.0f) + (GetActorForwardVector() * 70.0f), GetControlRotation());
 }

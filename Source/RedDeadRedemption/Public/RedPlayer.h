@@ -52,6 +52,12 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class USkeletalMeshComponent* revolMeshComp;
+
+	UPROPERTY(EditAnywhere)
+	class UStaticMeshComponent* bottleMeshComp;
+
+	UPROPERTY(EditAnywhere)
+	class UStaticMeshComponent* bottleFireMeshComp;
 	
 	UPROPERTY(EditAnywhere)
 	class AHorse* horsePlayer;
@@ -85,7 +91,7 @@ public:
 	void HorseRide();
 
 	void WeaponChangePress();
-	
+
 	UFUNCTION()
 	void ChangeFist();
 
