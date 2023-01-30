@@ -7,7 +7,8 @@
 #include <Kismet/GameplayStatics.h>
 #include <Components/CapsuleComponent.h>
 #include	"EnemyAI.h"
-#include "Bullet.h"
+#include "PlayerPistolBullet.h"
+#include "PlayerRifleBullet.h"
 
 // Sets default values for this component's properties
 UEnemyFSM::UEnemyFSM()
@@ -26,9 +27,8 @@ void UEnemyFSM::BeginPlay()
 	Super::BeginPlay();
 
 	// 월드에서 ARedPlayer 타깃 찾기
-	auto actor = UGameplayStatics::GetActorOfClass(GetWorld(), ARedPlayer::StaticClass());
+	
 	// ARedPlayer 타입으로 캐스팅
-	target = Cast<ARedPlayer>(actor);
 	// 소유 객체 가져오기
 	me = Cast<AEnemy>(GetOwner());
 
@@ -42,6 +42,8 @@ void UEnemyFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	{
+		target = UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetPawn();
+
 		switch (mState)
 		{
 		case EEnemyState::Idle:
@@ -82,12 +84,10 @@ void UEnemyFSM::IdleState()
 	for (auto hit : hits)
 	{
 		// 플레이어 타입으로 캐스팅
-		auto player = Cast<ARedPlayer>(hit.GetActor());
 		// 플레이어가 존재하면
-		if (player)
+		if (hit.GetActor() == target)
 		{
 			// 플레이어를 타깃으로 설정
-			target = player;
 			// 상태를 이동 상태로 변경
 			mState = EEnemyState::Move;
 			// 반복문 종료

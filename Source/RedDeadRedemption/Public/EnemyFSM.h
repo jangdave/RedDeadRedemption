@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include <vector>
 #include "EnemyFSM.generated.h"
 
 // 사용할 상태 정의
@@ -58,7 +59,7 @@ public:
 
 	// 타깃
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "FSM")
-		class ARedPlayer* target;
+	class APawn* target;
 
 	// 소유 액터
 	UPROPERTY()

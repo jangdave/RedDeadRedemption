@@ -4,7 +4,7 @@
 #include "Enemy.h"
 #include <Components/SkeletalMeshComponent.h>
 #include "EnemyFSM.h"
-#include "Bullet.h"
+#include "EnemyBullet.h"
 #include "Components/CapsuleComponent.h"
 
 // Sets default values
@@ -21,7 +21,7 @@ AEnemy::AEnemy()
 
 	// enemy mesh
 	// constructorhelpers를 이용해서 캐릭터의 메쉬를 가져온다.
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempEnemyMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/EnemyCowboy/cowboy-3d-model__1_.cowboy-3d-model__1_'"));
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempEnemyMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/PolygonWestern/Meshes/Characters/SK_Character_Badguy_01.SK_Character_Badguy_01'"));
 	// 불러오는데 성공했다면
 	if (TempEnemyMesh.Succeeded())
 	{
@@ -30,7 +30,7 @@ AEnemy::AEnemy()
 		// transform을 설정한다.
 		GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -90.0f), FRotator(0.0f, -90.0f, 0.0f));
 		// scale 수정
-		GetMesh()->SetRelativeScale3D(FVector(0.25f, 0.25f, 0.25f));
+		GetMesh()->SetRelativeScale3D(FVector(1.0f));
 	}
 	// enemy FSM 컴포넌트 추가
 	myEnemyFSM = CreateDefaultSubobject<UEnemyFSM>(TEXT("EnemyFSM"));
