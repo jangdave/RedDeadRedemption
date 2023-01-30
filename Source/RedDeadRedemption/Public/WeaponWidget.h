@@ -15,6 +15,8 @@ class REDDEADREDEMPTION_API UWeaponWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	virtual void NativeConstruct() override;
+
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UButton* btn_Rifle;
 
@@ -24,8 +26,9 @@ public:
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UButton* btn_Pistol;
 
-	virtual void NativeConstruct() override;
-	
+	UPROPERTY(EditAnywhere, meta = (BindWidget))
+	class UButton* btn_Bottle;
+		
 	UPROPERTY()
 	class ARedPlayer* player;
 
@@ -37,4 +40,7 @@ public:
 
 	UFUNCTION()
 	void Fist();
+
+	UFUNCTION()
+	void Bottle();
 };

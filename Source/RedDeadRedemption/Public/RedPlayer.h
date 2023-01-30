@@ -12,6 +12,7 @@ enum class EWeaponState : uint8
 	FIST,
 	RIFLE,
 	PISTOL,
+	FIREBOTTLE,
 };
 
 UCLASS()
@@ -39,7 +40,7 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class UCameraComponent* cameraComp;
-	
+
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class APlayerPistolBullet> pistolBulletFactory;
 
@@ -54,6 +55,12 @@ public:
 	
 	UPROPERTY(EditAnywhere)
 	class AHorse* horsePlayer;
+
+	UPROPERTY(EditAnywhere)
+	class AFireBottle* fireBottle;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AFireBottle> fireBottleFactory;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UWeaponWidget> weaponWidget;
@@ -89,6 +96,9 @@ public:
 	void ChangePistol();
 
 	UFUNCTION()
+	void ChangeBottle();
+
+	UFUNCTION()
 	void ControllerWidget();
 
 	void ChooseWeapon(EWeaponState val);
@@ -108,4 +118,6 @@ public:
 	void FireRifle();
 
 	void FireFist();
+
+	void FireBottle();
 };

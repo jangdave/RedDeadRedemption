@@ -34,7 +34,7 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class UCameraComponent* cameraComp;
-
+	
 	UPROPERTY(EditAnywhere)
 	class USceneComponent* attachComp;
 	

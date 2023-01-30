@@ -6,6 +6,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Bullet.h"
+#include "FireBottle.h"
 #include "Kismet/GameplayStatics.h"
 #include "Horse.h"
 #include "PlayerPistolBullet.h"
@@ -27,7 +28,7 @@ ARedPlayer::ARedPlayer()
 
 		GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -90.0f), FRotator(0, -90.0f, 0));
 	}
-
+	
 	gunMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("gunMeshComp"));
 	gunMeshComp->SetRelativeScale3D(FVector(1));
 	gunMeshComp->SetupAttachment(GetMesh());
@@ -72,6 +73,8 @@ void ARedPlayer::BeginPlay()
 	horsePlayer = Cast<AHorse>(UGameplayStatics::GetActorOfClass(GetWorld(), AHorse::StaticClass()));
 	
 	weapon_UI = CreateWidget<UWeaponWidget>(GetWorld(), weaponWidget);
+
+	fireBottle = Cast<AFireBottle>(UGameplayStatics::GetActorOfClass(this, AFireBottle::StaticClass()));
 
 	ChooseWeapon(EWeaponState::FIST);
 }
@@ -147,6 +150,10 @@ void ARedPlayer::FirePressed()
 		FireRifle();
 		break;
 
+	case EWeaponState::FIREBOTTLE:
+		FireBottle();
+		break;
+
 	default:
 		break;
 	}
@@ -198,7 +205,6 @@ void ARedPlayer::ChangeFist()
 
 void ARedPlayer::ChangeRifle()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Rifle"));
 	if (weapon_UI && true == weapon_UI->IsInViewport())
 	{
 		weapon_UI->RemoveFromParent();
@@ -217,6 +223,16 @@ void ARedPlayer::ChangePistol()
 	}
 }
 
+void ARedPlayer::ChangeBottle()
+{
+	if(weapon_UI && true == weapon_UI->IsInViewport())
+	{
+		weapon_UI->RemoveFromParent();
+		ControllerWidget();
+		ChooseWeapon(EWeaponState::FIREBOTTLE);
+	}
+}
+
 void ARedPlayer::ControllerWidget()
 {
 	UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetShowMouseCursor(false);
@@ -231,20 +247,29 @@ void ARedPlayer::ChooseWeapon(EWeaponState val)
 	case EWeaponState::FIST:
 			gunMeshComp->SetVisibility(false);
 			revolMeshComp->SetVisibility(false);
+			
 			armWeapon = val;
 		break;
 
 	case EWeaponState::PISTOL:
 			gunMeshComp->SetVisibility(false);
 			revolMeshComp->SetVisibility(true);
+			
 			armWeapon = val;
 		break;
 
 	case EWeaponState::RIFLE:
 			gunMeshComp->SetVisibility(true);
 			revolMeshComp->SetVisibility(false);
+			
 			armWeapon = val;
 		break;
+
+	case EWeaponState::FIREBOTTLE:
+			gunMeshComp->SetVisibility(false);
+			revolMeshComp->SetVisibility(false);
+			
+			armWeapon = val;
 
 	default:
 		break;
@@ -266,5 +291,9 @@ void ARedPlayer::FireRifle()
 }
 
 void ARedPlayer::FireFist()
+{
+}
+
+void ARedPlayer::FireBottle()
 {
 }

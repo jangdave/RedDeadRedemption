@@ -24,6 +24,10 @@ void UWeaponWidget::NativeConstruct()
 	{
 		btn_Fist->OnClicked.AddDynamic(this, &UWeaponWidget::Fist);
 	}
+	if (!btn_Bottle->OnClicked.IsAlreadyBound(this, &UWeaponWidget::Bottle))
+	{
+		btn_Bottle->OnClicked.AddDynamic(this, &UWeaponWidget::Bottle);
+	}
 }
 
 void UWeaponWidget::Rifle()
@@ -39,4 +43,9 @@ void UWeaponWidget::Pistol()
 void UWeaponWidget::Fist()
 {
 	player->ChangeFist();
+}
+
+void UWeaponWidget::Bottle()
+{
+	player->ChangeBottle();
 }

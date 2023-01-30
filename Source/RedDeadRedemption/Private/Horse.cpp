@@ -17,16 +17,15 @@ AHorse::AHorse()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/AfricanAnimalsPack/Zebra/Meshes/SK_Zebra.SK_Zebra'"));
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/HorseAnimsetPro/Meshes/Horses/SK_Horse_PA.SK_Horse_PA'"));
 	if (tempMesh.Succeeded())
 	{
 		GetMesh()->SetSkeletalMesh(tempMesh.Object);
 
-		GetMesh()->SetRelativeScale3D(FVector(1.2f));
+		GetMesh()->SetRelativeScale3D(FVector(1.1f));
 
-		GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -90.0f), FRotator(0, -90.0f, 0));
+		GetMesh()->SetRelativeLocationAndRotation(FVector(-45.0f, 0, -90.0f), FRotator(0, -90.0f, 0));
 	}
-
 	//GetMesh()->SetAnimationMode(EAnimationMode::AnimationSingleNode);
 	
 	boxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("boxComp"));
@@ -59,7 +58,7 @@ AHorse::AHorse()
 	{
 		playerMesh->SetSkeletalMesh(tempPlayerMesh.Object);
 
-		playerMesh->SetRelativeLocationAndRotation(FVector(5.0f, -5.0f, -65.0f), FRotator(0, -90.0f, 0));
+		playerMesh->SetRelativeLocationAndRotation(FVector(5.5f, 1.4f, -7.0f), FRotator(0, -90.0f, 0));
 	}
 
 	GetCharacterMovement()->MaxWalkSpeed = 50.0f;
@@ -170,6 +169,7 @@ void AHorse::HorseRide()
 	//플레이어 콜리젼 켜기
 	player->SetActorEnableCollision(true);
 	GetMovementComponent()->StopMovementImmediately();
+	player->ChooseWeapon(EWeaponState::FIST);
 }
 
 void AHorse::ChangeMesh(bool bChange)
