@@ -18,15 +18,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "EnemySettings")
 		class USkeletalMeshComponent* EnemyMesh;
 
-	// 적 체력
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemySettings")
-		float EnemyHealth;
-	// 적 걷는속도
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemySettings")
-		float EnemyWalkSpeed;
-	// 적 뛰는속도
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemySettings")
-		float EnemyRunSpeed;
+
 	// 적 받는 피해
 	UFUNCTION(BlueprintCallable, Category = "EnemySettings")
 		void OnMyTakeDamage(float Damage);
@@ -53,4 +45,11 @@ public:
 	// 총알 오버랩 이벤트
 	UFUNCTION()
 		void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bBFromSweep, const FHitResult& SweepResult);
+
+	// 총 메쉬
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "EnemySettings")
+		class USkeletalMeshComponent* GunMeshComp;
+	// 리볼버 메쉬
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "EnemySettings")
+		class UStaticMeshComponent* RevolverMeshComp;
 };
