@@ -78,6 +78,9 @@ public:
 	class UStaticMeshComponent* bottleFireMeshComp;
 
 	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AFireBottle> fireBottleFactory;
+
+	UPROPERTY(EditAnywhere)
 	TSubclassOf<class UWeaponWidget> weaponWidget;
 
 	UPROPERTY()
@@ -106,6 +109,14 @@ public:
 	void WeaponChangePressed();
 
 	void ControllerWidget();
+
+	void FirePistol();
+
+	void FireRifle();
+
+	void FireFist();
+
+	void FireBottle();
 
 	UFUNCTION()
 	void ChangeFist();

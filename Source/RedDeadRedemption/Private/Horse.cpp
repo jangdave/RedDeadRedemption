@@ -9,6 +9,10 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include <Components/SkeletalMeshComponent.h>
+
+#include "FireBottle.h"
+#include "PlayerPistolBullet.h"
+#include "PlayerRifleBullet.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "WeaponWidget.h"
 
@@ -102,6 +106,8 @@ void AHorse::BeginPlay()
 	player = Cast<ARedPlayer>(UGameplayStatics::GetActorOfClass(GetWorld(), ARedPlayer::StaticClass()));
 
 	weapon_UI = CreateWidget<UWeaponWidget>(GetWorld(), weaponWidget);
+
+	ChooseWeapon(EWeaponArm::FIST);
 }
 
 // Called every frame
@@ -198,7 +204,25 @@ void AHorse::HorseRide()
 	//플레이어 콜리젼 켜기
 	player->SetActorEnableCollision(true);
 	GetMovementComponent()->StopMovementImmediately();
-	player->ChooseWeapon(EWeaponState::FIST);
+	
+	if(weaponArm == EWeaponArm::FIREBOTTLE)
+	{
+		player->ChooseWeapon(EWeaponState::FIREBOTTLE);
+	}
+	else if(weaponArm == EWeaponArm::FIST)
+	{
+		player->ChooseWeapon(EWeaponState::FIST);
+	}
+	else if(weaponArm == EWeaponArm::PISTOL)
+	{
+		player->ChooseWeapon(EWeaponState::PISTOL);
+	}
+	else if(weaponArm == EWeaponArm::RIFLE)
+	{
+		player->ChooseWeapon(EWeaponState::RIFLE);
+	}
+
+	ChooseWeapon(EWeaponArm::FIST);
 }
 
 void AHorse::ChangeMesh(bool bChange)
@@ -215,7 +239,27 @@ void AHorse::ChangeMesh(bool bChange)
 
 void AHorse::FirePressed()
 {
-	player->FirePressed();
+	switch (weaponArm)
+	{
+	case EWeaponState::FIST:
+		FireFist();
+		break;
+
+	case EWeaponState::PISTOL:
+		FirePistol();
+		break;
+
+	case EWeaponState::RIFLE:
+		FireRifle();
+		break;
+
+	case EWeaponState::FIREBOTTLE:
+		FireBottle();
+		break;
+
+	default:
+		break;
+	}
 }
 
 void AHorse::WeaponChangePressed()
@@ -234,6 +278,27 @@ void AHorse::ControllerWidget()
 	UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetShowMouseCursor(false);
 	GetWorld()->GetFirstPlayerController()->AController::SetIgnoreLookInput(false);
 	UWidgetBlueprintLibrary::SetInputMode_GameOnly(GetWorld()->GetFirstPlayerController());
+}
+
+void AHorse::FirePistol()
+{
+	FTransform t = revolMeshComp->GetSocketTransform(TEXT("SK_Wep_Revolver_01_CylinderSocket"));
+	GetWorld()->SpawnActor<APlayerPistolBullet>(pistolBulletFactory, t);
+}
+
+void AHorse::FireRifle()
+{
+	FTransform t = gunMeshComp->GetSocketTransform(TEXT("SK_Wep_Rifle_01_SlideSocket"));
+	GetWorld()->SpawnActor<APlayerRifleBullet>(rifleBulletFactory, t);
+}
+
+void AHorse::FireFist()
+{
+}
+
+void AHorse::FireBottle()
+{
+	GetWorld()->SpawnActor<AFireBottle>(fireBottleFactory, GetActorLocation() + (GetActorUpVector() * 50.0f) + (GetActorForwardVector() * 100.0f), GetControlRotation());
 }
 
 void AHorse::ChangeFist()

@@ -198,6 +198,25 @@ void ARedPlayer::HorseRide()
 		//홀스 메쉬 켜기
 		horsePlayer->ChangeMesh(false);
 		bIsRide = true;
+
+		if (armWeapon == EWeaponState::FIREBOTTLE)
+		{
+			horsePlayer->ChooseWeapon(EWeaponArm::FIREBOTTLE);
+		}
+		else if (armWeapon == EWeaponState::FIST)
+		{
+			horsePlayer->ChooseWeapon(EWeaponArm::FIST);
+		}
+		else if (armWeapon == EWeaponState::PISTOL)
+		{
+			horsePlayer->ChooseWeapon(EWeaponArm::PISTOL);
+		}
+		else if (armWeapon == EWeaponState::RIFLE)
+		{
+			horsePlayer->ChooseWeapon(EWeaponArm::RIFLE);
+		}
+
+		ChooseWeapon(EWeaponState::FIST);
 	}
 }
 
