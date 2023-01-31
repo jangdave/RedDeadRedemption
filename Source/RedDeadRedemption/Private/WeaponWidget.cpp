@@ -2,6 +2,8 @@
 
 
 #include "WeaponWidget.h"
+
+#include "Horse.h"
 #include "RedPlayer.h"
 #include "Components/Button.h"
 #include "Kismet/GameplayStatics.h"
@@ -11,6 +13,8 @@ void UWeaponWidget::NativeConstruct()
 	Super::NativeConstruct();
 
 	player = Cast<ARedPlayer>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+
+	horse = Cast<AHorse>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 
 	if (!btn_Rifle->OnClicked.IsAlreadyBound(this, &UWeaponWidget::Rifle))
 	{
@@ -32,20 +36,52 @@ void UWeaponWidget::NativeConstruct()
 
 void UWeaponWidget::Rifle()
 {
-	player->ChangeRifle();
+	player = Cast<ARedPlayer>(UGameplayStatics::GetActorOfClass(GetWorld(),ARedPlayer::StaticClass()));
+	if(player->bIsRide != true)
+	{
+		player->ChangeRifle();
+	}
+	else
+	{
+		horse->ChangeRifle();
+	}
 }
 
 void UWeaponWidget::Pistol()
 {
-	player->ChangePistol();
+	player = Cast<ARedPlayer>(UGameplayStatics::GetActorOfClass(GetWorld(), ARedPlayer::StaticClass()));
+	if (player->bIsRide != true)
+	{
+		player->ChangePistol();
+	}
+	else
+	{
+		horse->ChangePistol();
+	}
 }
 
 void UWeaponWidget::Fist()
 {
-	player->ChangeFist();
+	player = Cast<ARedPlayer>(UGameplayStatics::GetActorOfClass(GetWorld(), ARedPlayer::StaticClass()));
+	if (player->bIsRide != true)
+	{
+		player->ChangeFist();
+	}
+	else
+	{
+		horse->ChangeFist();
+	}
 }
 
 void UWeaponWidget::Bottle()
 {
-	player->ChangeBottle();
+	player = Cast<ARedPlayer>(UGameplayStatics::GetActorOfClass(GetWorld(), ARedPlayer::StaticClass()));
+	if (player->bIsRide != true)
+	{
+		player->ChangeBottle();
+	}
+	else
+	{
+		horse->ChangeBottle();
+	}
 }

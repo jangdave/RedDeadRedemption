@@ -6,10 +6,15 @@
 #include "RedPlayer.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
-//#include "..\Public\Horse.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include <Components/SkeletalMeshComponent.h>
+
+#include "FireBottle.h"
+#include "PlayerPistolBullet.h"
+#include "PlayerRifleBullet.h"
+#include "Blueprint/WidgetBlueprintLibrary.h"
+#include "WeaponWidget.h"
 
 // Sets default values
 AHorse::AHorse()
@@ -62,6 +67,29 @@ AHorse::AHorse()
 	}
 
 	GetCharacterMovement()->MaxWalkSpeed = 50.0f;
+
+	gunMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("gunMeshComp"));
+	gunMeshComp->SetupAttachment(playerMesh);
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempGunMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/PolygonWestern/Meshes/Weapons/SK_Wep_Rifle_01.SK_Wep_Rifle_01'"));
+	if (tempGunMesh.Succeeded())
+	{
+		gunMeshComp->SetSkeletalMesh(tempGunMesh.Object);
+
+		gunMeshComp->SetRelativeLocationAndRotation(FVector(-21.0f, 47.0f, 136.0f), FRotator(0, 0, 0));
+	}
+	revolMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("revolMeshComp"));
+	revolMeshComp->SetupAttachment(playerMesh);
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempRevolMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/PolygonWestern/Meshes/Weapons/SK_Wep_Revolver_01.SK_Wep_Revolver_01'"));
+	if (tempRevolMesh.Succeeded())
+	{
+		revolMeshComp->SetSkeletalMesh(tempRevolMesh.Object);
+
+		revolMeshComp->SetRelativeLocationAndRotation(FVector(-17.0, 50.0f, 134.0f), FRotator(0, 0, 0));
+	}
+	bottleMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("bottleMeshComp"));
+	bottleMeshComp->SetupAttachment(playerMesh);
+	bottleFireMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("bottleFireMeshComp"));
+	bottleFireMeshComp->SetupAttachment(bottleMeshComp);
 }
 
 // Called when the game starts or when spawned
@@ -76,6 +104,10 @@ void AHorse::BeginPlay()
 	playerMesh->SetVisibility(false);
 
 	player = Cast<ARedPlayer>(UGameplayStatics::GetActorOfClass(GetWorld(), ARedPlayer::StaticClass()));
+
+	weapon_UI = CreateWidget<UWeaponWidget>(GetWorld(), weaponWidget);
+
+	ChooseWeapon(EWeaponArm::FIST);
 }
 
 // Called every frame
@@ -102,6 +134,8 @@ void AHorse::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAxis(TEXT("Horse Look Up"), this, &AHorse::LookUp);
 	PlayerInputComponent->BindAxis(TEXT("Horse Turn Right"), this, &AHorse::TurnRight);
 	PlayerInputComponent->BindAction(TEXT("HorseRide"), IE_Pressed, this, &AHorse::HorseRide);
+	PlayerInputComponent->BindAction(TEXT("FireBullet"), IE_Pressed, this, &AHorse::FirePressed);
+	PlayerInputComponent->BindAction(TEXT("HorseWeaponChange"), IE_Pressed, this, &AHorse::WeaponChangePressed);
 }
 
 void AHorse::OverlapRide(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -166,10 +200,29 @@ void AHorse::HorseRide()
 	player->GetMesh()->SetVisibility(true);
 	player->gunMeshComp->SetVisibility(true);
 	player->revolMeshComp->SetVisibility(true);
+	player->bIsRide = false;
 	//플레이어 콜리젼 켜기
 	player->SetActorEnableCollision(true);
 	GetMovementComponent()->StopMovementImmediately();
-	player->ChooseWeapon(EWeaponState::FIST);
+	
+	if(weaponArm == EWeaponArm::FIREBOTTLE)
+	{
+		player->ChooseWeapon(EWeaponState::FIREBOTTLE);
+	}
+	else if(weaponArm == EWeaponArm::FIST)
+	{
+		player->ChooseWeapon(EWeaponState::FIST);
+	}
+	else if(weaponArm == EWeaponArm::PISTOL)
+	{
+		player->ChooseWeapon(EWeaponState::PISTOL);
+	}
+	else if(weaponArm == EWeaponArm::RIFLE)
+	{
+		player->ChooseWeapon(EWeaponState::RIFLE);
+	}
+
+	ChooseWeapon(EWeaponArm::FIST);
 }
 
 void AHorse::ChangeMesh(bool bChange)
@@ -184,3 +237,149 @@ void AHorse::ChangeMesh(bool bChange)
 	}
 }
 
+void AHorse::FirePressed()
+{
+	switch (weaponArm)
+	{
+	case EWeaponState::FIST:
+		FireFist();
+		break;
+
+	case EWeaponState::PISTOL:
+		FirePistol();
+		break;
+
+	case EWeaponState::RIFLE:
+		FireRifle();
+		break;
+
+	case EWeaponState::FIREBOTTLE:
+		FireBottle();
+		break;
+
+	default:
+		break;
+	}
+}
+
+void AHorse::WeaponChangePressed()
+{
+	if (weapon_UI && false == weapon_UI->IsInViewport())
+	{
+		weapon_UI->AddToViewport();
+		UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetShowMouseCursor(true);
+		GetWorld()->GetFirstPlayerController()->AController::SetIgnoreLookInput(true);
+		UWidgetBlueprintLibrary::SetInputMode_GameAndUIEx(GetWorld()->GetFirstPlayerController(), weapon_UI);
+	}
+}
+
+void AHorse::ControllerWidget()
+{
+	UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetShowMouseCursor(false);
+	GetWorld()->GetFirstPlayerController()->AController::SetIgnoreLookInput(false);
+	UWidgetBlueprintLibrary::SetInputMode_GameOnly(GetWorld()->GetFirstPlayerController());
+}
+
+void AHorse::FirePistol()
+{
+	FTransform t = revolMeshComp->GetSocketTransform(TEXT("SK_Wep_Revolver_01_CylinderSocket"));
+	GetWorld()->SpawnActor<APlayerPistolBullet>(pistolBulletFactory, t);
+}
+
+void AHorse::FireRifle()
+{
+	FTransform t = gunMeshComp->GetSocketTransform(TEXT("SK_Wep_Rifle_01_SlideSocket"));
+	GetWorld()->SpawnActor<APlayerRifleBullet>(rifleBulletFactory, t);
+}
+
+void AHorse::FireFist()
+{
+}
+
+void AHorse::FireBottle()
+{
+	GetWorld()->SpawnActor<AFireBottle>(fireBottleFactory, GetActorLocation() + (GetActorUpVector() * 50.0f) + (GetActorForwardVector() * 100.0f), GetControlRotation());
+}
+
+void AHorse::ChangeFist()
+{
+	if (weapon_UI && true == weapon_UI->IsInViewport())
+	{
+		weapon_UI->RemoveFromParent();
+		ControllerWidget();
+		ChooseWeapon(EWeaponArm::FIST);
+	}
+}
+
+void AHorse::ChangeRifle()
+{
+	if (weapon_UI && true == weapon_UI->IsInViewport())
+	{
+		weapon_UI->RemoveFromParent();
+		ControllerWidget();
+		ChooseWeapon(EWeaponArm::RIFLE);
+	}
+}
+
+void AHorse::ChangePistol()
+{
+	if (weapon_UI && true == weapon_UI->IsInViewport())
+	{
+		weapon_UI->RemoveFromParent();
+		ControllerWidget();
+		ChooseWeapon(EWeaponArm::PISTOL);
+	}
+}
+
+void AHorse::ChangeBottle()
+{
+	if (weapon_UI && true == weapon_UI->IsInViewport())
+	{
+		weapon_UI->RemoveFromParent();
+		ControllerWidget();
+		ChooseWeapon(EWeaponArm::FIREBOTTLE);
+	}
+}
+
+void AHorse::ChooseWeapon(EWeaponArm val)
+{
+	switch (val)
+	{
+	case EWeaponArm::FIST:
+		gunMeshComp->SetVisibility(false);
+		revolMeshComp->SetVisibility(false);
+		bottleMeshComp->SetVisibility(false);
+		bottleFireMeshComp->SetVisibility(false);
+		weaponArm = val;
+		
+		break;
+
+	case EWeaponArm::PISTOL:
+		gunMeshComp->SetVisibility(false);
+		revolMeshComp->SetVisibility(true);
+		bottleMeshComp->SetVisibility(false);
+		bottleFireMeshComp->SetVisibility(false);
+		weaponArm = val;
+		
+		break;
+
+	case EWeaponArm::RIFLE:
+		gunMeshComp->SetVisibility(true);
+		revolMeshComp->SetVisibility(false);
+		bottleMeshComp->SetVisibility(false);
+		bottleFireMeshComp->SetVisibility(false);
+		weaponArm = val;
+		
+		break;
+
+	case EWeaponArm::FIREBOTTLE:
+		gunMeshComp->SetVisibility(false);
+		revolMeshComp->SetVisibility(false);
+		bottleMeshComp->SetVisibility(true);
+		bottleFireMeshComp->SetVisibility(true);
+		weaponArm = val;
+		
+	default:
+		break;
+	}
+}

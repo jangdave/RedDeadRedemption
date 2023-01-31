@@ -34,7 +34,13 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	EWeaponState armWeapon;
+
+	UPROPERTY(EditAnywhere)
+	class UPlayerAnim* playerAnim;
+
 	UPROPERTY(EditAnywhere)
 	class USpringArmComponent* springComp;
 
@@ -52,6 +58,12 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class USkeletalMeshComponent* revolMeshComp;
+
+	UPROPERTY(EditAnywhere)
+	class UStaticMeshComponent* bottleMeshComp;
+
+	UPROPERTY(EditAnywhere)
+	class UStaticMeshComponent* bottleFireMeshComp;
 	
 	UPROPERTY(EditAnywhere)
 	class AHorse* horsePlayer;
@@ -85,7 +97,15 @@ public:
 	void HorseRide();
 
 	void WeaponChangePress();
-	
+
+	void RunPressed();
+
+	void RunReleased();
+
+	void CrouchPressed();
+
+	void CrouchReleased();
+
 	UFUNCTION()
 	void ChangeFist();
 
@@ -108,11 +128,7 @@ public:
 	bool bPossessed = true;
 
 	bool bPressed = false;
-
-	bool bChooseRifle;
-
-	EWeaponState armWeapon;
-
+	
 	void FirePistol();
 
 	void FireRifle();
@@ -120,4 +136,12 @@ public:
 	void FireFist();
 
 	void FireBottle();
+
+	float walkSpeed = 400.0f;
+
+	float runSpeed = 600.0f;
+
+	float crouchSpeed = 200.0f;
+
+	bool bIsRide;
 };

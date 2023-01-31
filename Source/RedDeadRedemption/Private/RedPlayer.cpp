@@ -9,6 +9,7 @@
 #include "FireBottle.h"
 #include "Kismet/GameplayStatics.h"
 #include "Horse.h"
+#include "PlayerAnim.h"
 #include "PlayerPistolBullet.h"
 #include "PlayerRifleBullet.h"
 #include "WeaponWidget.h"
@@ -51,6 +52,11 @@ ARedPlayer::ARedPlayer()
 		revolMeshComp->SetRelativeLocationAndRotation(FVector(-17.0, 50.0f, 134.0f), FRotator(0, 0, 0));
 	}
 
+	bottleMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("bottleMeshComp"));
+	bottleMeshComp->SetupAttachment(GetMesh());
+	bottleFireMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("bottleFireMeshComp"));
+	bottleFireMeshComp->SetupAttachment(bottleMeshComp);
+
 	springComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("springComp"));
 	springComp->SetupAttachment(RootComponent);
 	springComp->SetRelativeLocation(FVector(0, 40.0f, 100.0f));
@@ -63,6 +69,13 @@ ARedPlayer::ARedPlayer()
 	springComp->bUsePawnControlRotation = true;
 	cameraComp->bUsePawnControlRotation = true;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->MaxWalkSpeed = 400.0f;
+
+	ConstructorHelpers::FClassFinder<UAnimInstance> tempAnim(TEXT("/Script/Engine.AnimBlueprint'/Game/Blueprint/player/ABP_RedPlayer.ABP_RedPlayer_C'"));
+	if(tempAnim.Succeeded())
+	{
+		GetMesh()->SetAnimInstanceClass(tempAnim.Class);
+	}
 }
 
 // Called when the game starts or when spawned
@@ -74,7 +87,9 @@ void ARedPlayer::BeginPlay()
 	
 	weapon_UI = CreateWidget<UWeaponWidget>(GetWorld(), weaponWidget);
 
-	fireBottle = Cast<AFireBottle>(UGameplayStatics::GetActorOfClass(this, AFireBottle::StaticClass()));
+	fireBottle = Cast<AFireBottle>(UGameplayStatics::GetActorOfClass(GetWorld(), fireBottleFactory));
+
+	playerAnim = Cast<UPlayerAnim>(GetMesh()->GetAnimInstance());
 
 	ChooseWeapon(EWeaponState::FIST);
 }
@@ -107,6 +122,10 @@ void ARedPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	PlayerInputComponent->BindAction(TEXT("FireBullet"), IE_Released, this, &ARedPlayer::FireReleased);
 	PlayerInputComponent->BindAction(TEXT("HorseRide"), IE_Pressed, this, &ARedPlayer::HorseRide);
 	PlayerInputComponent->BindAction(TEXT("WeaponChange"), IE_Pressed, this, &ARedPlayer::WeaponChangePress);
+	PlayerInputComponent->BindAction(TEXT("Run"), IE_Pressed, this, &ARedPlayer::RunPressed);
+	PlayerInputComponent->BindAction(TEXT("Run"), IE_Released, this, &ARedPlayer::RunReleased);
+	PlayerInputComponent->BindAction(TEXT("Crouch"), IE_Pressed, this, &ARedPlayer::CrouchPressed);
+	PlayerInputComponent->BindAction(TEXT("Crouch"), IE_Released, this, &ARedPlayer::CrouchReleased);
 }
 
 void ARedPlayer::Horizontal(float value)
@@ -178,6 +197,26 @@ void ARedPlayer::HorseRide()
 		this->SetActorEnableCollision(false);
 		//홀스 메쉬 켜기
 		horsePlayer->ChangeMesh(false);
+		bIsRide = true;
+
+		if (armWeapon == EWeaponState::FIREBOTTLE)
+		{
+			horsePlayer->ChooseWeapon(EWeaponArm::FIREBOTTLE);
+		}
+		else if (armWeapon == EWeaponState::FIST)
+		{
+			horsePlayer->ChooseWeapon(EWeaponArm::FIST);
+		}
+		else if (armWeapon == EWeaponState::PISTOL)
+		{
+			horsePlayer->ChooseWeapon(EWeaponArm::PISTOL);
+		}
+		else if (armWeapon == EWeaponState::RIFLE)
+		{
+			horsePlayer->ChooseWeapon(EWeaponArm::RIFLE);
+		}
+
+		ChooseWeapon(EWeaponState::FIST);
 	}
 }
 
@@ -193,29 +232,55 @@ void ARedPlayer::WeaponChangePress()
 	//UGameplayStatics::SetGamePaused(GetWorld(), false);
 }
 
+void ARedPlayer::RunPressed()
+{
+	GetCharacterMovement()->MaxWalkSpeed = runSpeed;
+}
+
+void ARedPlayer::RunReleased()
+{
+	GetCharacterMovement()->MaxWalkSpeed = walkSpeed;
+}
+
+void ARedPlayer::CrouchPressed()
+{
+	GetCharacterMovement()->MaxWalkSpeed = crouchSpeed;
+}
+
+void ARedPlayer::CrouchReleased()
+{
+	GetCharacterMovement()->MaxWalkSpeed = walkSpeed;
+}
+
 void ARedPlayer::ChangeFist()
 {
-	if (weapon_UI && true == weapon_UI->IsInViewport())
+	if(bIsRide != true)
 	{
-		weapon_UI->RemoveFromParent();
-		ControllerWidget();
-		ChooseWeapon(EWeaponState::FIST);
+		if (weapon_UI != nullptr && true == weapon_UI->IsInViewport())
+		{
+			weapon_UI->RemoveFromParent();
+			ControllerWidget();
+			ChooseWeapon(EWeaponState::FIST);
+		}
 	}
 }
 
 void ARedPlayer::ChangeRifle()
 {
-	if (weapon_UI && true == weapon_UI->IsInViewport())
+	if(bIsRide != true)
 	{
-		weapon_UI->RemoveFromParent();
-		ControllerWidget();
-		ChooseWeapon(EWeaponState::RIFLE);
+		if (weapon_UI != nullptr && true == weapon_UI->IsInViewport())
+		{
+			weapon_UI->RemoveFromParent();
+			ControllerWidget();
+			ChooseWeapon(EWeaponState::RIFLE);
+		}
 	}
 }
 
 void ARedPlayer::ChangePistol()
 {
-	if (weapon_UI && true == weapon_UI->IsInViewport())
+	if (weapon_UI != nullptr && true == weapon_UI->IsInViewport())
 	{
 		weapon_UI->RemoveFromParent();
 		ControllerWidget();
@@ -225,7 +290,7 @@ void ARedPlayer::ChangePistol()
 
 void ARedPlayer::ChangeBottle()
 {
-	if(weapon_UI && true == weapon_UI->IsInViewport())
+	if(weapon_UI != nullptr && true == weapon_UI->IsInViewport())
 	{
 		weapon_UI->RemoveFromParent();
 		ControllerWidget();
@@ -247,30 +312,37 @@ void ARedPlayer::ChooseWeapon(EWeaponState val)
 	case EWeaponState::FIST:
 			gunMeshComp->SetVisibility(false);
 			revolMeshComp->SetVisibility(false);
-			
+			bottleMeshComp->SetVisibility(false);
+			bottleFireMeshComp->SetVisibility(false);
 			armWeapon = val;
+			playerAnim->state = armWeapon;
 		break;
 
 	case EWeaponState::PISTOL:
 			gunMeshComp->SetVisibility(false);
 			revolMeshComp->SetVisibility(true);
-			
+			bottleMeshComp->SetVisibility(false);
+			bottleFireMeshComp->SetVisibility(false);
 			armWeapon = val;
+			playerAnim->state = armWeapon;
 		break;
 
 	case EWeaponState::RIFLE:
 			gunMeshComp->SetVisibility(true);
 			revolMeshComp->SetVisibility(false);
-			
+			bottleMeshComp->SetVisibility(false);
+			bottleFireMeshComp->SetVisibility(false);
 			armWeapon = val;
+			playerAnim->state = armWeapon;
 		break;
 
 	case EWeaponState::FIREBOTTLE:
 			gunMeshComp->SetVisibility(false);
 			revolMeshComp->SetVisibility(false);
-			
+			bottleMeshComp->SetVisibility(true);
+			bottleFireMeshComp->SetVisibility(true);
 			armWeapon = val;
-
+			playerAnim->state = armWeapon;
 	default:
 		break;
 	}
@@ -292,8 +364,10 @@ void ARedPlayer::FireRifle()
 
 void ARedPlayer::FireFist()
 {
+
 }
 
 void ARedPlayer::FireBottle()
 {
+	GetWorld()->SpawnActor<AFireBottle>(fireBottleFactory, GetActorLocation() + (GetActorUpVector() * 10.0f) + (GetActorForwardVector() * 70.0f), GetControlRotation());
 }
