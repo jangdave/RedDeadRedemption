@@ -9,6 +9,8 @@
 #include	"EnemyAI.h"
 #include "PlayerPistolBullet.h"
 #include "PlayerRifleBullet.h"
+#include "GameFramework/CharacterMovementComponent.h"
+
 
 // Sets default values for this component's properties
 UEnemyFSM::UEnemyFSM()
@@ -34,6 +36,7 @@ void UEnemyFSM::BeginPlay()
 
 	// 태어날때 현재 체력을 최대 체력으로 설정
 	EnemyHealth = EnemyMaxHealth;
+	
 	
 }
 
@@ -81,12 +84,14 @@ void UEnemyFSM::IdleState()
 	// 적의 위치에서 플레이어 인지범위 생성
 	GetWorld()->SweepMultiByChannel(hits, location, location, FQuat::Identity, ECollisionChannel::ECC_Pawn, shape);
 	// 플레이어가 인지범위에 있으면
+
 	for (auto hit : hits)
 	{
 		// 플레이어 타입으로 캐스팅
 		// 플레이어가 존재하면
 		if (hit.GetActor() == target)
 		{
+
 			// 플레이어를 타깃으로 설정
 			// 상태를 이동 상태로 변경
 			mState = EEnemyState::Move;
@@ -113,9 +118,13 @@ void UEnemyFSM::MoveState()
 	FVector destination = target->GetActorLocation();
 	// 2. 방향이 필요함.
 	FVector direction = destination - me->GetActorLocation();
-	// 3. 방향으로 이동하고 싶다.
+	// 3. 방향으로 EnemyRunSpeed속도로 이동하고 싶다.
+
+	me->GetCharacterMovement()->MaxWalkSpeed = EnemyRunSpeed;
 
 	me->AddMovementInput(direction.GetSafeNormal());
+
+	// me->AddMovementInput(direction.GetSafeNormal());
 
 	
 	// 타깃과 가까워 지면 공격 상태로 전환하고 싶다.
@@ -137,7 +146,10 @@ void UEnemyFSM::AttackState()
 	if (currentTime > AttackDelayTime)
 	{
 		// 3. 공격
-		//UE_LOG(LogTemp, Warning, TEXT("DIE!!"));
+		// Enemy에있는 GunMeshComp를 이용해서 공격
+		FTransform transform = me->GunMeshComp->GetSocketTransform("SK_Wep_Rifle_01_SlideSocket");
+		GetWorld()->SpawnActor<ABullet>(EnemyRifleBulletFactory, transform);
+
 		// 4. 경과 시간 초기화
 		currentTime = 0.0f;
 
@@ -183,6 +195,15 @@ void UEnemyFSM::DeadState()
 {
 	currentTime += GetWorld()->GetDeltaSeconds();
 
+	//// 1. 죽었을때 래그돌로 전환한다.
+	//if (currentTime > 1.0f)
+	//{
+	//	// 2. 래그돌로 전환
+	//	me->GetMesh()->SetSimulatePhysics(true);
+	//	// 3. 래그돌로 전환하고 더이상 움직이지 않게 한다.
+	//	return;
+	//}
+
 	// currentTime이 1초가 넘으면 사망
 	if (currentTime > 1.0f)
 	{
@@ -194,7 +215,7 @@ void UEnemyFSM::DeadState()
 void UEnemyFSM::OnDamageProcess(int32 damage)
 {
 		EnemyHealth -= damage;
-	
+
 	// 체력이 0이하면
 	if (EnemyHealth <= 0)
 	{

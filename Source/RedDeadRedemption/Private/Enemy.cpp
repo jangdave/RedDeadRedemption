@@ -6,17 +6,14 @@
 #include "EnemyFSM.h"
 #include "EnemyBullet.h"
 #include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 AEnemy::AEnemy()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	
-	EnemyHealth = 50;
-	EnemyWalkSpeed = 300;
-	EnemyRunSpeed = 800;
-	
+
 	
 
 	// enemy mesh
@@ -32,8 +29,28 @@ AEnemy::AEnemy()
 		// scale 수정
 		GetMesh()->SetRelativeScale3D(FVector(1.0f));
 	}
+
+	// 라이플의 컴포넌트를 만들고 싶다.
+	GunMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("GunMeshComp"));
+	GunMeshComp->SetupAttachment(GetMesh());
+	// 라이플의 에셋을 읽어서 컴포넌트에 적용한다.
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempGunMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/PolygonWestern/Meshes/Weapons/SK_Wep_Rifle_01.SK_Wep_Rifle_01'"));
+	// 만약 적용이 성공했다면
+	if (TempGunMesh.Succeeded())
+	{
+		// 라이플의 메쉬를 GunMeshComp에 적용한다.
+		GunMeshComp->SetSkeletalMesh(TempGunMesh.Object);
+		// transform을 설정한다.
+		GunMeshComp->SetRelativeLocationAndRotation(FVector(0.0f, 60.0f, 140.0f), FRotator(0.0f, 0.0f, 0.0f));
+		// scale 수정
+		GunMeshComp->SetRelativeScale3D(FVector(1.0f));
+	}
+
+
 	// enemy FSM 컴포넌트 추가
 	myEnemyFSM = CreateDefaultSubobject<UEnemyFSM>(TEXT("EnemyFSM"));
+
+	GetCharacterMovement()->bOrientRotationToMovement = true;
 }
 
 
@@ -77,7 +94,7 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void AEnemy::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bBFromSweep, const FHitResult& SweepResult)
 {
-	// OtherActor가 Bullet 이라면
+	// OtherActor가 PlayerPistolBullet 이라면
 	if (OtherActor->IsA<ABullet>())
 	{
 		// EnemyFSM으로 enemy에게 데미지를 주고 싶다.

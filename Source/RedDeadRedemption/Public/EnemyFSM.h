@@ -73,6 +73,18 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FSM")
 		float AttackDelayTime = 1.5f;
 
+	// 적 걷는 속도
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FSM")
+		float EnemyWalkSpeed = 400.0f;
+
+	// 적 뛰는 속도
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FSM")
+		float EnemyRunSpeed = 800.0f;
+
+	// 적 라이플 불릿 공장
+	UPROPERTY(EditAnywhere, Category = "FSM")
+		TSubclassOf<class ABullet> EnemyRifleBulletFactory;
+
 	// 피격 알림 이벤트 함수
 	void OnDamageProcess(int32 damage);
 	
@@ -81,6 +93,7 @@ public:
 	// 체력을 표현 하고싶다.
 	int32 EnemyHealth;
 	int32 EnemyMaxHealth = 50;
+
 
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
 	//	FVector EnemyLocation;
