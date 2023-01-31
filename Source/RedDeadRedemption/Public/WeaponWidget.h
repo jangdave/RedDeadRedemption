@@ -32,6 +32,9 @@ public:
 	UPROPERTY()
 	class ARedPlayer* player;
 
+	UPROPERTY()
+	class AHorse* horse;
+
 	UFUNCTION()
 	void Rifle();
 

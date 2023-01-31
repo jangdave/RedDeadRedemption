@@ -7,6 +7,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Enemy.h"
 #include "EnemyFSM.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ABullet::ABullet()
@@ -43,6 +44,7 @@ void ABullet::BeginPlay()
 {
 	Super::BeginPlay();
 
+	//UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), bulletEffect, GetActorLocation(), GetActorRotation(), true);
 	
 }
 
