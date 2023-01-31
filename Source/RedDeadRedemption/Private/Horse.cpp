@@ -22,7 +22,7 @@ AHorse::AHorse()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/HorseAnimsetPro/Meshes/Horses/SK_Horse_PA.SK_Horse_PA'"));
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/HorseAnimsetPro/Meshes/Horses/SK_Horse.SK_Horse'"));
 	if (tempMesh.Succeeded())
 	{
 		GetMesh()->SetSkeletalMesh(tempMesh.Object);
@@ -58,12 +58,12 @@ AHorse::AHorse()
 
 	playerMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("playerMesh"));
 	playerMesh->SetupAttachment(attachComp);
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempPlayerMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/PolygonWestern/Meshes/Characters/SK_Character_Cowboy_01.SK_Character_Cowboy_01'"));
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempPlayerMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Characters/Mannequins/Meshes/SKM_Manny.SKM_Manny'"));
 	if (tempPlayerMesh.Succeeded())
 	{
 		playerMesh->SetSkeletalMesh(tempPlayerMesh.Object);
 
-		playerMesh->SetRelativeLocationAndRotation(FVector(5.5f, 1.4f, -7.0f), FRotator(0, -90.0f, 0));
+		playerMesh->SetRelativeLocationAndRotation(FVector(0, 0, 80.0f), FRotator(0, -90.0f, 0));
 	}
 
 	GetCharacterMovement()->MaxWalkSpeed = 50.0f;
@@ -75,7 +75,7 @@ AHorse::AHorse()
 	{
 		gunMeshComp->SetSkeletalMesh(tempGunMesh.Object);
 
-		gunMeshComp->SetRelativeLocationAndRotation(FVector(-21.0f, 47.0f, 136.0f), FRotator(0, 0, 0));
+		gunMeshComp->SetRelativeLocationAndRotation(FVector(-15.0f, 45.0f, 52.0f), FRotator(0, 0, 0));
 	}
 	revolMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("revolMeshComp"));
 	revolMeshComp->SetupAttachment(playerMesh);
@@ -84,7 +84,7 @@ AHorse::AHorse()
 	{
 		revolMeshComp->SetSkeletalMesh(tempRevolMesh.Object);
 
-		revolMeshComp->SetRelativeLocationAndRotation(FVector(-17.0, 50.0f, 134.0f), FRotator(0, 0, 0));
+		revolMeshComp->SetRelativeLocationAndRotation(FVector(-10.0, 50.0f, 50.0f), FRotator(0, 0, 0));
 	}
 	bottleMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("bottleMeshComp"));
 	bottleMeshComp->SetupAttachment(playerMesh);

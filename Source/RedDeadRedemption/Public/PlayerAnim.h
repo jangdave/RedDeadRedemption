@@ -35,10 +35,4 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool isInAir;
-
-	FORCEINLINE void SetWeapon(EWeaponState weaponState) { if(weaponState == EWeaponState::FIST)
-	{
-		isPistol = true;
-		isRifle = false;
-	} }
 };
