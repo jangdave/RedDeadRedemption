@@ -98,18 +98,9 @@ void UEnemyFSM::IdleState()
 			// 반복문 종료
 			break;
 		}
+		
 	}	
 	
-	// 1.시간이 흘렀으니까
-	//currentTime += GetWorld()->DeltaTimeSeconds;
-	// 2.시간이 경과했는지 확인
-	//if (currentTime > IdleDelayTime)
-	//{
-	//	// 3.상태를 이동 상태로 변경
-	//	mState = EEnemyState::Move;
-	//	// 4.경과 시간 초기화
-	//	currentTime = 0.0f;
-	//}
 }
 // 이동 상태
 void UEnemyFSM::MoveState()
