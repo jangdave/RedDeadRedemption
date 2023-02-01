@@ -154,7 +154,10 @@ void ARedPlayer::TurnRight(float value)
 
 void ARedPlayer::Jumping()
 {
-	Jump();
+	if(playerAnim->isTargetOn == false)
+	{
+		Jump();
+	}
 }
 
 void ARedPlayer::FirePressed()
@@ -238,7 +241,10 @@ void ARedPlayer::WeaponChangePress()
 
 void ARedPlayer::RunPressed()
 {
-	GetCharacterMovement()->MaxWalkSpeed = runSpeed;
+	if (playerAnim->isTargetOn == false)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = runSpeed;
+	}
 }
 
 void ARedPlayer::RunReleased()
@@ -249,11 +255,13 @@ void ARedPlayer::RunReleased()
 void ARedPlayer::TargetOnPressed()
 {
 	playerAnim->isTargetOn = true;
+	bUseControllerRotationYaw = true;
 }
 
 void ARedPlayer::TargetOnReleased()
 {
 	playerAnim->isTargetOn = false;
+	bUseControllerRotationYaw = false;
 }
 
 void ARedPlayer::CrouchPressed()

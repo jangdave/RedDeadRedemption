@@ -42,6 +42,9 @@ public:
 	class UBoxComponent* boxComp;
 
 	UPROPERTY(EditAnywhere)
+	class UHorseAnim* horseAnim;
+
+	UPROPERTY(EditAnywhere)
 	class USpringArmComponent* springComp;
 
 	UPROPERTY(EditAnywhere)
@@ -101,6 +104,8 @@ public:
 	void LookUp(float value);
 
 	void TurnRight(float value);
+
+	void ActionJump();
 
 	void HorseRide();
 
