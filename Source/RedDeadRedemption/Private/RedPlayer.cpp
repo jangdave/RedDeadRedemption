@@ -22,7 +22,7 @@ ARedPlayer::ARedPlayer()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Characters/Mannequins/Meshes/SKM_Manny.SKM_Manny'"));
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/PolygonWestern/Meshes/Characters/SK_Character_Cowboy_01.SK_Character_Cowboy_01'"));
 	if (tempMesh.Succeeded())
 	{
 		GetMesh()->SetSkeletalMesh(tempMesh.Object);
@@ -32,28 +32,28 @@ ARedPlayer::ARedPlayer()
 	
 	gunMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("gunMeshComp"));
 	gunMeshComp->SetRelativeScale3D(FVector(1));
-	gunMeshComp->SetupAttachment(GetMesh());
+	gunMeshComp->SetupAttachment(GetMesh(), TEXT("Hand_RSocket"));
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempGunMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/PolygonWestern/Meshes/Weapons/SK_Wep_Rifle_01.SK_Wep_Rifle_01'"));
 	if (tempGunMesh.Succeeded())
 	{
 		gunMeshComp->SetSkeletalMesh(tempGunMesh.Object);
 
-		gunMeshComp->SetRelativeLocationAndRotation(FVector(-21.0f, 47.0f, 136.0f), FRotator(0, 0, 0));
+		gunMeshComp->SetRelativeLocationAndRotation(FVector(-10.0f, -4.1f, -8.0f), FRotator(2.4f, -70.0f, 162.0f));
 	}
 
 	revolMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("revolMeshComp"));
 	revolMeshComp->SetRelativeScale3D(FVector(1));
-	revolMeshComp->SetupAttachment(GetMesh());
+	revolMeshComp->SetupAttachment(GetMesh(), TEXT("Hand_RSocket"));
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempRevolMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/PolygonWestern/Meshes/Weapons/SK_Wep_Revolver_01.SK_Wep_Revolver_01'"));
 	if (tempRevolMesh.Succeeded())
 	{
 		revolMeshComp->SetSkeletalMesh(tempRevolMesh.Object);
 
-		revolMeshComp->SetRelativeLocationAndRotation(FVector(-17.0, 50.0f, 134.0f), FRotator(0, 0, 0));
+		revolMeshComp->SetRelativeLocationAndRotation(FVector(-11.0f, -5.5f, -6.0f), FRotator(0, -90.0f, 163.0f));
 	}
 
 	bottleMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("bottleMeshComp"));
-	bottleMeshComp->SetupAttachment(GetMesh());
+	bottleMeshComp->SetupAttachment(GetMesh(), TEXT("Hand_RSocket"));
 	bottleFireMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("bottleFireMeshComp"));
 	bottleFireMeshComp->SetupAttachment(bottleMeshComp);
 
@@ -71,7 +71,7 @@ ARedPlayer::ARedPlayer()
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->MaxWalkSpeed = 400.0f;
 
-	ConstructorHelpers::FClassFinder<UAnimInstance> tempAnim(TEXT("/Script/Engine.AnimBlueprint'/Game/Blueprint/player/ABP_NewPlayer.ABP_NewPlayer_C'"));
+	ConstructorHelpers::FClassFinder<UAnimInstance> tempAnim(TEXT("/Script/Engine.AnimBlueprint'/Game/Blueprint/player/ABP_Player.ABP_Player_C'"));
 	if(tempAnim.Succeeded())
 	{
 		GetMesh()->SetAnimInstanceClass(tempAnim.Class);
@@ -92,6 +92,8 @@ void ARedPlayer::BeginPlay()
 	playerAnim = Cast<UPlayerAnim>(GetMesh()->GetAnimInstance());
 
 	ChooseWeapon(EWeaponState::FIST);
+
+	playerAnim->isTargetOn = false;
 }
 
 // Called every frame
@@ -126,6 +128,8 @@ void ARedPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	PlayerInputComponent->BindAction(TEXT("Run"), IE_Released, this, &ARedPlayer::RunReleased);
 	PlayerInputComponent->BindAction(TEXT("Crouch"), IE_Pressed, this, &ARedPlayer::CrouchPressed);
 	PlayerInputComponent->BindAction(TEXT("Crouch"), IE_Released, this, &ARedPlayer::CrouchReleased);
+	PlayerInputComponent->BindAction(TEXT("Target"), IE_Pressed, this, &ARedPlayer::TargetOnPressed);
+	PlayerInputComponent->BindAction(TEXT("Target"), IE_Released, this, &ARedPlayer::TargetOnReleased);
 }
 
 void ARedPlayer::Horizontal(float value)
@@ -240,6 +244,16 @@ void ARedPlayer::RunPressed()
 void ARedPlayer::RunReleased()
 {
 	GetCharacterMovement()->MaxWalkSpeed = walkSpeed;
+}
+
+void ARedPlayer::TargetOnPressed()
+{
+	playerAnim->isTargetOn = true;
+}
+
+void ARedPlayer::TargetOnReleased()
+{
+	playerAnim->isTargetOn = false;
 }
 
 void ARedPlayer::CrouchPressed()

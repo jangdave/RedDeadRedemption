@@ -102,6 +102,10 @@ public:
 
 	void RunReleased();
 
+	void TargetOnPressed();
+
+	void TargetOnReleased();
+
 	void CrouchPressed();
 
 	void CrouchReleased();

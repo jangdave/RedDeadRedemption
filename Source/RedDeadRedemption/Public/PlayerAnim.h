@@ -20,13 +20,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	EWeaponState state;
-
-	bool isPistol;
-
-	bool isRifle;
-
-	bool isFist;
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float forwordVelocity;
 
@@ -35,4 +29,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool isInAir;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool isTargetOn;
 };

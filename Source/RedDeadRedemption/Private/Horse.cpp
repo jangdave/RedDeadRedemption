@@ -22,7 +22,7 @@ AHorse::AHorse()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/HorseAnimsetPro/Meshes/Horses/SK_Horse.SK_Horse'"));
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/HorseAnimsetPro/Meshes/Horses/SK_Horse_PA.SK_Horse_PA'"));
 	if (tempMesh.Succeeded())
 	{
 		GetMesh()->SetSkeletalMesh(tempMesh.Object);
@@ -58,7 +58,7 @@ AHorse::AHorse()
 
 	playerMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("playerMesh"));
 	playerMesh->SetupAttachment(attachComp);
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempPlayerMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/Characters/Mannequins/Meshes/SKM_Manny.SKM_Manny'"));
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempPlayerMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/PolygonWestern/Meshes/Characters/SK_Character_Cowboy_01.SK_Character_Cowboy_01'"));
 	if (tempPlayerMesh.Succeeded())
 	{
 		playerMesh->SetSkeletalMesh(tempPlayerMesh.Object);
@@ -69,7 +69,7 @@ AHorse::AHorse()
 	GetCharacterMovement()->MaxWalkSpeed = 50.0f;
 
 	gunMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("gunMeshComp"));
-	gunMeshComp->SetupAttachment(playerMesh);
+	gunMeshComp->SetupAttachment(playerMesh, TEXT("Hand_RSocket"));
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempGunMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/PolygonWestern/Meshes/Weapons/SK_Wep_Rifle_01.SK_Wep_Rifle_01'"));
 	if (tempGunMesh.Succeeded())
 	{
@@ -78,7 +78,7 @@ AHorse::AHorse()
 		gunMeshComp->SetRelativeLocationAndRotation(FVector(-15.0f, 45.0f, 52.0f), FRotator(0, 0, 0));
 	}
 	revolMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("revolMeshComp"));
-	revolMeshComp->SetupAttachment(playerMesh);
+	revolMeshComp->SetupAttachment(playerMesh, TEXT("Hand_RSocket"));
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempRevolMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/PolygonWestern/Meshes/Weapons/SK_Wep_Revolver_01.SK_Wep_Revolver_01'"));
 	if (tempRevolMesh.Succeeded())
 	{
@@ -87,7 +87,7 @@ AHorse::AHorse()
 		revolMeshComp->SetRelativeLocationAndRotation(FVector(-10.0, 50.0f, 50.0f), FRotator(0, 0, 0));
 	}
 	bottleMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("bottleMeshComp"));
-	bottleMeshComp->SetupAttachment(playerMesh);
+	bottleMeshComp->SetupAttachment(playerMesh, TEXT("Hand_RSocket"));
 	bottleFireMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("bottleFireMeshComp"));
 	bottleFireMeshComp->SetupAttachment(bottleMeshComp);
 }
