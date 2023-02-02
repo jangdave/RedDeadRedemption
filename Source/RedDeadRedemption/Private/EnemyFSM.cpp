@@ -13,6 +13,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "AIController.h"
 #include "NavigationSystem.h"
+#include "EnemyAnim.h"
 
 
 // Sets default values for this component's properties
@@ -48,6 +49,7 @@ void UEnemyFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	{
+		
 		target = UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetPawn();
 
 		switch (mState)
