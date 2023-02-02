@@ -9,7 +9,10 @@
 #include	"EnemyAI.h"
 #include "PlayerPistolBullet.h"
 #include "PlayerRifleBullet.h"
+#include "EnemyBullet.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "AIController.h"
+#include "NavigationSystem.h"
 
 
 // Sets default values for this component's properties
@@ -129,7 +132,6 @@ void UEnemyFSM::MoveState()
 // 공격 상태
 void UEnemyFSM::AttackState()
 {
-
 	// 목표 : 일정시간 마다 한번씩 공격하고싶다.
 	// 1. 시간이 흘렀으니까
 	currentTime += GetWorld()->DeltaTimeSeconds;
@@ -139,11 +141,10 @@ void UEnemyFSM::AttackState()
 		// 3. 공격
 		// Enemy에있는 GunMeshComp를 이용해서 공격
 		FTransform transform = me->GunMeshComp->GetSocketTransform("SK_Wep_Rifle_01_SlideSocket");
-		GetWorld()->SpawnActor<ABullet>(EnemyRifleBulletFactory, transform);
+		GetWorld()->SpawnActor<AEnemyBullet>(EnemyRifleBulletFactory, transform);
 
 		// 4. 경과 시간 초기화
 		currentTime = 0.0f;
-
 
 		// 목표 : 타깃이 공격 범위를 벗어나면 상태를 이동으로 전환하고 싶다.
 		// 1. 타깃과의 거리가 필요하다.
@@ -181,24 +182,17 @@ void UEnemyFSM::DamageState()
 		currentTime = 0.0f;
 	}
 }
+
 // 사망 상태
 void UEnemyFSM::DeadState()
 {
 	currentTime += GetWorld()->GetDeltaSeconds();
 
-	//// 1. 죽었을때 래그돌로 전환한다.
-	//if (currentTime > 1.0f)
-	//{
-	//	// 2. 래그돌로 전환
-	//	me->GetMesh()->SetSimulatePhysics(true);
-	//	// 3. 래그돌로 전환하고 더이상 움직이지 않게 한다.
-	//	return;
-	//}
+		// 사망
 
-	// currentTime이 1초가 넘으면 사망
 	if (currentTime > 1.0f)
 	{
-		// 사망
+	// currentTime이 1초가 넘으면 사망
 		me->Destroy();
 	}
 }
@@ -220,9 +214,4 @@ void UEnemyFSM::OnDamageProcess(int32 damage)
 	}
 }
 
-
-//void UEnemyFSM::SetTargetLocation(FVector newTargetLocation)
-//{
-//	EnemyLocation = newTargetLocation;
-//}
 

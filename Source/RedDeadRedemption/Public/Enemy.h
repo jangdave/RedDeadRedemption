@@ -42,6 +42,10 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "FMSComponent")
 		class UEnemyFSM* myEnemyFSM;
 
+	// 에너미 에니매이션
+	UPROPERTY()
+		class UEnemyAnim* enemyAnim;
+
 	// 총알 오버랩 이벤트
 	UFUNCTION()
 		void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bBFromSweep, const FHitResult& SweepResult);
