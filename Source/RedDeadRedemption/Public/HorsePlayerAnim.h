@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
+#include "Horse.h"
 #include "HorsePlayerAnim.generated.h"
 
 /**
@@ -16,6 +17,9 @@ class REDDEADREDEMPTION_API UHorsePlayerAnim : public UAnimInstance
 
 public:
 	void NativeUpdateAnimation(float DeltaSeconds) override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	EWeaponArm state;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float forVelocity;

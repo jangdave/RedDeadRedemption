@@ -15,6 +15,7 @@ void UPlayerAnim::NativeUpdateAnimation(float DeltaSeconds)
 	{
 		return;
 	}
+
 	FVector velocity = owner->GetVelocity();
 	FVector forVelocity = owner->GetActorForwardVector();
 	FVector rigVelocity = owner->GetActorRightVector();

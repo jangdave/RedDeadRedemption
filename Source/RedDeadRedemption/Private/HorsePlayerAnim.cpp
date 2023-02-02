@@ -10,7 +10,7 @@ void UHorsePlayerAnim::NativeUpdateAnimation(float DeltaSeconds)
 	Super::NativeUpdateAnimation(DeltaSeconds);
 
 	AHorse* owner = Cast<AHorse>(TryGetPawnOwner());
-
+	
 	if (owner == nullptr)
 	{
 		return;
@@ -18,8 +18,9 @@ void UHorsePlayerAnim::NativeUpdateAnimation(float DeltaSeconds)
 
 	FVector velocity = owner->GetVelocity();
 	FVector forwVelocity = owner->GetActorForwardVector();
-	FVector rigwVelocity = owner->GetActorRightVector();
 	forVelocity = FVector::DotProduct(velocity, forwVelocity);
-	rigVelocity = FVector::DotProduct(velocity, rigwVelocity);
+	rigVelocity = owner->h;
 	bAir = owner->GetCharacterMovement()->IsFalling();
+
+	state = owner->weaponArm;
 }

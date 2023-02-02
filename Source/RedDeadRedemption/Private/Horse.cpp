@@ -65,9 +65,7 @@ AHorse::AHorse()
 
 		playerMesh->SetRelativeLocationAndRotation(FVector(0, 0, 80.0f), FRotator(0, -90.0f, 0));
 	}
-
-	GetCharacterMovement()->MaxWalkSpeed = 50.0f;
-
+	
 	gunMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("gunMeshComp"));
 	gunMeshComp->SetupAttachment(playerMesh, TEXT("Hand_RSocket"));
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempGunMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/PolygonWestern/Meshes/Weapons/SK_Wep_Rifle_01.SK_Wep_Rifle_01'"));
@@ -125,11 +123,20 @@ void AHorse::Tick(float DeltaTime)
 
 	FTransform trans(GetControlRotation());
 	FVector resultDirection = trans.TransformVector(direction);
+	//FVector resultDirection = direction;
 	resultDirection.Z = 0;
 	resultDirection.Normalize();
 	AddMovementInput(resultDirection);
-	//방향 초기화
-	direction = FVector::ZeroVector;
+
+	accel = FMath::Clamp(accel, 0, maxAccel);
+	if (h == 0 && v == 0)
+	{
+		// 손놓으면 감속
+		accel = FMath::Lerp(accel, 0, breakValue);
+	}
+
+	GetCharacterMovement()->MaxWalkSpeed = 1200 * accel;
+
 }
 
 // Called to bind functionality to input
@@ -161,7 +168,7 @@ void AHorse::OverlapRide(UPrimitiveComponent* OverlappedComponent, AActor* Other
 
 void AHorse::EndRide(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	GetCharacterMovement()->MaxWalkSpeed = 0.0f;
+	//GetCharacterMovement()->MaxWalkSpeed = 0.0f;
 	if (player != nullptr)
 	{
 		player->bPressed = false;
@@ -170,20 +177,21 @@ void AHorse::EndRide(UPrimitiveComponent* OverlappedComponent, AActor* OtherActo
 
 void AHorse::Horizontal(float value)
 {
-	direction.Y = value;
+	h = value;
+	accel += FMath::Abs(value) * accelRate * GetWorld()->GetDeltaSeconds();
+	if (value != 0)
+	{
+		direction.Y = value;
+	}
 }
 
 void AHorse::Vertical(float value)
 {
-	direction.X = value;
-
-	if(GetCharacterMovement()->MaxWalkSpeed < 1200.0f)
+	v = value;
+	accel += FMath::Abs(value) * accelRate * GetWorld()->GetDeltaSeconds();
+	if (value != 0) 
 	{
-		GetCharacterMovement()->MaxWalkSpeed += value;
-	}
-	if(value <= 0.0f)
-	{
-		GetCharacterMovement()->MaxWalkSpeed = 0.0f;
+		direction.X = value;
 	}
 }
 
@@ -383,7 +391,7 @@ void AHorse::ChooseWeapon(EWeaponArm val)
 		bottleMeshComp->SetVisibility(false);
 		bottleFireMeshComp->SetVisibility(false);
 		weaponArm = val;
-		
+
 		break;
 
 	case EWeaponArm::FIREBOTTLE:

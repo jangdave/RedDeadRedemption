@@ -80,6 +80,27 @@ public:
 	UPROPERTY()
 	class UWeaponWidget* weapon_UI;
 
+	UPROPERTY(EditDefaultsOnly)
+	class UParticleSystem* gunEnemyImpactFactory;
+
+	UPROPERTY(EditDefaultsOnly)
+	class UParticleSystem* pistolEnemyImpactFactory;
+
+	UPROPERTY(EditDefaultsOnly)
+	class UParticleSystem* GroundImpactFactory;
+
+	UPROPERTY(EditAnywhere)
+	class USoundBase* gunFireSound;
+
+	UPROPERTY(EditAnywhere)
+	class USoundBase* pistolFireSound;
+
+	UPROPERTY(EditAnywhere)
+	class USoundBase* groundImpactSound;
+
+	UPROPERTY(EditAnywhere)
+	class USoundBase* enemyImpactSound;
+
 	void Horizontal(float value);
 
 	void Vertical(float value);
@@ -148,4 +169,10 @@ public:
 	float crouchSpeed = 200.0f;
 
 	bool bIsRide;
+
+	bool bTarget;
+
+	void SpawnEmitter(UParticleSystem* factory, FTransform transform);
+
+	void PlaySound(USoundBase* sound);
 };

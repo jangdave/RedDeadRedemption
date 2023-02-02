@@ -44,6 +44,7 @@ void UWeaponWidget::Rifle()
 	else
 	{
 		horse->ChangeRifle();
+		
 	}
 }
 

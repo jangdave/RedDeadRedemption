@@ -89,6 +89,17 @@ public:
 	UPROPERTY()
 	class UWeaponWidget* weapon_UI;
 
+	UPROPERTY(EditAnywhere)
+	float breakValue = 0.1f;
+
+	UPROPERTY(EditAnywhere)
+	float accelRate = 5;
+
+	UPROPERTY(EditAnywhere)
+	float maxAccel = 1;
+
+	float accel;
+
 	void ChooseWeapon(EWeaponArm val);
 	
 	UFUNCTION()
@@ -139,4 +150,6 @@ public:
 	void ChangeMesh(bool bChange);
 
 	FVector direction;
+
+	float h, v;
 };

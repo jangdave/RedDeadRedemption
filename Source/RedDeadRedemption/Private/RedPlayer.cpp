@@ -6,6 +6,8 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Bullet.h"
+#include "Enemy.h"
+#include "EnemyFSM.h"
 #include "FireBottle.h"
 #include "Kismet/GameplayStatics.h"
 #include "Horse.h"
@@ -162,26 +164,32 @@ void ARedPlayer::Jumping()
 
 void ARedPlayer::FirePressed()
 {
-	switch (armWeapon)
+	if(bTarget != false)
 	{
-	case EWeaponState::FIST:
-		FireFist();
-		break;
+		switch (armWeapon)
+		{
+		case EWeaponState::FIST:
+			FireFist();
+			break;
 
-	case EWeaponState::PISTOL:
-		FirePistol();
-		break;
+		case EWeaponState::PISTOL:
 
-	case EWeaponState::RIFLE:
-		FireRifle();
-		break;
+			FirePistol();
+			PlaySound(pistolFireSound);
+			break;
 
-	case EWeaponState::FIREBOTTLE:
-		FireBottle();
-		break;
+		case EWeaponState::RIFLE:
+			FireRifle();
+			PlaySound(gunFireSound);
+			break;
 
-	default:
-		break;
+		case EWeaponState::FIREBOTTLE:
+			FireBottle();
+			break;
+
+		default:
+			break;
+		}
 	}
 }
 
@@ -255,12 +263,14 @@ void ARedPlayer::RunReleased()
 void ARedPlayer::TargetOnPressed()
 {
 	playerAnim->isTargetOn = true;
+	bTarget = playerAnim->isTargetOn;
 	bUseControllerRotationYaw = true;
 }
 
 void ARedPlayer::TargetOnReleased()
 {
 	playerAnim->isTargetOn = false;
+	bTarget = playerAnim->isTargetOn;
 	bUseControllerRotationYaw = false;
 }
 
@@ -372,16 +382,69 @@ void ARedPlayer::ChooseWeapon(EWeaponState val)
 
 void ARedPlayer::FirePistol()
 {
-	FTransform t = revolMeshComp->GetSocketTransform(TEXT("SK_Wep_Revolver_01_CylinderSocket"));
-	//t.SetScale3D(FVector(1));
-	GetWorld()->SpawnActor<APlayerPistolBullet>(pistolBulletFactory, t);
+	FHitResult hitInfo;
+	FVector start = cameraComp->GetComponentLocation();
+	FVector end = start + cameraComp->GetForwardVector() * 200000.0f;
+	FCollisionObjectQueryParams objParams;
+	objParams.AddObjectTypesToQuery(ECC_GameTraceChannel3);
+	bool bHit = GetWorld()->LineTraceSingleByObjectType(hitInfo, start, end, objParams);
+	if (bHit)
+	{
+		FTransform trans(hitInfo.ImpactPoint);
+		SpawnEmitter(pistolEnemyImpactFactory, trans);
+		PlaySound(enemyImpactSound);
+
+		auto enemy = Cast<AEnemy>(hitInfo.GetActor());
+		if (enemy != nullptr)
+		{
+			UEnemyFSM* fsm = Cast<UEnemyFSM>(enemy->GetDefaultSubobjectByName(TEXT("EnemyFSM")));
+
+			fsm->OnDamageProcess(10);
+		}
+	}
+
+	objParams.AddObjectTypesToQuery(ECC_GameTraceChannel4);
+	bool bGroundHit = GetWorld()->LineTraceSingleByObjectType(hitInfo, start, end, objParams);
+	if (bGroundHit)
+	{
+		FTransform trans(hitInfo.ImpactPoint);
+		SpawnEmitter(GroundImpactFactory, trans);
+		PlaySound(groundImpactSound);
+	}
 }
 
 void ARedPlayer::FireRifle()
 {
-	FTransform t = gunMeshComp->GetSocketTransform(TEXT("SK_Wep_Rifle_01_SlideSocket"));
-	//t.SetScale3D(FVector(1));
-	GetWorld()->SpawnActor<APlayerRifleBullet>(rifleBulletFactory, t);
+	FHitResult hitInfo;
+	FVector start = cameraComp->GetComponentLocation();
+	FVector end = start + cameraComp->GetForwardVector() * 200000.0f;
+	FCollisionObjectQueryParams objParams;
+
+	objParams.AddObjectTypesToQuery(ECC_GameTraceChannel3);
+	bool bEnemyHit = GetWorld()->LineTraceSingleByObjectType(hitInfo, start, end, objParams);
+	if(bEnemyHit)
+	{
+		FTransform trans(hitInfo.ImpactPoint);
+		SpawnEmitter(gunEnemyImpactFactory, trans);
+		PlaySound(enemyImpactSound);
+
+		auto enemy = Cast<AEnemy>(hitInfo.GetActor());
+		if(enemy != nullptr)
+		{
+			UEnemyFSM* fsm = Cast<UEnemyFSM>(enemy->GetDefaultSubobjectByName(TEXT("EnemyFSM")));
+
+			fsm->OnDamageProcess(25);
+		}
+	}
+
+	objParams.AddObjectTypesToQuery(ECC_GameTraceChannel4);
+	bool bGroundHit = GetWorld()->LineTraceSingleByObjectType(hitInfo, start, end, objParams);
+	if (bGroundHit)
+	{
+		FTransform trans(hitInfo.ImpactPoint);
+		SpawnEmitter(GroundImpactFactory, trans);
+		PlaySound(groundImpactSound);
+	}
 }
 
 void ARedPlayer::FireFist()
@@ -392,4 +455,14 @@ void ARedPlayer::FireFist()
 void ARedPlayer::FireBottle()
 {
 	GetWorld()->SpawnActor<AFireBottle>(fireBottleFactory, GetActorLocation() + (GetActorUpVector() * 10.0f) + (GetActorForwardVector() * 70.0f), GetControlRotation());
+}
+
+void ARedPlayer::SpawnEmitter(UParticleSystem* factory, FTransform transform)
+{
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), factory, transform);
+}
+
+void ARedPlayer::PlaySound(USoundBase* sound)
+{
+	UGameplayStatics::PlaySoundAtLocation(GetWorld(), sound, GetActorLocation(), GetActorRotation());
 }
