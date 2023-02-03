@@ -89,6 +89,27 @@ public:
 	UPROPERTY()
 	class UWeaponWidget* weapon_UI;
 
+	UPROPERTY(EditDefaultsOnly)
+	class UParticleSystem* gunEnemyImpactFactory;
+
+	UPROPERTY(EditDefaultsOnly)
+	class UParticleSystem* pistolEnemyImpactFactory;
+
+	UPROPERTY(EditDefaultsOnly)
+	class UParticleSystem* GroundImpactFactory;
+
+	UPROPERTY(EditAnywhere)
+	class USoundBase* gunFireSound;
+
+	UPROPERTY(EditAnywhere)
+	class USoundBase* pistolFireSound;
+
+	UPROPERTY(EditAnywhere)
+	class USoundBase* groundImpactSound;
+
+	UPROPERTY(EditAnywhere)
+	class USoundBase* enemyImpactSound;
+
 	UPROPERTY(EditAnywhere)
 	float breakValue = 0.1f;
 
@@ -149,7 +170,18 @@ public:
 	UFUNCTION()
 	void ChangeMesh(bool bChange);
 
+	UPROPERTY(EditAnywhere)
+	FVector cameraLoc;
+
+	UPROPERTY()
 	FVector direction;
 
-	float h, v;
+	UPROPERTY()
+	FVector breakDirection;
+
+	UPROPERTY()
+	float h;
+
+	UPROPERTY()
+	float v;
 };

@@ -12,8 +12,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "Horse.h"
 #include "PlayerAnim.h"
-#include "PlayerPistolBullet.h"
-#include "PlayerRifleBullet.h"
 #include "WeaponWidget.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "GameFramework/Controller.h"
@@ -166,6 +164,7 @@ void ARedPlayer::FirePressed()
 {
 	if(bTarget != false)
 	{
+		FVector loc = GetActorLocation();
 		switch (armWeapon)
 		{
 		case EWeaponState::FIST:
@@ -173,14 +172,13 @@ void ARedPlayer::FirePressed()
 			break;
 
 		case EWeaponState::PISTOL:
-
 			FirePistol();
-			PlaySound(pistolFireSound);
+			PlaySound(pistolFireSound, loc);
 			break;
 
 		case EWeaponState::RIFLE:
 			FireRifle();
-			PlaySound(gunFireSound);
+			PlaySound(gunFireSound, loc);
 			break;
 
 		case EWeaponState::FIREBOTTLE:
@@ -386,13 +384,17 @@ void ARedPlayer::FirePistol()
 	FVector start = cameraComp->GetComponentLocation();
 	FVector end = start + cameraComp->GetForwardVector() * 200000.0f;
 	FCollisionObjectQueryParams objParams;
+	FCollisionObjectQueryParams objParams1;
 	objParams.AddObjectTypesToQuery(ECC_GameTraceChannel3);
-	bool bHit = GetWorld()->LineTraceSingleByObjectType(hitInfo, start, end, objParams);
-	if (bHit)
+	objParams1.AddObjectTypesToQuery(ECC_GameTraceChannel4);
+
+	bool bEnemyHit = GetWorld()->LineTraceSingleByObjectType(hitInfo, start, end, objParams);
+	if (bEnemyHit)
 	{
 		FTransform trans(hitInfo.ImpactPoint);
+		FVector loc(hitInfo.ImpactPoint);
 		SpawnEmitter(pistolEnemyImpactFactory, trans);
-		PlaySound(enemyImpactSound);
+		PlaySound(enemyImpactSound, loc);
 
 		auto enemy = Cast<AEnemy>(hitInfo.GetActor());
 		if (enemy != nullptr)
@@ -403,13 +405,13 @@ void ARedPlayer::FirePistol()
 		}
 	}
 
-	objParams.AddObjectTypesToQuery(ECC_GameTraceChannel4);
-	bool bGroundHit = GetWorld()->LineTraceSingleByObjectType(hitInfo, start, end, objParams);
-	if (bGroundHit)
+	bool bGround = GetWorld()->LineTraceSingleByObjectType(hitInfo, start, end, objParams1);
+	if (bGround)
 	{
 		FTransform trans(hitInfo.ImpactPoint);
+		FVector loc(hitInfo.ImpactPoint);
 		SpawnEmitter(GroundImpactFactory, trans);
-		PlaySound(groundImpactSound);
+		PlaySound(groundImpactSound, loc);
 	}
 }
 
@@ -419,14 +421,19 @@ void ARedPlayer::FireRifle()
 	FVector start = cameraComp->GetComponentLocation();
 	FVector end = start + cameraComp->GetForwardVector() * 200000.0f;
 	FCollisionObjectQueryParams objParams;
-
+	FCollisionObjectQueryParams objParams1;
+	//채널3 - enemy
 	objParams.AddObjectTypesToQuery(ECC_GameTraceChannel3);
+	//채널4 - ground
+	objParams1.AddObjectTypesToQuery(ECC_GameTraceChannel4);
+
 	bool bEnemyHit = GetWorld()->LineTraceSingleByObjectType(hitInfo, start, end, objParams);
 	if(bEnemyHit)
 	{
 		FTransform trans(hitInfo.ImpactPoint);
+		FVector loc(hitInfo.ImpactPoint);
 		SpawnEmitter(gunEnemyImpactFactory, trans);
-		PlaySound(enemyImpactSound);
+		PlaySound(enemyImpactSound, loc);
 
 		auto enemy = Cast<AEnemy>(hitInfo.GetActor());
 		if(enemy != nullptr)
@@ -437,13 +444,13 @@ void ARedPlayer::FireRifle()
 		}
 	}
 
-	objParams.AddObjectTypesToQuery(ECC_GameTraceChannel4);
-	bool bGroundHit = GetWorld()->LineTraceSingleByObjectType(hitInfo, start, end, objParams);
+	bool bGroundHit = GetWorld()->LineTraceSingleByObjectType(hitInfo, start, end, objParams1);
 	if (bGroundHit)
 	{
 		FTransform trans(hitInfo.ImpactPoint);
+		FVector loc(hitInfo.ImpactPoint);
 		SpawnEmitter(GroundImpactFactory, trans);
-		PlaySound(groundImpactSound);
+		PlaySound(groundImpactSound, loc);
 	}
 }
 
@@ -462,7 +469,7 @@ void ARedPlayer::SpawnEmitter(UParticleSystem* factory, FTransform transform)
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), factory, transform);
 }
 
-void ARedPlayer::PlaySound(USoundBase* sound)
+void ARedPlayer::PlaySound(USoundBase* sound, FVector location)
 {
-	UGameplayStatics::PlaySoundAtLocation(GetWorld(), sound, GetActorLocation(), GetActorRotation());
+	UGameplayStatics::PlaySoundAtLocation(GetWorld(), sound, location);
 }

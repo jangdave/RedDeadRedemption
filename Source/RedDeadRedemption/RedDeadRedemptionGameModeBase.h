@@ -28,6 +28,25 @@ public:
 
 	UPROPERTY()
 	class UGamePlayWidget* play_UI;
-	
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UTargetCrossWidget> targetCrossWidget;
+
+	UPROPERTY()
+	class UTargetCrossWidget* target_UI;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UDefaultCrossWidget> defaultCrossWidget;
+
+	UPROPERTY()
+	class UDefaultCrossWidget* default_UI;
+
+	UPROPERTY()
+	class ARedPlayer* player;
+
 	void OnGamePlayWidget();
+
+	void CrossHairOnOff();
+
+	void CrossHairchange();
 };

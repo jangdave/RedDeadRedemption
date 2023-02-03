@@ -34,4 +34,12 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	class UProjectileMovementComponent* movementComp;
+
+	UPROPERTY(EditAnywhere)
+	class AFireBottleFloor* floor;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AFireBottleFloor> effectFloor;
+
+	void Explode();
 };
