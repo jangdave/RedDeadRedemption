@@ -83,11 +83,20 @@ public:
 
 	// 적 라이플 불릿 공장
 	UPROPERTY(EditAnywhere, Category = "FSM")
-		TSubclassOf<class ABullet> EnemyRifleBulletFactory;
+		TSubclassOf<class AEnemyBullet> EnemyRifleBulletFactory;
+
+	// 적 피스톨 불릿 공장
+	UPROPERTY(EditAnywhere, Category = "FSM")
+		TSubclassOf<class AEnemyBullet> EnemyPistolBulletFactory;
 
 	// 피격 알림 이벤트 함수
 	void OnDamageProcess(int32 damage);
-	
+
+	// 히트 이벤트
+
+
+	// AI 컨트롤러
+
 
 public:
 	// 체력을 표현 하고싶다.

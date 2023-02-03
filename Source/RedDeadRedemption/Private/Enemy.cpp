@@ -4,9 +4,12 @@
 #include "Enemy.h"
 #include <Components/SkeletalMeshComponent.h>
 #include "EnemyFSM.h"
+#include "EnemyAnim.h"
 #include "EnemyBullet.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "PlayerPistolBullet.h"
+#include "PlayerRifleBullet.h"
 
 // Sets default values
 AEnemy::AEnemy()
@@ -15,6 +18,8 @@ AEnemy::AEnemy()
 	PrimaryActorTick.bCanEverTick = true;
 
 	
+	// enemy FSM 컴포넌트 추가
+	myEnemyFSM = CreateDefaultSubobject<UEnemyFSM>(TEXT("EnemyFSM"));
 
 	// enemy mesh
 	// constructorhelpers를 이용해서 캐릭터의 메쉬를 가져온다.
@@ -47,8 +52,13 @@ AEnemy::AEnemy()
 	}
 
 
-	// enemy FSM 컴포넌트 추가
-	myEnemyFSM = CreateDefaultSubobject<UEnemyFSM>(TEXT("EnemyFSM"));
+
+	// 애너미에님 컨스트럭터헬퍼스
+	ConstructorHelpers::FClassFinder<UAnimInstance> TempAnim(TEXT("/Script/Engine.AnimBlueprint'/Game/Blueprint/Enemy/ABP_Enemy.ABP_Enemy_C'"));
+	if (TempAnim.Succeeded())
+	{
+		GetMesh()->SetAnimInstanceClass(TempAnim.Class);
+	}
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 }
@@ -70,6 +80,9 @@ void AEnemy::OnMyTakeDamage(float Damage)
 void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// 애너미애님 겟매쉬 캐스트
+	enemyAnim = Cast<UEnemyAnim>(GetMesh()->GetAnimInstance());
 
 	// 총알과의 Overlap을 감지하기 위한 함수
 	GetMesh()->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::OnOverlapBegin);
@@ -95,12 +108,19 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 void AEnemy::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bBFromSweep, const FHitResult& SweepResult)
 {
 	// OtherActor가 PlayerPistolBullet 이라면
-	if (OtherActor->IsA<ABullet>())
+	if (OtherActor->IsA<APlayerPistolBullet>())
 	{
 		// EnemyFSM으로 enemy에게 데미지를 주고 싶다.
 		myEnemyFSM->OnDamageProcess(10.0f);
 
 		UE_LOG(LogTemp, Warning, TEXT("Hit"));
 	}
-	
+	// OtherActor가 PlayerRifleBullet 이라면
+	else if (OtherActor->IsA<APlayerRifleBullet>())
+	{
+		// EnemyFSM으로 enemy에게 데미지를 주고 싶다.
+		myEnemyFSM->OnDamageProcess(20.0f);
+
+		UE_LOG(LogTemp, Warning, TEXT("Hit"));
+	}
 }
