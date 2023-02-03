@@ -9,8 +9,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include <Components/SkeletalMeshComponent.h>
-
 #include "FireBottle.h"
+#include "HorseAnim.h"
 #include "PlayerPistolBullet.h"
 #include "PlayerRifleBullet.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
@@ -51,10 +51,10 @@ AHorse::AHorse()
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
 	attachComp = CreateDefaultSubobject<USceneComponent>(TEXT("attachComp"));
-	attachComp->SetupAttachment(RootComponent);
+	attachComp->SetupAttachment(GetMesh());
 	detachComp = CreateDefaultSubobject<USceneComponent>(TEXT("detachComp"));
-	detachComp->SetupAttachment(RootComponent);
-	detachComp->SetRelativeLocation(FVector(0, -150.0f, -90.0f));
+	detachComp->SetupAttachment(GetMesh());
+	detachComp->SetRelativeLocation(FVector(0, 45.0f, 40.0f));
 
 	playerMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("playerMesh"));
 	playerMesh->SetupAttachment(attachComp);
@@ -65,9 +65,7 @@ AHorse::AHorse()
 
 		playerMesh->SetRelativeLocationAndRotation(FVector(0, 0, 80.0f), FRotator(0, -90.0f, 0));
 	}
-
-	GetCharacterMovement()->MaxWalkSpeed = 50.0f;
-
+	
 	gunMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("gunMeshComp"));
 	gunMeshComp->SetupAttachment(playerMesh, TEXT("Hand_RSocket"));
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> tempGunMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/PolygonWestern/Meshes/Weapons/SK_Wep_Rifle_01.SK_Wep_Rifle_01'"));
@@ -75,7 +73,7 @@ AHorse::AHorse()
 	{
 		gunMeshComp->SetSkeletalMesh(tempGunMesh.Object);
 
-		gunMeshComp->SetRelativeLocationAndRotation(FVector(-15.0f, 45.0f, 52.0f), FRotator(0, 0, 0));
+		gunMeshComp->SetRelativeLocationAndRotation(FVector(-11.0f, -2.6f, -8.0f), FRotator(-6.2f, -75.0f, 165.0f));
 	}
 	revolMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("revolMeshComp"));
 	revolMeshComp->SetupAttachment(playerMesh, TEXT("Hand_RSocket"));
@@ -84,12 +82,18 @@ AHorse::AHorse()
 	{
 		revolMeshComp->SetSkeletalMesh(tempRevolMesh.Object);
 
-		revolMeshComp->SetRelativeLocationAndRotation(FVector(-10.0, 50.0f, 50.0f), FRotator(0, 0, 0));
+		revolMeshComp->SetRelativeLocationAndRotation(FVector(-12.4f, -4.3f, -6.2f), FRotator(5.0f, -80.0f, 165.0f));
 	}
 	bottleMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("bottleMeshComp"));
 	bottleMeshComp->SetupAttachment(playerMesh, TEXT("Hand_RSocket"));
 	bottleFireMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("bottleFireMeshComp"));
 	bottleFireMeshComp->SetupAttachment(bottleMeshComp);
+
+	ConstructorHelpers::FClassFinder<UAnimInstance> tempAnim(TEXT("/Script/Engine.AnimBlueprint'/Game/Blueprint/player/ABP_NewHorse.ABP_NewHorse_C'"));
+	if (tempAnim.Succeeded())
+	{
+		GetMesh()->SetAnimInstanceClass(tempAnim.Class);
+	}
 }
 
 // Called when the game starts or when spawned
@@ -107,6 +111,8 @@ void AHorse::BeginPlay()
 
 	weapon_UI = CreateWidget<UWeaponWidget>(GetWorld(), weaponWidget);
 
+	horseAnim = Cast<UHorseAnim>(GetMesh()->GetAnimInstance());
+
 	ChooseWeapon(EWeaponArm::FIST);
 }
 
@@ -117,11 +123,20 @@ void AHorse::Tick(float DeltaTime)
 
 	FTransform trans(GetControlRotation());
 	FVector resultDirection = trans.TransformVector(direction);
+	//FVector resultDirection = direction;
 	resultDirection.Z = 0;
 	resultDirection.Normalize();
 	AddMovementInput(resultDirection);
-	//방향 초기화
-	direction = FVector::ZeroVector;
+
+	accel = FMath::Clamp(accel, 0, maxAccel);
+	if (h == 0 && v == 0)
+	{
+		// 손놓으면 감속
+		accel = FMath::Lerp(accel, 0, breakValue);
+	}
+
+	GetCharacterMovement()->MaxWalkSpeed = 1200 * accel;
+
 }
 
 // Called to bind functionality to input
@@ -136,6 +151,7 @@ void AHorse::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAction(TEXT("HorseRide"), IE_Pressed, this, &AHorse::HorseRide);
 	PlayerInputComponent->BindAction(TEXT("FireBullet"), IE_Pressed, this, &AHorse::FirePressed);
 	PlayerInputComponent->BindAction(TEXT("HorseWeaponChange"), IE_Pressed, this, &AHorse::WeaponChangePressed);
+	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &AHorse::ActionJump);
 }
 
 void AHorse::OverlapRide(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -152,7 +168,7 @@ void AHorse::OverlapRide(UPrimitiveComponent* OverlappedComponent, AActor* Other
 
 void AHorse::EndRide(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	GetCharacterMovement()->MaxWalkSpeed = 0.0f;
+	//GetCharacterMovement()->MaxWalkSpeed = 0.0f;
 	if (player != nullptr)
 	{
 		player->bPressed = false;
@@ -161,20 +177,21 @@ void AHorse::EndRide(UPrimitiveComponent* OverlappedComponent, AActor* OtherActo
 
 void AHorse::Horizontal(float value)
 {
-	direction.Y = value;
+	h = value;
+	accel += FMath::Abs(value) * accelRate * GetWorld()->GetDeltaSeconds();
+	if (value != 0)
+	{
+		direction.Y = value;
+	}
 }
 
 void AHorse::Vertical(float value)
 {
-	direction.X = value;
-
-	if(GetCharacterMovement()->MaxWalkSpeed < 1200.0f)
+	v = value;
+	accel += FMath::Abs(value) * accelRate * GetWorld()->GetDeltaSeconds();
+	if (value != 0) 
 	{
-		GetCharacterMovement()->MaxWalkSpeed += value;
-	}
-	if(value <= 0.0f)
-	{
-		GetCharacterMovement()->MaxWalkSpeed = 0.0f;
+		direction.X = value;
 	}
 }
 
@@ -186,6 +203,11 @@ void AHorse::LookUp(float value)
 void AHorse::TurnRight(float value)
 {
 	AddControllerYawInput(value);
+}
+
+void AHorse::ActionJump()
+{
+	Jump();
 }
 
 void AHorse::HorseRide()
@@ -369,7 +391,7 @@ void AHorse::ChooseWeapon(EWeaponArm val)
 		bottleMeshComp->SetVisibility(false);
 		bottleFireMeshComp->SetVisibility(false);
 		weaponArm = val;
-		
+
 		break;
 
 	case EWeaponArm::FIREBOTTLE:
