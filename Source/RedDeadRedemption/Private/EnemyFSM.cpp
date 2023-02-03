@@ -100,6 +100,7 @@ void UEnemyFSM::IdleState()
 			// 플레이어를 타깃으로 설정
 			// 상태를 이동 상태로 변경
 			mState = EEnemyState::Move;
+			me->enemyAnim->State = mState;
 			// 반복문 종료
 			break;
 		}
@@ -129,6 +130,7 @@ void UEnemyFSM::MoveState()
 	{
 		// 2. 상태를 공격 상태로 변경
 		mState = EEnemyState::Attack;
+		me->enemyAnim->State = mState;
 	}
 }
 // 공격 상태
@@ -156,6 +158,7 @@ void UEnemyFSM::AttackState()
 		{
 			// 3. 상태를 이동 상태로 변경
 			mState = EEnemyState::Move;
+			me->enemyAnim->State = mState;
 		}
 	}
 	// 플레이어와의 거리 계산
@@ -180,7 +183,7 @@ void UEnemyFSM::DamageState()
 	{
 		// 상태를 이동 상태로 변경
 		mState = EEnemyState::Move;
-		// 경과 시간 초기화
+		me->enemyAnim->State = mState;	// 경과 시간 초기화
 		currentTime = 0.0f;
 	}
 }
@@ -208,11 +211,13 @@ void UEnemyFSM::OnDamageProcess(int32 damage)
 	{
 		// 상태를 사망 상태로 변경
 		mState = EEnemyState::Dead;
+		me->enemyAnim->State = mState;
 	}
 	else
 	{
 		// 상태를 피격 상태로 변경
 		mState = EEnemyState::Damage;
+		me->enemyAnim->State = mState;
 	}
 }
 
