@@ -39,5 +39,15 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Explosive Settings")
 		float ExplosionCount = 0;
 
-	// 
+	// Æø¹ß Æã¼Ç
+	UFUNCTION(BlueprintCallable)
+		void Explosion();
+
+	// Æø¹ß È¿°ú
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Explosive Settings")
+		class UParticleSystem* ExplosionEffect;
+
+	class UEnemyFSM* EnemyFSM;
+	
+	class AEnemy* Enemy;
 };
