@@ -51,6 +51,17 @@ AEnemy::AEnemy()
 		
 	}
 
+	// 리볼버 컴포넌트
+	RevolverMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("RevolverMeshComp"));
+	RevolverMeshComp->SetRelativeScale3D(FVector(1.0f));
+	RevolverMeshComp->SetupAttachment(GetMesh(), TEXT("Hand_RSocket"));
+	// 리볼버 에셋 읽어서 컴포넌트에 적용
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempRevolverMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/PolygonWestern/Meshes/Weapons/SK_Wep_Revolver_01.SK_Wep_Revolver_01'"));
+	if (TempRevolverMesh.Succeeded())
+	{
+		RevolverMeshComp->SetSkeletalMesh(TempRevolverMesh.Object);
+		RevolverMeshComp->SetRelativeLocationAndRotation(FVector(-10.304565f, -4.293165f, -3.691982f), FRotator(20.551983f, -76.14f, 159.704f));
+	}
 
 
 	// 애너미에님 컨스트럭터헬퍼스

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Enemy.h"
+#include "RedPlayer.h"
 #include "EnemySpawner.generated.h"
 
 UCLASS()
@@ -29,17 +30,40 @@ public:
 	// enemy class and a TimerHandle for the spawn timer.
 	UPROPERTY(EditAnywhere, Category = "Spawning")
 		TSubclassOf<class AEnemy> EnemyClass;
-	
+
+	// 플레이어
 	UPROPERTY(EditAnywhere, Category = "Spawning")
-		float SpawnDelay;
+		class ARedPlayer* Player;
+
+	// 최대 적 스폰
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Spawning")
+		int32 MaxEnemySpawn = 5;
+
+	// 현재 스폰된 적 수
+	UPROPERTY(EditAnywhere, Category = "Spawning")
+		int32 EnemiesSpawned = 0;
+
+	UPROPERTY(EditAnywhere, Category = "Spawning")
+		float SpawnDelay = 2.0f;
+
+	// 플레이어 감지 범위
+	UPROPERTY(EditAnywhere, Category = "Spawning")
+		float PlayerDetectionRange = 3000.0f;
+
+	// 플레이어 스폰 범위
+	UPROPERTY(EditAnywhere, Category = "Spawning")
+		float PlayerSpawnRange = 100.0f;
+
+	void CheckPlayerDistance();
+
+	FTimerHandle SpawnTimer;
 
 private:
 	// A timer handle for the spawn timer.
 	int EnemyCount;
-	FTimerHandle SpawnTimer;
 
 	// A function to spawn an enemy.
-//	void SpawnEnemy(UEnemyFSM* Enemy);
+void SpawnEnemy();
 //	void OnEnemyDeath(UEnemyFSM* Enemy);
 	
 };
