@@ -36,4 +36,7 @@ public:
 
 		UPROPERTY()
 			class AEnemy* me;
+
+		UPROPERTY(EditAnywhere, BlueprintReadOnly)
+			int pose;
 };

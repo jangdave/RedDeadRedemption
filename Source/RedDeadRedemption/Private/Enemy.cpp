@@ -37,7 +37,8 @@ AEnemy::AEnemy()
 
 	// 라이플의 컴포넌트를 만들고 싶다.
 	GunMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("GunMeshComp"));
-	GunMeshComp->SetupAttachment(GetMesh());
+	GunMeshComp->SetRelativeScale3D(FVector(1.0f));
+	GunMeshComp->SetupAttachment(GetMesh(), TEXT("Hand_RSocket"));
 	// 라이플의 에셋을 읽어서 컴포넌트에 적용한다.
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempGunMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/PolygonWestern/Meshes/Weapons/SK_Wep_Rifle_01.SK_Wep_Rifle_01'"));
 	// 만약 적용이 성공했다면
@@ -46,9 +47,8 @@ AEnemy::AEnemy()
 		// 라이플의 메쉬를 GunMeshComp에 적용한다.
 		GunMeshComp->SetSkeletalMesh(TempGunMesh.Object);
 		// transform을 설정한다.
-		GunMeshComp->SetRelativeLocationAndRotation(FVector(0.0f, 60.0f, 140.0f), FRotator(0.0f, 0.0f, 0.0f));
-		// scale 수정
-		GunMeshComp->SetRelativeScale3D(FVector(1.0f));
+		GunMeshComp->SetRelativeLocationAndRotation(FVector(-10.304565f, -4.293165f, -3.691982f), FRotator(20.551983f, -76.14f, 159.704f));
+		
 	}
 
 
