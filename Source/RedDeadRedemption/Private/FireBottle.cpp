@@ -81,6 +81,7 @@ void AFireBottle::Explode()
 		{
 			FVector loc = FVector(GetActorLocation().X, GetActorLocation().Y, 0);
 			FRotator roc = FRotator(0, 0, 0);
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), explosionImpactFactory,GetActorLocation());
 			GetWorld()->SpawnActor<AFireBottleFloor>(effectFloor, loc, roc);
 			this->Destroy();
 		}

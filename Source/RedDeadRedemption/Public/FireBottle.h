@@ -41,5 +41,8 @@ public:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AFireBottleFloor> effectFloor;
 
+	UPROPERTY(EditDefaultsOnly)
+	class UParticleSystem* explosionImpactFactory;
+
 	void Explode();
 };

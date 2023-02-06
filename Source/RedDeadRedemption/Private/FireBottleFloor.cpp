@@ -2,11 +2,11 @@
 
 
 #include "FireBottleFloor.h"
-
 #include "Enemy.h"
 #include "EnemyFSM.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
+#include "RedPlayer.h"
 #include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -27,11 +27,15 @@ void AFireBottleFloor::BeginPlay()
 
 	enemy = Cast<AEnemy>(UGameplayStatics::GetActorOfClass(GetWorld(), AEnemy::StaticClass()));
 
+	player = Cast<ARedPlayer>(UGameplayStatics::GetActorOfClass(GetWorld(), ARedPlayer::StaticClass()));
+
 	sphereComp->OnComponentBeginOverlap.AddDynamic(this, &AFireBottleFloor::OnOverlap);
 
 	StartFloor();
 
 	StartFire();
+
+	GetWorld()->GetTimerManager().SetTimer(destroyTime, this, &AFireBottleFloor::DestroySelf, 8.0f, false);
 }
 
 // Called every frame
@@ -47,13 +51,17 @@ void AFireBottleFloor::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	{
 		enemy->myEnemyFSM->OnDamageProcess(5);
 	}
+	else if(player != nullptr)
+	{
+		player->OnDamage(20);
+	}
 }
 
 void AFireBottleFloor::StartFloor()
 {
 	if(floorEffect != nullptr)
 	{
-		UNiagaraComponent* niagaraFloorComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), floorEffect, GetActorLocation());
+		niagaraFloorComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), floorEffect, GetActorLocation());
 	}
 }
 
@@ -61,12 +69,16 @@ void AFireBottleFloor::StartFire()
 {
 	if (fireEffect != nullptr)
 	{
-		UNiagaraComponent* niagaraFireComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), fireEffect, GetActorLocation());
+		niagaraFireComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), fireEffect, GetActorLocation());
 	}
 }
 
 void AFireBottleFloor::DestroySelf()
 {
-	Destroy();
+	this->Destroy();
+
+	niagaraFloorComp->DestroyInstance();
+
+	niagaraFireComp->DestroyInstance();
 }
 

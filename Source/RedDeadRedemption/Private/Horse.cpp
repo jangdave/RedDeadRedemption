@@ -13,6 +13,7 @@
 #include "EnemyFSM.h"
 #include "FireBottle.h"
 #include "HorseAnim.h"
+#include "HorsePlayerAnim.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "WeaponWidget.h"
 
@@ -39,7 +40,7 @@ AHorse::AHorse()
 
 	springComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("springComp"));
 	springComp->SetupAttachment(RootComponent);
-	springComp->SetRelativeLocationAndRotation(FVector(0, 0, 100.0f), FRotator(-30.0f, 0, 0));
+	springComp->SetRelativeLocationAndRotation(FVector(0, 0, 250.0f), FRotator(-30.0f, 0, 0));
 	springComp->TargetArmLength = 500.0f;
 
 	cameraComp = CreateDefaultSubobject<UCameraComponent>(TEXT("cameraComp"));
@@ -54,7 +55,7 @@ AHorse::AHorse()
 	attachComp->SetupAttachment(GetMesh());
 	detachComp = CreateDefaultSubobject<USceneComponent>(TEXT("detachComp"));
 	detachComp->SetupAttachment(GetMesh());
-	detachComp->SetRelativeLocation(FVector(0, 45.0f, 40.0f));
+	detachComp->SetRelativeLocation(FVector(80.0f, 45.0f, 40.0f));
 
 	playerMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("playerMesh"));
 	playerMesh->SetupAttachment(attachComp);
@@ -93,6 +94,12 @@ AHorse::AHorse()
 	if (tempAnim.Succeeded())
 	{
 		GetMesh()->SetAnimInstanceClass(tempAnim.Class);
+	}
+
+	ConstructorHelpers::FClassFinder<UAnimInstance> tempRiderAnim(TEXT("/Script/Engine.AnimBlueprint'/Game/Blueprint/player/ABP_HorsePlayer.ABP_HorsePlayer_C'"));
+	if (tempRiderAnim.Succeeded())
+	{
+		playerMesh->SetAnimInstanceClass(tempRiderAnim.Class);
 	}
 }
 
@@ -224,6 +231,23 @@ void AHorse::ActionJump()
 
 void AHorse::HorseRide()
 {
+	UnRide();
+}
+
+void AHorse::ChangeMesh(bool bChange)
+{
+	if (bChange != true)
+	{
+		playerMesh->SetVisibility(true);
+	}
+	else
+	{
+		return;
+	}
+}
+
+void AHorse::UnRide()
+{
 	player->SetActorTransform(detachComp->GetComponentTransform());
 
 	UGameplayStatics::GetPlayerController(this, 0)->Possess(player);
@@ -238,37 +262,25 @@ void AHorse::HorseRide()
 	//플레이어 콜리젼 켜기
 	player->SetActorEnableCollision(true);
 	GetMovementComponent()->StopMovementImmediately();
-	
-	if(weaponArm == EWeaponArm::FIREBOTTLE)
+
+	if (weaponArm == EWeaponArm::FIREBOTTLE)
 	{
 		player->ChooseWeapon(EWeaponState::FIREBOTTLE);
 	}
-	else if(weaponArm == EWeaponArm::FIST)
+	else if (weaponArm == EWeaponArm::FIST)
 	{
 		player->ChooseWeapon(EWeaponState::FIST);
 	}
-	else if(weaponArm == EWeaponArm::PISTOL)
+	else if (weaponArm == EWeaponArm::PISTOL)
 	{
 		player->ChooseWeapon(EWeaponState::PISTOL);
 	}
-	else if(weaponArm == EWeaponArm::RIFLE)
+	else if (weaponArm == EWeaponArm::RIFLE)
 	{
 		player->ChooseWeapon(EWeaponState::RIFLE);
 	}
 
 	ChooseWeapon(EWeaponArm::FIST);
-}
-
-void AHorse::ChangeMesh(bool bChange)
-{
-	if (bChange != true)
-	{
-		playerMesh->SetVisibility(true);
-	}
-	else
-	{
-		return;
-	}
 }
 
 void AHorse::FirePressed()
@@ -399,7 +411,7 @@ void AHorse::FireFist()
 
 void AHorse::FireBottle()
 {
-	GetWorld()->SpawnActor<AFireBottle>(fireBottleFactory, GetActorLocation() + (GetActorUpVector() * 50.0f) + (GetActorForwardVector() * 100.0f), GetControlRotation());
+	GetWorld()->SpawnActor<AFireBottle>(fireBottleFactory, GetActorLocation() + (GetActorUpVector() * 100.0f) + (GetActorForwardVector() * 100.0f), GetControlRotation());
 }
 
 void AHorse::ChangeFist()

@@ -9,7 +9,7 @@ void UPlayerAnim::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
 
-	ARedPlayer* owner = Cast<ARedPlayer>(TryGetPawnOwner());
+	owner = Cast<ARedPlayer>(TryGetPawnOwner());
 
 	if(owner == nullptr)
 	{
@@ -23,3 +23,33 @@ void UPlayerAnim::NativeUpdateAnimation(float DeltaSeconds)
 	rightVelocity = FVector::DotProduct(velocity, rigVelocity);
 	isInAir = owner->GetCharacterMovement()->IsFalling();
 }
+
+void UPlayerAnim::OnAnim(FName sectionName)
+{
+	owner->PlayAnimMontage(playerMontageFactory, 1, sectionName);
+}
+
+void UPlayerAnim::Throw()
+{
+	owner->bottleMeshComp->SetVisibility(false);
+	owner->bottleFireMeshComp->SetVisibility(false);
+	owner->SpawnBottle();
+}
+
+void UPlayerAnim::EndThrow()
+{
+	owner->bottleMeshComp->SetVisibility(true);
+	owner->bottleFireMeshComp->SetVisibility(true);
+	owner->GetCharacterMovement()->MaxWalkSpeed = 400.0f;
+}
+
+void UPlayerAnim::EndMount()
+{
+	owner->Ride();
+}
+
+void UPlayerAnim::EndDismount()
+{
+
+}
+

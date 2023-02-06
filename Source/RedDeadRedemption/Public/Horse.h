@@ -45,6 +45,9 @@ public:
 	class UHorseAnim* horseAnim;
 
 	UPROPERTY(EditAnywhere)
+	class UHorsePlayerAnim* riderAnim;
+
+	UPROPERTY(EditAnywhere)
 	class USpringArmComponent* springComp;
 
 	UPROPERTY(EditAnywhere)
@@ -184,4 +187,7 @@ public:
 
 	UPROPERTY()
 	float v;
+
+	UFUNCTION()
+	void UnRide();
 };

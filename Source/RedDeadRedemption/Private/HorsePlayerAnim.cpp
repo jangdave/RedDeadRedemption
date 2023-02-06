@@ -9,7 +9,7 @@ void UHorsePlayerAnim::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
 
-	AHorse* owner = Cast<AHorse>(TryGetPawnOwner());
+	owner = Cast<AHorse>(TryGetPawnOwner());
 	
 	if (owner == nullptr)
 	{

@@ -32,4 +32,25 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool isTargetOn;
+
+	UPROPERTY(EditAnywhere)
+	class UAnimMontage* playerMontageFactory;
+
+	UPROPERTY()
+	class ARedPlayer* owner;
+
+	UFUNCTION(BlueprintCallable)
+	void OnAnim(FName sectionName);
+
+	UFUNCTION(BlueprintCallable)
+	void EndThrow();
+
+	UFUNCTION(BlueprintCallable)
+	void Throw();
+
+	UFUNCTION(BlueprintCallable)
+	void EndMount();
+
+	UFUNCTION(BlueprintCallable)
+	void EndDismount();
 };

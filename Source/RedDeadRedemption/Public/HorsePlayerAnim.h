@@ -27,6 +27,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float rigVelocity;
 
+	UPROPERTY()
+	class AHorse* owner;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bAir;
 };
