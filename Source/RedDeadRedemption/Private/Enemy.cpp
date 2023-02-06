@@ -10,6 +10,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "PlayerPistolBullet.h"
 #include "PlayerRifleBullet.h"
+#include "PhysicsEngine/PhysicsAsset.h"
+#include "Engine/SkeletalMesh.h"
 
 // Sets default values
 AEnemy::AEnemy()
@@ -75,16 +77,11 @@ AEnemy::AEnemy()
 }
 
 
-void AEnemy::OnMyTakeDamage(float Damage)
+void AEnemy::OnDeath()
 {
-
-	//EnemyHealth -= Damage;
-
-	//if (EnemyHealth <= 0.0f)
-	//{
-	//	Destroy();
-	//}
-	
+	GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
+	GetMesh()->SetSimulatePhysics(true);
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 // Called when the game starts or when spawned
@@ -135,3 +132,4 @@ void AEnemy::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 		UE_LOG(LogTemp, Warning, TEXT("Hit"));
 	}
 }
+

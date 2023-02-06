@@ -96,7 +96,8 @@ public:
 
 
 	// AI 컨트롤러
-
+	UPROPERTY()
+		class AAIController* AI;
 
 public:
 	// 체력을 표현 하고싶다.

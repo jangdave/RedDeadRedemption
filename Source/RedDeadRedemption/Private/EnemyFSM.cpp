@@ -6,6 +6,7 @@
 #include "RedPlayer.h"
 #include <Kismet/GameplayStatics.h>
 #include <Components/CapsuleComponent.h>
+#include <Components/SkeletalMeshComponent.h>
 #include	"EnemyAI.h"
 #include "PlayerPistolBullet.h"
 #include "PlayerRifleBullet.h"
@@ -14,6 +15,7 @@
 #include "AIController.h"
 #include "NavigationSystem.h"
 #include "EnemyAnim.h"
+
 
 
 // Sets default values for this component's properties
@@ -41,7 +43,8 @@ void UEnemyFSM::BeginPlay()
 	// 태어날때 현재 체력을 최대 체력으로 설정
 	EnemyHealth = EnemyMaxHealth;
 	
-	
+	// AAIController 타입으로 캐스팅
+	AI = Cast<AAIController>(me->GetController());
 }
 
 // Called every frame
@@ -119,10 +122,9 @@ void UEnemyFSM::MoveState()
 
 	me->GetCharacterMovement()->MaxWalkSpeed = EnemyRunSpeed;
 
-	me->AddMovementInput(direction.GetSafeNormal());
+//	me->AddMovementInput(direction.GetSafeNormal());
 
-	// me->AddMovementInput(direction.GetSafeNormal());
-
+	AI->MoveToLocation(destination, 300.0f);
 	
 	// 타깃과 가까워 지면 공격 상태로 전환하고 싶다.
 	// 1. 만약 거리가 공격 범위 안에 들어오면..
@@ -194,8 +196,7 @@ void UEnemyFSM::DeadState()
 	currentTime += GetWorld()->GetDeltaSeconds();
 
 		// 사망
-
-	if (currentTime > 1.0f)
+	if (currentTime > 3.0f)
 	{
 	// currentTime이 1초가 넘으면 사망
 		me->Destroy();
@@ -210,6 +211,7 @@ void UEnemyFSM::OnDamageProcess(int32 damage)
 	if (EnemyHealth <= 0)
 	{
 		// 상태를 사망 상태로 변경
+		me->OnDeath();
 		mState = EEnemyState::Dead;
 		me->enemyAnim->State = mState;
 	}

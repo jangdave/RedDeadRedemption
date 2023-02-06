@@ -17,13 +17,11 @@ public:
 	// 적 메쉬
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "EnemySettings")
 		class USkeletalMeshComponent* EnemyMesh;
-
-
-	// 적 받는 피해
-	UFUNCTION(BlueprintCallable, Category = "EnemySettings")
-		void OnMyTakeDamage(float Damage);
-
 	
+
+	// 적 래그돌
+	UFUNCTION(BlueprintCallable, Category = "EnemySettings")
+		void OnDeath();
 	
 
 protected:
