@@ -71,7 +71,7 @@ void AFireBottle::Explode()
 	FCollisionObjectQueryParams params;
 	params.AddObjectTypesToQuery(ECC_GameTraceChannel3);
 	params.AddObjectTypesToQuery(ECC_GameTraceChannel4);
-	FCollisionShape checkShape = FCollisionShape::MakeSphere(20);
+	FCollisionShape checkShape = FCollisionShape::MakeSphere(30);
 	GetWorld()->OverlapMultiByObjectType(hitsInfo, centerLoc, centerRot, params, checkShape);
 	for(FOverlapResult hitInfo : hitsInfo)
 	{
@@ -85,7 +85,7 @@ void AFireBottle::Explode()
 			this->Destroy();
 		}
 	}
-	DrawDebugSphere(GetWorld(), centerLoc, 20, 1, FColor::Yellow, false, 0.5);
+	DrawDebugSphere(GetWorld(), centerLoc, 30, 1, FColor::Yellow, false, 0.5);
 }
 
 //UKismetSystemLibrary::SphereTraceMulti();

@@ -115,7 +115,7 @@ void AHorse::BeginPlay()
 
 	ChooseWeapon(EWeaponArm::FIST);
 
-	GetCharacterMovement()->MaxWalkSpeed = 1200 * accel;
+	//GetCharacterMovement()->MaxWalkSpeed = 1200 * accel;
 
 }
 
@@ -147,6 +147,8 @@ void AHorse::Tick(float DeltaTime)
 		AddMovementInput(resultDirection);
 		direction = FVector::ZeroVector;
 	}
+
+	GetCharacterMovement()->MaxWalkSpeed = 1200 * accel;
 }
 
 // Called to bind functionality to input
