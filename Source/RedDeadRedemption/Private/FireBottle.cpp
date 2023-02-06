@@ -2,9 +2,10 @@
 
 
 #include "FireBottle.h"
-
+#include "FireBottleFloor.h"
 #include "Components/BoxComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AFireBottle::AFireBottle()
@@ -50,7 +51,8 @@ AFireBottle::AFireBottle()
 void AFireBottle::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	floor = Cast<AFireBottleFloor>(UGameplayStatics::GetActorOfClass(GetWorld(), effectFloor));
 }
 
 // Called every frame
@@ -58,7 +60,35 @@ void AFireBottle::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	Explode();
 }
+
+void AFireBottle::Explode()
+{
+	TArray<FOverlapResult> hitsInfo;
+	FVector centerLoc = GetActorLocation();
+	FQuat centerRot = GetActorRotation().Quaternion();
+	FCollisionObjectQueryParams params;
+	params.AddObjectTypesToQuery(ECC_GameTraceChannel3);
+	params.AddObjectTypesToQuery(ECC_GameTraceChannel4);
+	FCollisionShape checkShape = FCollisionShape::MakeSphere(30);
+	GetWorld()->OverlapMultiByObjectType(hitsInfo, centerLoc, centerRot, params, checkShape);
+	for(FOverlapResult hitInfo : hitsInfo)
+	{
+		bool bHit = hitInfo.bBlockingHit;
+
+		if(bHit)
+		{
+			FVector loc = FVector(GetActorLocation().X, GetActorLocation().Y, 0);
+			FRotator roc = FRotator(0, 0, 0);
+			GetWorld()->SpawnActor<AFireBottleFloor>(effectFloor, loc, roc);
+			this->Destroy();
+		}
+	}
+	DrawDebugSphere(GetWorld(), centerLoc, 30, 1, FColor::Yellow, false, 0.5);
+}
+
+//UKismetSystemLibrary::SphereTraceMulti();
 
 //반경 5미터 이내에 있는 모든 AEnemy엑터들을 감지한다
 //감지된 에너미들의 정보를 담을 변수의 배열

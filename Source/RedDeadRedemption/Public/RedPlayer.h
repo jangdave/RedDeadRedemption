@@ -174,5 +174,5 @@ public:
 
 	void SpawnEmitter(UParticleSystem* factory, FTransform transform);
 
-	void PlaySound(USoundBase* sound);
+	void PlaySound(USoundBase* sound, FVector location);
 };

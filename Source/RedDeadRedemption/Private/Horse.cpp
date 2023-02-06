@@ -9,10 +9,10 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include <Components/SkeletalMeshComponent.h>
+#include "Enemy.h"
+#include "EnemyFSM.h"
 #include "FireBottle.h"
 #include "HorseAnim.h"
-#include "PlayerPistolBullet.h"
-#include "PlayerRifleBullet.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "WeaponWidget.h"
 
@@ -114,29 +114,41 @@ void AHorse::BeginPlay()
 	horseAnim = Cast<UHorseAnim>(GetMesh()->GetAnimInstance());
 
 	ChooseWeapon(EWeaponArm::FIST);
+
+	//GetCharacterMovement()->MaxWalkSpeed = 1200 * accel;
+
 }
 
 // Called every frame
 void AHorse::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	FTransform trans(GetControlRotation());
-	FVector resultDirection = trans.TransformVector(direction);
-	//FVector resultDirection = direction;
-	resultDirection.Z = 0;
-	resultDirection.Normalize();
-	AddMovementInput(resultDirection);
-
+	
 	accel = FMath::Clamp(accel, 0, maxAccel);
 	if (h == 0 && v == 0)
 	{
 		// 손놓으면 감속
 		accel = FMath::Lerp(accel, 0, breakValue);
+
+		FTransform transform(GetControlRotation());
+		FVector resultDirection = transform.TransformVector(breakDirection);
+		resultDirection.Z = 0;
+		resultDirection.Normalize();
+		AddMovementInput(resultDirection);
+	}
+	else
+	{
+		breakDirection = direction;
+
+		FTransform transform(GetControlRotation());
+		FVector resultDirection = transform.TransformVector(direction);
+		resultDirection.Z = 0;
+		resultDirection.Normalize();
+		AddMovementInput(resultDirection);
+		direction = FVector::ZeroVector;
 	}
 
 	GetCharacterMovement()->MaxWalkSpeed = 1200 * accel;
-
 }
 
 // Called to bind functionality to input
@@ -261,6 +273,7 @@ void AHorse::ChangeMesh(bool bChange)
 
 void AHorse::FirePressed()
 {
+	FVector locf = GetActorLocation();
 	switch (weaponArm)
 	{
 	case EWeaponState::FIST:
@@ -269,9 +282,11 @@ void AHorse::FirePressed()
 
 	case EWeaponState::PISTOL:
 		FirePistol();
+		player->PlaySound(pistolFireSound, locf);
 		break;
 
 	case EWeaponState::RIFLE:
+		player->PlaySound(gunFireSound, locf);
 		FireRifle();
 		break;
 
@@ -304,14 +319,78 @@ void AHorse::ControllerWidget()
 
 void AHorse::FirePistol()
 {
-	FTransform t = revolMeshComp->GetSocketTransform(TEXT("SK_Wep_Revolver_01_CylinderSocket"));
-	GetWorld()->SpawnActor<APlayerPistolBullet>(pistolBulletFactory, t);
+	FHitResult hitInfo;
+	FVector start = cameraComp->GetComponentLocation() + cameraLoc;
+	FVector end = start + cameraComp->GetForwardVector() * 200000.0f;
+	FCollisionObjectQueryParams objParams;
+	FCollisionObjectQueryParams objParams1;
+	objParams.AddObjectTypesToQuery(ECC_GameTraceChannel3);
+	objParams1.AddObjectTypesToQuery(ECC_GameTraceChannel4);
+
+	bool bEnemyHit = GetWorld()->LineTraceSingleByObjectType(hitInfo, start, end, objParams);
+	if (bEnemyHit)
+	{
+		FTransform trans(hitInfo.ImpactPoint);
+		FVector loc(hitInfo.ImpactPoint);
+		player->SpawnEmitter(pistolEnemyImpactFactory, trans);
+		player->PlaySound(enemyImpactSound, loc);
+
+		auto enemy = Cast<AEnemy>(hitInfo.GetActor());
+		if (enemy != nullptr)
+		{
+			UEnemyFSM* fsm = Cast<UEnemyFSM>(enemy->GetDefaultSubobjectByName(TEXT("EnemyFSM")));
+
+			fsm->OnDamageProcess(10);
+		}
+	}
+
+	bool bGround = GetWorld()->LineTraceSingleByObjectType(hitInfo, start, end, objParams1);
+	if (bGround)
+	{
+		FTransform trans(hitInfo.ImpactPoint);
+		FVector loc(hitInfo.ImpactPoint);
+		player->SpawnEmitter(GroundImpactFactory, trans);
+		player->PlaySound(groundImpactSound, loc);
+	}
 }
 
 void AHorse::FireRifle()
 {
-	FTransform t = gunMeshComp->GetSocketTransform(TEXT("SK_Wep_Rifle_01_SlideSocket"));
-	GetWorld()->SpawnActor<APlayerRifleBullet>(rifleBulletFactory, t);
+	FHitResult hitInfo;
+	FVector start = cameraComp->GetComponentLocation() + cameraLoc;
+	FVector end = start + cameraComp->GetForwardVector() * 200000.0f;
+	FCollisionObjectQueryParams objParams;
+	FCollisionObjectQueryParams objParams1;
+	//채널3 - enemy
+	objParams.AddObjectTypesToQuery(ECC_GameTraceChannel3);
+	//채널4 - ground
+	objParams1.AddObjectTypesToQuery(ECC_GameTraceChannel4);
+
+	bool bEnemyHit = GetWorld()->LineTraceSingleByObjectType(hitInfo, start, end, objParams);
+	if (bEnemyHit)
+	{
+		FTransform trans(hitInfo.ImpactPoint);
+		FVector loc(hitInfo.ImpactPoint);
+		player->SpawnEmitter(gunEnemyImpactFactory, trans);
+		player->PlaySound(enemyImpactSound, loc);
+
+		auto enemy = Cast<AEnemy>(hitInfo.GetActor());
+		if (enemy != nullptr)
+		{
+			UEnemyFSM* fsm = Cast<UEnemyFSM>(enemy->GetDefaultSubobjectByName(TEXT("EnemyFSM")));
+
+			fsm->OnDamageProcess(25);
+		}
+	}
+
+	bool bGroundHit = GetWorld()->LineTraceSingleByObjectType(hitInfo, start, end, objParams1);
+	if (bGroundHit)
+	{
+		FTransform trans(hitInfo.ImpactPoint);
+		FVector loc(hitInfo.ImpactPoint);
+		player->SpawnEmitter(GroundImpactFactory, trans);
+		player->PlaySound(groundImpactSound, loc);
+	}
 }
 
 void AHorse::FireFist()

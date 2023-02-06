@@ -18,7 +18,6 @@ void UHorseAnim::NativeUpdateAnimation(float DeltaSeconds)
 	FVector velocity = owner->GetVelocity();
 	FVector forVelocity = owner->GetActorForwardVector();
 	forwordVelocity = FVector::DotProduct(velocity, forVelocity);
-	UE_LOG(LogTemp, Warning, TEXT("%f"), forwordVelocity);
 	rightVelocity = owner->h;
 	isAir = owner->GetCharacterMovement()->IsFalling();
 }
