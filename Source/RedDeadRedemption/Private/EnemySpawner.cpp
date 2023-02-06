@@ -22,7 +22,7 @@ void AEnemySpawner::BeginPlay()
 	Super::BeginPlay();
 
 	// 스폰 타이머를 시작
-	//GetWorld()->GetTimerManager().SetTimer(SpawnTimer, this, &AEnemySpawner::SpawnEnemy, SpawnDelay, true);
+	GetWorld()->GetTimerManager().SetTimer(SpawnTimer, this, &AEnemySpawner::SpawnEnemy, SpawnDelay, true);
 
 	Player = Cast<ARedPlayer>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 }
@@ -47,7 +47,8 @@ void AEnemySpawner::CheckPlayerDistance()
 	{
 		// 스폰 타이머를 한번만 시작
 		GetWorld()->GetTimerManager().SetTimer(SpawnTimer, this, &AEnemySpawner::SpawnEnemy, SpawnDelay, true);
-		
+		UE_LOG(LogTemp, Warning, TEXT("Player Detected"));
+
 	}
 	else // 나가는 순간
 	{

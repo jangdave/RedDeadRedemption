@@ -50,6 +50,10 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Spawning")
 		float PlayerDetectionRange = 3000.0f;
 
+	// 플레이어 스폰 범위
+	UPROPERTY(EditAnywhere, Category = "Spawning")
+		float PlayerSpawnRange = 100.0f;
+
 	void CheckPlayerDistance();
 
 	FTimerHandle SpawnTimer;

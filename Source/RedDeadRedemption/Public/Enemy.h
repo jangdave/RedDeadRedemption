@@ -55,5 +55,5 @@ public:
 		class USkeletalMeshComponent* GunMeshComp;
 	// 리볼버 메쉬
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "EnemySettings")
-		class UStaticMeshComponent* RevolverMeshComp;
+		class USkeletalMeshComponent* RevolverMeshComp;
 };

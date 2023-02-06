@@ -79,7 +79,7 @@ public:
 
 	// 적 뛰는 속도
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FSM")
-		float EnemyRunSpeed = 800.0f;
+		float EnemyRunSpeed = 600.0f;
 
 	// 적 라이플 불릿 공장
 	UPROPERTY(EditAnywhere, Category = "FSM")
