@@ -117,6 +117,12 @@ public:
 
 	void HorseRide();
 
+	UFUNCTION()
+	void HorseUnRide();
+
+	UFUNCTION()
+	void UnRideAnimEnd();
+
 	void WeaponChangePress();
 
 	void RunPressed();
@@ -176,7 +182,7 @@ public:
 
 	bool bTarget;
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	int32 HP;
 
 	UPROPERTY(EditAnywhere)

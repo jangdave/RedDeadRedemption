@@ -32,4 +32,22 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bAir;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float horseYaw;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float horsePitch;
+
+	UPROPERTY(EditAnywhere)
+	class UAnimMontage* riderMontageFactory;
+
+	UFUNCTION(BlueprintCallable)
+	void OnRiderAnim(FName sectionName);
+
+	UFUNCTION(BlueprintCallable)
+	void EndThrow();
+
+	UFUNCTION(BlueprintCallable)
+	void Throw();
 };

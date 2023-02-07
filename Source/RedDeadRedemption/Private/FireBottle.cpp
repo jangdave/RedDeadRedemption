@@ -2,6 +2,7 @@
 
 
 #include "FireBottle.h"
+#include "Enemy.h"
 #include "FireBottleFloor.h"
 #include "Components/BoxComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
@@ -71,6 +72,8 @@ void AFireBottle::Explode()
 	FCollisionObjectQueryParams params;
 	params.AddObjectTypesToQuery(ECC_GameTraceChannel3);
 	params.AddObjectTypesToQuery(ECC_GameTraceChannel4);
+	params.AddObjectTypesToQuery(ECC_WorldStatic);
+
 	FCollisionShape checkShape = FCollisionShape::MakeSphere(30);
 	GetWorld()->OverlapMultiByObjectType(hitsInfo, centerLoc, centerRot, params, checkShape);
 	for(FOverlapResult hitInfo : hitsInfo)
@@ -79,10 +82,21 @@ void AFireBottle::Explode()
 
 		if(bHit)
 		{
-			FVector loc = FVector(GetActorLocation().X, GetActorLocation().Y, 0);
-			FRotator roc = FRotator(0, 0, 0);
-			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), explosionImpactFactory,GetActorLocation());
-			GetWorld()->SpawnActor<AFireBottleFloor>(effectFloor, loc, roc);
+			auto enemy = Cast<AEnemy>(hitInfo.GetActor());
+			if(enemy == nullptr)
+			{
+				FVector loc = FVector(GetActorLocation());
+				FRotator rot = FRotator(0, 0, 0);
+				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), explosionImpactFactory, loc);
+				GetWorld()->SpawnActor<AFireBottleFloor>(effectFloor, loc, rot);
+			}
+			else
+			{
+				FVector eneLoc = FVector(enemy->GetActorLocation().X, enemy->GetActorLocation().Y, enemy->GetActorLocation().Z-88.0f);
+				FRotator eneRot = FRotator(0, 0, 0);
+				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), explosionImpactFactory, eneLoc);
+				GetWorld()->SpawnActor<AFireBottleFloor>(effectFloor, eneLoc, eneRot);
+			}
 			this->Destroy();
 		}
 	}

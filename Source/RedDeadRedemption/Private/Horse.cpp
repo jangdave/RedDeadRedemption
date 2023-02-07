@@ -55,7 +55,7 @@ AHorse::AHorse()
 	attachComp->SetupAttachment(GetMesh());
 	detachComp = CreateDefaultSubobject<USceneComponent>(TEXT("detachComp"));
 	detachComp->SetupAttachment(GetMesh());
-	detachComp->SetRelativeLocation(FVector(80.0f, 45.0f, 40.0f));
+	detachComp->SetRelativeLocation(FVector(-80.0f, 45.0f, 40.0f));
 
 	playerMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("playerMesh"));
 	playerMesh->SetupAttachment(attachComp);
@@ -120,17 +120,23 @@ void AHorse::BeginPlay()
 
 	horseAnim = Cast<UHorseAnim>(GetMesh()->GetAnimInstance());
 
+	horsePlayerAnim = Cast<UHorsePlayerAnim>(playerMesh->GetAnimInstance());
+
 	ChooseWeapon(EWeaponArm::FIST);
-
-	//GetCharacterMovement()->MaxWalkSpeed = 1200 * accel;
-
 }
 
 // Called every frame
 void AHorse::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
+
+	FRotator cam = cameraComp->GetComponentRotation();
+	if(cam.Yaw < 145.0f && cam.Yaw > -120.0f)
+	{
+		horsePlayerAnim->horseYaw = cam.Yaw;
+		horsePlayerAnim->horsePitch = cam.Pitch;
+	}
+
 	accel = FMath::Clamp(accel, 0, maxAccel);
 	if (h == 0 && v == 0)
 	{
@@ -187,7 +193,6 @@ void AHorse::OverlapRide(UPrimitiveComponent* OverlappedComponent, AActor* Other
 
 void AHorse::EndRide(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	//GetCharacterMovement()->MaxWalkSpeed = 0.0f;
 	if (player != nullptr)
 	{
 		player->bPressed = false;
@@ -231,7 +236,29 @@ void AHorse::ActionJump()
 
 void AHorse::HorseRide()
 {
-	UnRide();
+	if (weaponArm == EWeaponArm::FIREBOTTLE)
+	{
+		player->ChooseWeapon(EWeaponState::FIREBOTTLE);
+	}
+	else if (weaponArm == EWeaponArm::FIST)
+	{
+		player->ChooseWeapon(EWeaponState::FIST);
+	}
+	else if (weaponArm == EWeaponArm::PISTOL)
+	{
+		player->ChooseWeapon(EWeaponState::PISTOL);
+	}
+	else if (weaponArm == EWeaponArm::RIFLE)
+	{
+		player->ChooseWeapon(EWeaponState::RIFLE);
+	}
+
+	ChooseWeapon(EWeaponArm::FIST);
+	player->SetActorLocation(FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z + 50));
+	player->SetActorRotation(GetActorRotation());
+	playerMesh->SetVisibility(false);
+	player->GetMesh()->SetVisibility(true);
+	player->HorseUnRide();
 }
 
 void AHorse::ChangeMesh(bool bChange)
@@ -252,35 +279,13 @@ void AHorse::UnRide()
 
 	UGameplayStatics::GetPlayerController(this, 0)->Possess(player);
 
-	playerMesh->SetVisibility(false);
-
-	//플레이어 보이게 하기
-	player->GetMesh()->SetVisibility(true);
-	player->gunMeshComp->SetVisibility(true);
-	player->revolMeshComp->SetVisibility(true);
 	player->bIsRide = false;
 	//플레이어 콜리젼 켜기
 	player->SetActorEnableCollision(true);
+
 	GetMovementComponent()->StopMovementImmediately();
 
-	if (weaponArm == EWeaponArm::FIREBOTTLE)
-	{
-		player->ChooseWeapon(EWeaponState::FIREBOTTLE);
-	}
-	else if (weaponArm == EWeaponArm::FIST)
-	{
-		player->ChooseWeapon(EWeaponState::FIST);
-	}
-	else if (weaponArm == EWeaponArm::PISTOL)
-	{
-		player->ChooseWeapon(EWeaponState::PISTOL);
-	}
-	else if (weaponArm == EWeaponArm::RIFLE)
-	{
-		player->ChooseWeapon(EWeaponState::RIFLE);
-	}
-
-	ChooseWeapon(EWeaponArm::FIST);
+	GetCharacterMovement()->MaxWalkSpeed = 0;
 }
 
 void AHorse::FirePressed()
@@ -289,7 +294,6 @@ void AHorse::FirePressed()
 	switch (weaponArm)
 	{
 	case EWeaponState::FIST:
-		FireFist();
 		break;
 
 	case EWeaponState::PISTOL:
@@ -405,11 +409,15 @@ void AHorse::FireRifle()
 	}
 }
 
-void AHorse::FireFist()
+void AHorse::FireBottle()
 {
+	if(horsePlayerAnim != nullptr)
+	{
+		horsePlayerAnim->OnRiderAnim(TEXT("HorseThrow"));
+	}
 }
 
-void AHorse::FireBottle()
+void AHorse::SpawnHorseBottle()
 {
 	GetWorld()->SpawnActor<AFireBottle>(fireBottleFactory, GetActorLocation() + (GetActorUpVector() * 100.0f) + (GetActorForwardVector() * 100.0f), GetControlRotation());
 }

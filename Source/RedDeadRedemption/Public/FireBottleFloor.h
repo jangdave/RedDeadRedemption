@@ -33,23 +33,15 @@ public:
 	UPROPERTY(EditAnywhere)
 	class USphereComponent* sphereComp;
 
-	UPROPERTY()
-	class AEnemy* enemy;
-
-	UPROPERTY()
-	class ARedPlayer* player;
-
 	UFUNCTION()
-	void OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	void OnOverlap();
 
 	void StartFloor();
 
 	void StartFire();
 
 	void DestroySelf();
-
-	void DestroyNiagara();
-
+	
 	UPROPERTY()
 	UNiagaraComponent* niagaraFloorComp;
 

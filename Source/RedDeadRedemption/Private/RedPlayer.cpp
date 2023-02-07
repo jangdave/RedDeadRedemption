@@ -13,6 +13,7 @@
 #include "Horse.h"
 #include "PlayerAnim.h"
 #include "WeaponWidget.h"
+#include "GamePlayWidget.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "GameFramework/Controller.h"
 
@@ -102,10 +103,6 @@ void ARedPlayer::BeginPlay()
 void ARedPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-
-	UE_LOG(LogTemp, Warning, TEXT("HP : %d"), HP);
-
 
 	FTransform trans(GetControlRotation());
 	FVector resultDirection = trans.TransformVector(direction);
@@ -210,11 +207,22 @@ void ARedPlayer::HorseRide()
 	{
 		//플레이어 컨트롤러 넘기기
 		GetWorld()->GetFirstPlayerController()->Possess(horsePlayer);
-		//SetActorLocation(horsePlayer->GetActorLocation());
-		SetActorTransform(horsePlayer->GetActorTransform());
+		SetActorLocation(FVector(horsePlayer->GetActorLocation().X, horsePlayer->GetActorLocation().Y, horsePlayer->GetActorLocation().Z + 20));
+		SetActorRotation(horsePlayer->GetActorRotation());
 		playerAnim->OnAnim(TEXT("Mount"));
 	}
 }
+
+void ARedPlayer::HorseUnRide()
+{
+	playerAnim->OnAnim(TEXT("Dismount"));
+}
+
+void ARedPlayer::UnRideAnimEnd()
+{
+	horsePlayer->UnRide();
+}
+
 
 void ARedPlayer::WeaponChangePress()
 {
@@ -225,7 +233,6 @@ void ARedPlayer::WeaponChangePress()
 		GetWorld()->GetFirstPlayerController()->AController::SetIgnoreLookInput(true);
 		UWidgetBlueprintLibrary::SetInputMode_GameAndUIEx(GetWorld()->GetFirstPlayerController(), weapon_UI);
 	}
-	//UGameplayStatics::SetGamePaused(GetWorld(), false);
 }
 
 void ARedPlayer::RunPressed()
@@ -468,9 +475,11 @@ void ARedPlayer::PlaySound(USoundBase* sound, FVector location)
 
 void ARedPlayer::OnDamage(int32 damage)
 {
+	HP -= damage;
+
 	if(HP <= 0)
 	{
-		
+		playerAnim->OnAnim(TEXT("Dead"));
 	}
 	else
 	{
@@ -480,14 +489,14 @@ void ARedPlayer::OnDamage(int32 damage)
 
 void ARedPlayer::Ride()
 {
+	horsePlayer->ChangeMesh(false);
+
 	//플레이어 메쉬 안보이게하기
 	GetMesh()->SetVisibility(false);
-	gunMeshComp->SetVisibility(false);
-	revolMeshComp->SetVisibility(false);
+	
 	//플레이어 콜리젼 끄기
 	this->SetActorEnableCollision(false);
-	//홀스 메쉬 켜기
-	horsePlayer->ChangeMesh(false);
+	
 	bIsRide = true;
 
 	if (armWeapon == EWeaponState::FIREBOTTLE)
@@ -510,3 +519,4 @@ void ARedPlayer::Ride()
 	ChooseWeapon(EWeaponState::FIST);
 }
 
+//UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 10);

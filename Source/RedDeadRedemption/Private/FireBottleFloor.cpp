@@ -25,12 +25,6 @@ void AFireBottleFloor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	enemy = Cast<AEnemy>(UGameplayStatics::GetActorOfClass(GetWorld(), AEnemy::StaticClass()));
-
-	player = Cast<ARedPlayer>(UGameplayStatics::GetActorOfClass(GetWorld(), ARedPlayer::StaticClass()));
-
-	sphereComp->OnComponentBeginOverlap.AddDynamic(this, &AFireBottleFloor::OnOverlap);
-
 	StartFloor();
 
 	StartFire();
@@ -43,18 +37,37 @@ void AFireBottleFloor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	OnOverlap();
 }
 
-void AFireBottleFloor::OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AFireBottleFloor::OnOverlap()
 {
-	if(enemy != nullptr)
+	TArray<FOverlapResult> hitsInfo;
+	FVector centerLoc = GetActorLocation();
+	FQuat centerRot = GetActorRotation().Quaternion();
+	FCollisionObjectQueryParams params;
+	params.AddObjectTypesToQuery(ECC_GameTraceChannel1);
+	params.AddObjectTypesToQuery(ECC_GameTraceChannel2);
+	params.AddObjectTypesToQuery(ECC_GameTraceChannel3);
+	
+	FCollisionShape checkShape = FCollisionShape::MakeSphere(200);
+	GetWorld()->OverlapMultiByObjectType(hitsInfo, centerLoc, centerRot, params, checkShape);
+	for (FOverlapResult hitInfo : hitsInfo)
 	{
-		enemy->myEnemyFSM->OnDamageProcess(5);
+		auto enemy = Cast<AEnemy>(hitInfo.GetActor());
+		if (enemy != nullptr)
+		{
+			UEnemyFSM* fsm = Cast<UEnemyFSM>(enemy->GetDefaultSubobjectByName(TEXT("EnemyFSM")));
+
+			fsm->OnDamageProcess(1);
+		}
+		auto player = Cast<ARedPlayer>(hitInfo.GetActor());
+		if (player != nullptr)
+		{
+			player->OnDamage(50);
+		}
 	}
-	else if(player != nullptr)
-	{
-		player->OnDamage(20);
-	}
+	DrawDebugSphere(GetWorld(), centerLoc, 200, 1, FColor::Yellow, false, 0.5);
 }
 
 void AFireBottleFloor::StartFloor()

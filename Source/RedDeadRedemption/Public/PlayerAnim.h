@@ -53,4 +53,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void EndDismount();
+
+	UFUNCTION(BlueprintCallable)
+	void EndDead();
 };

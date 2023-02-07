@@ -24,3 +24,21 @@ void UHorsePlayerAnim::NativeUpdateAnimation(float DeltaSeconds)
 
 	state = owner->weaponArm;
 }
+
+void UHorsePlayerAnim::OnRiderAnim(FName sectionName)
+{
+	//owner->playerMesh->PlayAnimMontage(riderMontageFactory, 1, sectionName);
+}
+
+void UHorsePlayerAnim::EndThrow()
+{
+	owner->bottleMeshComp->SetVisibility(false);
+	owner->bottleFireMeshComp->SetVisibility(false);
+	owner->SpawnHorseBottle();
+}
+
+void UHorsePlayerAnim::Throw()
+{
+	owner->bottleMeshComp->SetVisibility(true);
+	owner->bottleFireMeshComp->SetVisibility(true);
+}

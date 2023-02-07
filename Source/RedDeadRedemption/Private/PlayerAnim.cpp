@@ -50,6 +50,11 @@ void UPlayerAnim::EndMount()
 
 void UPlayerAnim::EndDismount()
 {
+	owner->UnRideAnimEnd();
+}
+
+void UPlayerAnim::EndDead()
+{
 
 }
 
