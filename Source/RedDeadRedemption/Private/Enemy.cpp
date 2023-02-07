@@ -82,6 +82,8 @@ void AEnemy::OnDeath()
 	GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
 	GetMesh()->SetSimulatePhysics(true);
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	RevolverMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GunMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 // Called when the game starts or when spawned

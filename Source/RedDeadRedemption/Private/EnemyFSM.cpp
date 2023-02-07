@@ -144,6 +144,8 @@ void UEnemyFSM::AttackState()
 	// 2. 공격시간이 경과했는지 확인
 	if (currentTime > AttackDelayTime)
 	{
+		me->enemyAnim->bAttackPlay = true;
+		me->OnMyAttack(FName("againfire"));
 		// 3. 공격
 		// Enemy에있는 GunMeshComp를 이용해서 공격
 		FTransform transform = me->GunMeshComp->GetSocketTransform("SK_Wep_Rifle_01_SlideSocket");
@@ -161,6 +163,11 @@ void UEnemyFSM::AttackState()
 			// 3. 상태를 이동 상태로 변경
 			mState = EEnemyState::Move;
 			me->enemyAnim->State = mState;
+		}
+		else
+		{
+			//범위 안에있으면 계속 공격
+			me->enemyAnim->bAttackPlay = true;
 		}
 	}
 	// 플레이어와의 거리 계산
@@ -195,12 +202,12 @@ void UEnemyFSM::DeadState()
 {
 	currentTime += GetWorld()->GetDeltaSeconds();
 
-		// 사망
-	if (currentTime > 3.0f)
-	{
-	// currentTime이 1초가 넘으면 사망
-		me->Destroy();
-	}
+	//	// 사망
+	//if (currentTime > 5.0f)
+	//{
+	//// currentTime이 1초가 넘으면 사망
+	//	me->Destroy();
+	//}
 }
 
 void UEnemyFSM::OnDamageProcess(int32 damage)
@@ -223,4 +230,7 @@ void UEnemyFSM::OnDamageProcess(int32 damage)
 	}
 }
 
-
+void UEnemyFSM::OnAttackEvent()
+{
+	
+}

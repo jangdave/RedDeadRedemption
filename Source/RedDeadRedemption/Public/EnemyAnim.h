@@ -34,6 +34,11 @@ public:
 		UFUNCTION()
 			void AnimNotify_OnHit();
 
+		// 적 공격 애니메이션 노티파이
+		UFUNCTION()
+			void AnimNotify_OnAttack();
+
+
 		UPROPERTY()
 			class AEnemy* me;
 

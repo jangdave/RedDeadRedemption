@@ -19,3 +19,12 @@ void UEnemyAnim::AnimNotify_OnHit()
 		return;
 	}
 }
+
+void UEnemyAnim::AnimNotify_OnAttack()	
+{
+	if (this == nullptr)
+	{
+		return;
+	}
+	me->myEnemyFSM->OnAttackEvent();
+}

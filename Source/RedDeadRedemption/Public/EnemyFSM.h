@@ -56,7 +56,7 @@ public:
 		float IdleDelayTime = 2.0f;
 	// 경과 시간
 	float currentTime = 0.0f;
-
+	bool bAttackPlay = false;
 	// 타깃
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "FSM")
 	class APawn* target;
@@ -92,8 +92,8 @@ public:
 	// 피격 알림 이벤트 함수
 	void OnDamageProcess(int32 damage);
 
-	// 히트 이벤트
-
+	// 공격 이벤트
+	void OnAttackEvent();
 
 	// AI 컨트롤러
 	UPROPERTY()

@@ -48,6 +48,9 @@ public:
 	UFUNCTION()
 		void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bBFromSweep, const FHitResult& SweepResult);
 
+	UFUNCTION(BlueprintimplementableEvent, Category = "EnemySettings")
+		void OnMyAttack(FName SectionName);
+
 	// ÃÑ ¸Þ½¬
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "EnemySettings")
 		class USkeletalMeshComponent* GunMeshComp;
