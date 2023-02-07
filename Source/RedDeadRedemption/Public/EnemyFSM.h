@@ -91,7 +91,7 @@ public:
 
 	// 피격 알림 이벤트 함수
 	void OnDamageProcess(int32 damage);
-
+	
 	// 공격 이벤트
 	void OnAttackEvent();
 

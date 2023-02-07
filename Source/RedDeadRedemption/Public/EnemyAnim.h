@@ -22,7 +22,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		EEnemyState State;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool bAttackPlay;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
