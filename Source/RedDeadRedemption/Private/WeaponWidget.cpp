@@ -2,7 +2,6 @@
 
 
 #include "WeaponWidget.h"
-
 #include "Horse.h"
 #include "RedPlayer.h"
 #include "Components/Button.h"
