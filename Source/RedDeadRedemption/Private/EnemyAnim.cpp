@@ -19,3 +19,17 @@ void UEnemyAnim::AnimNotify_OnHit()
 		return;
 	}
 }
+
+void UEnemyAnim::AnimNotify_OnAttack()	
+{
+	if (this == nullptr)
+	{
+		return;
+	}
+	me->myEnemyFSM->OnAttackEvent();
+}
+
+void UEnemyAnim::OnMyAttack(FName SectionName)
+{
+	me->PlayAnimMontage(AttackMontage, 1.0f, SectionName);
+}

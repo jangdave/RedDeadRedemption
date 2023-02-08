@@ -6,6 +6,7 @@
 #include "RedPlayer.h"
 #include <Kismet/GameplayStatics.h>
 #include <Components/CapsuleComponent.h>
+#include <Components/SkeletalMeshComponent.h>
 #include	"EnemyAI.h"
 #include "PlayerPistolBullet.h"
 #include "PlayerRifleBullet.h"
@@ -14,6 +15,7 @@
 #include "AIController.h"
 #include "NavigationSystem.h"
 #include "EnemyAnim.h"
+
 
 
 // Sets default values for this component's properties
@@ -41,7 +43,8 @@ void UEnemyFSM::BeginPlay()
 	// 태어날때 현재 체력을 최대 체력으로 설정
 	EnemyHealth = EnemyMaxHealth;
 	
-	
+	// AAIController 타입으로 캐스팅
+	AI = Cast<AAIController>(me->GetController());
 }
 
 // Called every frame
@@ -70,7 +73,6 @@ void UEnemyFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 			DeadState();
 			break;
 		}
-		
 		
 	}
 	
@@ -119,10 +121,9 @@ void UEnemyFSM::MoveState()
 
 	me->GetCharacterMovement()->MaxWalkSpeed = EnemyRunSpeed;
 
-	me->AddMovementInput(direction.GetSafeNormal());
+//	me->AddMovementInput(direction.GetSafeNormal());
 
-	// me->AddMovementInput(direction.GetSafeNormal());
-
+	AI->MoveToLocation(destination, 300.0f);
 	
 	// 타깃과 가까워 지면 공격 상태로 전환하고 싶다.
 	// 1. 만약 거리가 공격 범위 안에 들어오면..
@@ -142,6 +143,8 @@ void UEnemyFSM::AttackState()
 	// 2. 공격시간이 경과했는지 확인
 	if (currentTime > AttackDelayTime)
 	{
+		// Enemy.cpp에있는 OnFire 함수를 호출
+		me->OnFire();
 		// 3. 공격
 		// Enemy에있는 GunMeshComp를 이용해서 공격
 		FTransform transform = me->GunMeshComp->GetSocketTransform("SK_Wep_Rifle_01_SlideSocket");
@@ -159,6 +162,11 @@ void UEnemyFSM::AttackState()
 			// 3. 상태를 이동 상태로 변경
 			mState = EEnemyState::Move;
 			me->enemyAnim->State = mState;
+		}
+		else
+		{
+			//범위 안에있으면 계속 공격
+			me->enemyAnim->bAttackPlay = true;
 		}
 	}
 	// 플레이어와의 거리 계산
@@ -193,13 +201,12 @@ void UEnemyFSM::DeadState()
 {
 	currentTime += GetWorld()->GetDeltaSeconds();
 
-		// 사망
-
-	if (currentTime > 1.0f)
-	{
-	// currentTime이 1초가 넘으면 사망
-		me->Destroy();
-	}
+	//	// 사망
+	//if (currentTime > 5.0f)
+	//{
+	//// currentTime이 1초가 넘으면 사망
+	//	me->Destroy();
+	//}
 }
 
 void UEnemyFSM::OnDamageProcess(int32 damage)
@@ -210,6 +217,7 @@ void UEnemyFSM::OnDamageProcess(int32 damage)
 	if (EnemyHealth <= 0)
 	{
 		// 상태를 사망 상태로 변경
+		me->OnDeath();
 		mState = EEnemyState::Dead;
 		me->enemyAnim->State = mState;
 	}
@@ -221,4 +229,7 @@ void UEnemyFSM::OnDamageProcess(int32 damage)
 	}
 }
 
-
+void UEnemyFSM::OnAttackEvent()
+{	
+		
+}

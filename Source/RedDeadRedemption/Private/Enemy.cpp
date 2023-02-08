@@ -10,6 +10,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "PlayerPistolBullet.h"
 #include "PlayerRifleBullet.h"
+#include "PhysicsEngine/PhysicsAsset.h"
+#include "Engine/SkeletalMesh.h"
 
 // Sets default values
 AEnemy::AEnemy()
@@ -18,44 +20,44 @@ AEnemy::AEnemy()
 	PrimaryActorTick.bCanEverTick = true;
 
 	
-	// enemy FSM ÄÄÆ÷³ÍÆ® Ãß°¡
+	// enemy FSM ì»´í¬ë„ŒíŠ¸ ì¶”ê°€
 	myEnemyFSM = CreateDefaultSubobject<UEnemyFSM>(TEXT("EnemyFSM"));
 
 	// enemy mesh
-	// constructorhelpers¸¦ ÀÌ¿ëÇØ¼­ Ä³¸¯ÅÍÀÇ ¸Ş½¬¸¦ °¡Á®¿Â´Ù.
+	// constructorhelpersë¥¼ ì´ìš©í•´ì„œ ìºë¦­í„°ì˜ ë©”ì‰¬ë¥¼ ê°€ì ¸ì˜¨ë‹¤.
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempEnemyMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/PolygonWestern/Meshes/Characters/SK_Character_Badguy_01.SK_Character_Badguy_01'"));
-	// ºÒ·¯¿À´Âµ¥ ¼º°øÇß´Ù¸é
+	// ë¶ˆëŸ¬ì˜¤ëŠ”ë° ì„±ê³µí–ˆë‹¤ë©´
 	if (TempEnemyMesh.Succeeded())
 	{
-		// ¸Ş½¬¸¦ GetMesh·Î Àû¿ëÇÑ´Ù.
+		// ë©”ì‰¬ë¥¼ GetMeshë¡œ ì ìš©í•œë‹¤.
 		GetMesh()->SetSkeletalMesh(TempEnemyMesh.Object);
-		// transformÀ» ¼³Á¤ÇÑ´Ù.
+		// transformì„ ì„¤ì •í•œë‹¤.
 		GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -90.0f), FRotator(0.0f, -90.0f, 0.0f));
-		// scale ¼öÁ¤
+		// scale ìˆ˜ì •
 		GetMesh()->SetRelativeScale3D(FVector(1.0f));
 	}
 
-	// ¶óÀÌÇÃÀÇ ÄÄÆ÷³ÍÆ®¸¦ ¸¸µé°í ½Í´Ù.
+	// ë¼ì´í”Œì˜ ì»´í¬ë„ŒíŠ¸ë¥¼ ë§Œë“¤ê³  ì‹¶ë‹¤.
 	GunMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("GunMeshComp"));
 	GunMeshComp->SetRelativeScale3D(FVector(1.0f));
 	GunMeshComp->SetupAttachment(GetMesh(), TEXT("Hand_RSocket"));
-	// ¶óÀÌÇÃÀÇ ¿¡¼ÂÀ» ÀĞ¾î¼­ ÄÄÆ÷³ÍÆ®¿¡ Àû¿ëÇÑ´Ù.
+	// ë¼ì´í”Œì˜ ì—ì…‹ì„ ì½ì–´ì„œ ì»´í¬ë„ŒíŠ¸ì— ì ìš©í•œë‹¤.
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempGunMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/PolygonWestern/Meshes/Weapons/SK_Wep_Rifle_01.SK_Wep_Rifle_01'"));
-	// ¸¸¾à Àû¿ëÀÌ ¼º°øÇß´Ù¸é
+	// ë§Œì•½ ì ìš©ì´ ì„±ê³µí–ˆë‹¤ë©´
 	if (TempGunMesh.Succeeded())
 	{
-		// ¶óÀÌÇÃÀÇ ¸Ş½¬¸¦ GunMeshComp¿¡ Àû¿ëÇÑ´Ù.
+		// ë¼ì´í”Œì˜ ë©”ì‰¬ë¥¼ GunMeshCompì— ì ìš©í•œë‹¤.
 		GunMeshComp->SetSkeletalMesh(TempGunMesh.Object);
-		// transformÀ» ¼³Á¤ÇÑ´Ù.
+		// transformì„ ì„¤ì •í•œë‹¤.
 		GunMeshComp->SetRelativeLocationAndRotation(FVector(-10.304565f, -4.293165f, -3.691982f), FRotator(20.551983f, -76.14f, 159.704f));
 		
 	}
 
-	// ¸®º¼¹ö ÄÄÆ÷³ÍÆ®
+	// ë¦¬ë³¼ë²„ ì»´í¬ë„ŒíŠ¸
 	RevolverMeshComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("RevolverMeshComp"));
 	RevolverMeshComp->SetRelativeScale3D(FVector(1.0f));
 	RevolverMeshComp->SetupAttachment(GetMesh(), TEXT("Hand_RSocket"));
-	// ¸®º¼¹ö ¿¡¼Â ÀĞ¾î¼­ ÄÄÆ÷³ÍÆ®¿¡ Àû¿ë
+	// ë¦¬ë³¼ë²„ ì—ì…‹ ì½ì–´ì„œ ì»´í¬ë„ŒíŠ¸ì— ì ìš©
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempRevolverMesh(TEXT("/Script/Engine.SkeletalMesh'/Game/PolygonWestern/Meshes/Weapons/SK_Wep_Revolver_01.SK_Wep_Revolver_01'"));
 	if (TempRevolverMesh.Succeeded())
 	{
@@ -64,7 +66,7 @@ AEnemy::AEnemy()
 	}
 
 
-	// ¾Ö³Ê¹Ì¿¡´Ô ÄÁ½ºÆ®·°ÅÍÇïÆÛ½º
+	// ì• ë„ˆë¯¸ì—ë‹˜ ì»¨ìŠ¤íŠ¸ëŸ­í„°í—¬í¼ìŠ¤
 	ConstructorHelpers::FClassFinder<UAnimInstance> TempAnim(TEXT("/Script/Engine.AnimBlueprint'/Game/Blueprint/Enemy/ABP_Enemy.ABP_Enemy_C'"));
 	if (TempAnim.Succeeded())
 	{
@@ -75,16 +77,13 @@ AEnemy::AEnemy()
 }
 
 
-void AEnemy::OnMyTakeDamage(float Damage)
+void AEnemy::OnDeath()
 {
-
-	//EnemyHealth -= Damage;
-
-	//if (EnemyHealth <= 0.0f)
-	//{
-	//	Destroy();
-	//}
-	
+	GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
+	GetMesh()->SetSimulatePhysics(true);
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	RevolverMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GunMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 // Called when the game starts or when spawned
@@ -92,10 +91,10 @@ void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ¾Ö³Ê¹Ì¾Ö´Ô °Ù¸Å½¬ Ä³½ºÆ®
+	// ì• ë„ˆë¯¸ì• ë‹˜ ê²Ÿë§¤ì‰¬ ìºìŠ¤íŠ¸
 	enemyAnim = Cast<UEnemyAnim>(GetMesh()->GetAnimInstance());
 
-	// ÃÑ¾Ë°úÀÇ OverlapÀ» °¨ÁöÇÏ±â À§ÇÑ ÇÔ¼ö
+	// ì´ì•Œê³¼ì˜ Overlapì„ ê°ì§€í•˜ê¸° ìœ„í•œ í•¨ìˆ˜
 	GetMesh()->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::OnOverlapBegin);
 
 }
@@ -116,22 +115,28 @@ void AEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
+void AEnemy::OnFire()
+{
+	Cast<UEnemyAnim>(GetMesh()->GetAnimInstance())->OnMyAttack(TEXT("Shoot"));
+}
+
 void AEnemy::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bBFromSweep, const FHitResult& SweepResult)
 {
-	// OtherActor°¡ PlayerPistolBullet ÀÌ¶ó¸é
+	// OtherActorê°€ PlayerPistolBullet ì´ë¼ë©´
 	if (OtherActor->IsA<APlayerPistolBullet>())
 	{
-		// EnemyFSMÀ¸·Î enemy¿¡°Ô µ¥¹ÌÁö¸¦ ÁÖ°í ½Í´Ù.
+		// EnemyFSMìœ¼ë¡œ enemyì—ê²Œ ë°ë¯¸ì§€ë¥¼ ì£¼ê³  ì‹¶ë‹¤.
 		myEnemyFSM->OnDamageProcess(10.0f);
 
 		UE_LOG(LogTemp, Warning, TEXT("Hit"));
 	}
-	// OtherActor°¡ PlayerRifleBullet ÀÌ¶ó¸é
+	// OtherActorê°€ PlayerRifleBullet ì´ë¼ë©´
 	else if (OtherActor->IsA<APlayerRifleBullet>())
 	{
-		// EnemyFSMÀ¸·Î enemy¿¡°Ô µ¥¹ÌÁö¸¦ ÁÖ°í ½Í´Ù.
+		// EnemyFSMìœ¼ë¡œ enemyì—ê²Œ ë°ë¯¸ì§€ë¥¼ ì£¼ê³  ì‹¶ë‹¤.
 		myEnemyFSM->OnDamageProcess(20.0f);
 
 		UE_LOG(LogTemp, Warning, TEXT("Hit"));
 	}
 }
+

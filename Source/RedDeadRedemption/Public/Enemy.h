@@ -14,16 +14,14 @@ class REDDEADREDEMPTION_API AEnemy : public ACharacter
 public:
 	// Sets default values for this character's properties
 	AEnemy();
-	// Àû ¸Ş½¬
+	// ì  ë©”ì‰¬
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "EnemySettings")
 		class USkeletalMeshComponent* EnemyMesh;
-
-
-	// Àû ¹Ş´Â ÇÇÇØ
-	UFUNCTION(BlueprintCallable, Category = "EnemySettings")
-		void OnMyTakeDamage(float Damage);
-
 	
+
+	// ì  ë˜ê·¸ëŒ
+	UFUNCTION(BlueprintCallable, Category = "EnemySettings")
+		void OnDeath();
 	
 
 protected:
@@ -38,22 +36,28 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
 public:
-	// Àû AI °ü¸® ÄÄÆ÷³ÍÆ® Å¬·¡½º
+	// ì  AI ê´€ë¦¬ ì»´í¬ë„ŒíŠ¸ í´ë˜ìŠ¤
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "FMSComponent")
 		class UEnemyFSM* myEnemyFSM;
 
-	// ¿¡³Ê¹Ì ¿¡´Ï¸ÅÀÌ¼Ç
+	// ì—ë„ˆë¯¸ ì—ë‹ˆë§¤ì´ì…˜
 	UPROPERTY()
 		class UEnemyAnim* enemyAnim;
 
-	// ÃÑ¾Ë ¿À¹ö·¦ ÀÌº¥Æ®
+	// ì—ë„ˆë¯¸ ì´ë°œì‚¬ ì´ë²¤íŠ¸
+	UFUNCTION()
+		void OnFire();
+	
+	// ì´ì•Œ ì˜¤ë²„ë© ì´ë²¤íŠ¸
 	UFUNCTION()
 		void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bBFromSweep, const FHitResult& SweepResult);
 
-	// ÃÑ ¸Ş½¬
+
+
+	// ì´ ë©”ì‰¬
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "EnemySettings")
 		class USkeletalMeshComponent* GunMeshComp;
-	// ¸®º¼¹ö ¸Ş½¬
+	// ë¦¬ë³¼ë²„ ë©”ì‰¬
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "EnemySettings")
 		class USkeletalMeshComponent* RevolverMeshComp;
 };

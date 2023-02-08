@@ -22,7 +22,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		EEnemyState State;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool bAttackPlay;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -34,6 +34,16 @@ public:
 		UFUNCTION()
 			void AnimNotify_OnHit();
 
+		// 적 공격 애니메이션 노티파이
+		UFUNCTION()
+			void AnimNotify_OnAttack();
+
+		UPROPERTY(EditAnywhere)
+		class UAnimMontage* AttackMontage;
+
+		UFUNCTION(BlueprintCallable)
+		void OnMyAttack(FName SectionName);
+	
 		UPROPERTY()
 			class AEnemy* me;
 
