@@ -3,23 +3,20 @@
 
 #include "EnemyBullet.h"
 #include "RedPlayer.h"
+#include "Kismet/GameplayStatics.h"
 
-void AEnemyBullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+
+void AEnemyBullet::SetDamage(float ADamage)
 {
-	// if the bullet hits the player
-	if (OtherActor->IsA(ARedPlayer::StaticClass()))
+	// EnemyBullet이 닿은게 RedPlayer라면
+	if (GetWorld()->GetFirstPlayerController()->GetPawn()->ActorHasTag("RedPlayer"))
 	{
-		// cast the actor to the player
-		ARedPlayer* Player = Cast<ARedPlayer>(OtherActor);
-
-		// if the player is valid
-		if (Player)
-		{
-			// apply damage to the player
-			Player->OnDamage(20);
-		}
+		// RedPlayer의 OnHit 함수 실행
+		UGameplayStatics::ApplyDamage(GetWorld()->GetFirstPlayerController()->GetPawn(), ADamage, nullptr, this, nullptr);
+		// RedPlayer 타입으로 캐스팅
+		ARedPlayer* RedPlayer = Cast<ARedPlayer>(GetWorld()->GetFirstPlayerController()->GetPawn());
+		// RedPlayer의 체력을 EnemyBullet의 데미지만큼 감소
+		RedPlayer->HP -= ADamage;
 	}
-
-	// destroy the bullet
 	Destroy();
 }

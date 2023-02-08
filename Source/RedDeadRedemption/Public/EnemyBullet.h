@@ -19,8 +19,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemyBullet")
 	float Damage = 10.0f;
 
-	// fuction to set damage
-	UFUNCTION(BlueprintCallable, Category = "EnemyBullet")
-	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	// 총알 데미지 함수
+	UFUNCTION(BlueprintCallable)
+	void SetDamage(float ADamage);
+	
+
 
 };
