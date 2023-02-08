@@ -97,12 +97,16 @@ void ARedPlayer::BeginPlay()
 	playerAnim->isTargetOn = false;
 
 	HP = MaxHP;
+
+	RP = MaxRP;
 }
 
 // Called every frame
 void ARedPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	HPRPCharge();
 
 	FTransform trans(GetControlRotation());
 	FVector resultDirection = trans.TransformVector(direction);
@@ -134,6 +138,19 @@ void ARedPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	PlayerInputComponent->BindAction(TEXT("Target"), IE_Pressed, this, &ARedPlayer::TargetOnPressed);
 	PlayerInputComponent->BindAction(TEXT("Target"), IE_Released, this, &ARedPlayer::TargetOnReleased);
 }
+
+void ARedPlayer::HPRPCharge()
+{
+	if (HP <= 100)
+	{
+		HP += 0.05;
+	}
+	if (RP <= 100)
+	{
+		RP += 0.05;
+	}
+}
+
 
 void ARedPlayer::Horizontal(float value)
 {
@@ -237,11 +254,22 @@ void ARedPlayer::WeaponChangePress()
 
 void ARedPlayer::RunPressed()
 {
-	if (playerAnim->isTargetOn == false)
+	if (playerAnim->isTargetOn == false && RP >= 0)
 	{
 		GetCharacterMovement()->MaxWalkSpeed = runSpeed;
+
+		RP -= 10.0f;
+
+		FTimerHandle runTimer;
+		GetWorld()->GetTimerManager().SetTimer(runTimer, this, &ARedPlayer::RunTime, 5.0f, false);
 	}
 }
+
+void ARedPlayer::RunTime()
+{
+	GetCharacterMovement()->MaxWalkSpeed = walkSpeed;
+}
+
 
 void ARedPlayer::RunReleased()
 {
@@ -473,7 +501,7 @@ void ARedPlayer::PlaySound(USoundBase* sound, FVector location)
 	UGameplayStatics::PlaySoundAtLocation(GetWorld(), sound, location);
 }
 
-void ARedPlayer::OnDamage(int32 damage)
+void ARedPlayer::OnDamage(float damage)
 {
 	HP -= damage;
 

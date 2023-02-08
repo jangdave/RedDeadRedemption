@@ -64,7 +64,7 @@ void AFireBottleFloor::OnOverlap()
 		auto player = Cast<ARedPlayer>(hitInfo.GetActor());
 		if (player != nullptr)
 		{
-			player->OnDamage(50);
+			player->OnDamage(0.1f);
 		}
 	}
 	DrawDebugSphere(GetWorld(), centerLoc, 200, 1, FColor::Yellow, false, 0.5);

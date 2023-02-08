@@ -18,8 +18,14 @@ public:
 	virtual void NativeConstruct() override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	int32 playerHP;
+	float playerHP;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	int32 playerMaxHP = 100;
+	float playerMaxHP = 100;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float playerRP;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float playerMaxRP = 100;
 };

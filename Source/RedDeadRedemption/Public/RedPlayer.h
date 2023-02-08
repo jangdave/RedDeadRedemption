@@ -127,6 +127,8 @@ public:
 
 	void RunPressed();
 
+	void RunTime();
+
 	void RunReleased();
 
 	void TargetOnPressed();
@@ -181,19 +183,27 @@ public:
 	bool bIsRide;
 
 	bool bTarget;
+	
+	UPROPERTY(EditAnywhere)
+	float HP;
 
 	UPROPERTY(EditAnywhere)
-	int32 HP;
+	float MaxHP = 100.0f;
 
 	UPROPERTY(EditAnywhere)
-	int32 MaxHP = 100;
+	float RP;
+
+	UPROPERTY(EditAnywhere)
+	float MaxRP = 100.0f;
+
+	void HPRPCharge();
 
 	void SpawnEmitter(UParticleSystem* factory, FTransform transform);
 
 	void PlaySound(USoundBase* sound, FVector location);
 
 	UFUNCTION()
-	void OnDamage(int32 damage);
+	void OnDamage(float damage);
 	
 	UPROPERTY(EditAnywhere)
 	bool bFire;
