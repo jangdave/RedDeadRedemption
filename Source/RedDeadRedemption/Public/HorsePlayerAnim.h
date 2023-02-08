@@ -43,7 +43,7 @@ public:
 	class UAnimMontage* riderMontageFactory;
 
 	UFUNCTION(BlueprintCallable)
-	void OnRiderAnim(FName sectionName);
+	void OnRiderAnim();
 
 	UFUNCTION(BlueprintCallable)
 	void EndThrow();

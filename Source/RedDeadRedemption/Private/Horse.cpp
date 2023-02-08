@@ -413,7 +413,7 @@ void AHorse::FireBottle()
 {
 	if(horsePlayerAnim != nullptr)
 	{
-		horsePlayerAnim->OnRiderAnim(TEXT("HorseThrow"));
+		horsePlayerAnim->OnRiderAnim();
 	}
 }
 

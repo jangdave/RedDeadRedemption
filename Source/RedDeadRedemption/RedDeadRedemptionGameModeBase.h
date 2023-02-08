@@ -41,6 +41,12 @@ public:
 	UPROPERTY()
 	class UDefaultCrossWidget* default_UI;
 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UBloodWidget> bloodWidget;
+
+	UPROPERTY()
+	class UBloodWidget* blood_UI;
+
 	UPROPERTY()
 	class ARedPlayer* player;
 
@@ -49,4 +55,6 @@ public:
 	void CrossHairOnOff();
 
 	void CrossHairchange();
+
+	void OnBlood();
 };
