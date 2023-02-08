@@ -35,6 +35,8 @@ void ARedDeadRedemptionGameModeBase::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	CrossHairchange();
+
+	play_UI->playerHP = player->HP;
 }
 
 void ARedDeadRedemptionGameModeBase::OnGamePlayWidget()

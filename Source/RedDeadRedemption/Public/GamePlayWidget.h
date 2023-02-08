@@ -16,4 +16,10 @@ class REDDEADREDEMPTION_API UGamePlayWidget : public UUserWidget
 
 public:
 	virtual void NativeConstruct() override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 playerHP;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 playerMaxHP = 100;
 };

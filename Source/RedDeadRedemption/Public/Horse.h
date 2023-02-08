@@ -45,6 +45,12 @@ public:
 	class UHorseAnim* horseAnim;
 
 	UPROPERTY(EditAnywhere)
+	class UHorsePlayerAnim* horsePlayerAnim;
+
+	UPROPERTY(EditAnywhere)
+	class UHorsePlayerAnim* riderAnim;
+
+	UPROPERTY(EditAnywhere)
 	class USpringArmComponent* springComp;
 
 	UPROPERTY(EditAnywhere)
@@ -150,10 +156,11 @@ public:
 	void FirePistol();
 
 	void FireRifle();
-
-	void FireFist();
-
+	
 	void FireBottle();
+
+	UFUNCTION()
+	void SpawnHorseBottle();
 
 	UFUNCTION()
 	void ChangeFist();
@@ -184,4 +191,7 @@ public:
 
 	UPROPERTY()
 	float v;
+
+	UFUNCTION()
+	void UnRide();
 };

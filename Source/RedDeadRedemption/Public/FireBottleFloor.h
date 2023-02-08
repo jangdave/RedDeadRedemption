@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "NiagaraComponent.h"
 #include "FireBottleFloor.generated.h"
 
 UCLASS()
@@ -32,15 +33,20 @@ public:
 	UPROPERTY(EditAnywhere)
 	class USphereComponent* sphereComp;
 
-	UPROPERTY()
-	class AEnemy* enemy;
-
 	UFUNCTION()
-	void OnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	void OnOverlap();
 
 	void StartFloor();
 
 	void StartFire();
 
 	void DestroySelf();
+	
+	UPROPERTY()
+	UNiagaraComponent* niagaraFloorComp;
+
+	UPROPERTY()
+	UNiagaraComponent* niagaraFireComp;
+
+	FTimerHandle destroyTime;
 };

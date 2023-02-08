@@ -13,6 +13,7 @@
 #include "Horse.h"
 #include "PlayerAnim.h"
 #include "WeaponWidget.h"
+#include "GamePlayWidget.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "GameFramework/Controller.h"
 
@@ -94,6 +95,8 @@ void ARedPlayer::BeginPlay()
 	ChooseWeapon(EWeaponState::FIST);
 
 	playerAnim->isTargetOn = false;
+
+	HP = MaxHP;
 }
 
 // Called every frame
@@ -164,6 +167,7 @@ void ARedPlayer::FirePressed()
 {
 	if(bTarget != false)
 	{
+		bFire = true;
 		FVector loc = GetActorLocation();
 		switch (armWeapon)
 		{
@@ -188,6 +192,7 @@ void ARedPlayer::FirePressed()
 		default:
 			break;
 		}
+		bFire = false;
 	}
 }
 
@@ -202,36 +207,22 @@ void ARedPlayer::HorseRide()
 	{
 		//플레이어 컨트롤러 넘기기
 		GetWorld()->GetFirstPlayerController()->Possess(horsePlayer);
-		//플레이어 메쉬 안보이게하기
-		GetMesh()->SetVisibility(false);
-		gunMeshComp->SetVisibility(false);
-		revolMeshComp->SetVisibility(false);
-		//플레이어 콜리젼 끄기
-		this->SetActorEnableCollision(false);
-		//홀스 메쉬 켜기
-		horsePlayer->ChangeMesh(false);
-		bIsRide = true;
-
-		if (armWeapon == EWeaponState::FIREBOTTLE)
-		{
-			horsePlayer->ChooseWeapon(EWeaponArm::FIREBOTTLE);
-		}
-		else if (armWeapon == EWeaponState::FIST)
-		{
-			horsePlayer->ChooseWeapon(EWeaponArm::FIST);
-		}
-		else if (armWeapon == EWeaponState::PISTOL)
-		{
-			horsePlayer->ChooseWeapon(EWeaponArm::PISTOL);
-		}
-		else if (armWeapon == EWeaponState::RIFLE)
-		{
-			horsePlayer->ChooseWeapon(EWeaponArm::RIFLE);
-		}
-
-		ChooseWeapon(EWeaponState::FIST);
+		SetActorLocation(FVector(horsePlayer->GetActorLocation().X, horsePlayer->GetActorLocation().Y, horsePlayer->GetActorLocation().Z + 20));
+		SetActorRotation(horsePlayer->GetActorRotation());
+		playerAnim->OnAnim(TEXT("Mount"));
 	}
 }
+
+void ARedPlayer::HorseUnRide()
+{
+	playerAnim->OnAnim(TEXT("Dismount"));
+}
+
+void ARedPlayer::UnRideAnimEnd()
+{
+	horsePlayer->UnRide();
+}
+
 
 void ARedPlayer::WeaponChangePress()
 {
@@ -242,7 +233,6 @@ void ARedPlayer::WeaponChangePress()
 		GetWorld()->GetFirstPlayerController()->AController::SetIgnoreLookInput(true);
 		UWidgetBlueprintLibrary::SetInputMode_GameAndUIEx(GetWorld()->GetFirstPlayerController(), weapon_UI);
 	}
-	//UGameplayStatics::SetGamePaused(GetWorld(), false);
 }
 
 void ARedPlayer::RunPressed()
@@ -461,7 +451,16 @@ void ARedPlayer::FireFist()
 
 void ARedPlayer::FireBottle()
 {
-	GetWorld()->SpawnActor<AFireBottle>(fireBottleFactory, GetActorLocation() + (GetActorUpVector() * 10.0f) + (GetActorForwardVector() * 70.0f), GetControlRotation());
+	if(playerAnim != nullptr)
+	{
+		playerAnim->OnAnim(TEXT("Throw"));
+		GetCharacterMovement()->MaxWalkSpeed = 0.0f;
+	}
+}
+
+void ARedPlayer::SpawnBottle()
+{
+	GetWorld()->SpawnActor<AFireBottle>(fireBottleFactory, GetActorLocation() + (GetActorUpVector() * 30.0f) + (GetActorForwardVector() * 70.0f), FRotator(GetControlRotation().Pitch, GetControlRotation().Yaw, 0));
 }
 
 void ARedPlayer::SpawnEmitter(UParticleSystem* factory, FTransform transform)
@@ -473,3 +472,51 @@ void ARedPlayer::PlaySound(USoundBase* sound, FVector location)
 {
 	UGameplayStatics::PlaySoundAtLocation(GetWorld(), sound, location);
 }
+
+void ARedPlayer::OnDamage(int32 damage)
+{
+	HP -= damage;
+
+	if(HP <= 0)
+	{
+		playerAnim->OnAnim(TEXT("Dead"));
+	}
+	else
+	{
+		HP -= damage;
+	}
+}
+
+void ARedPlayer::Ride()
+{
+	horsePlayer->ChangeMesh(false);
+
+	//플레이어 메쉬 안보이게하기
+	GetMesh()->SetVisibility(false);
+	
+	//플레이어 콜리젼 끄기
+	this->SetActorEnableCollision(false);
+	
+	bIsRide = true;
+
+	if (armWeapon == EWeaponState::FIREBOTTLE)
+	{
+		horsePlayer->ChooseWeapon(EWeaponArm::FIREBOTTLE);
+	}
+	else if (armWeapon == EWeaponState::FIST)
+	{
+		horsePlayer->ChooseWeapon(EWeaponArm::FIST);
+	}
+	else if (armWeapon == EWeaponState::PISTOL)
+	{
+		horsePlayer->ChooseWeapon(EWeaponArm::PISTOL);
+	}
+	else if (armWeapon == EWeaponState::RIFLE)
+	{
+		horsePlayer->ChooseWeapon(EWeaponArm::RIFLE);
+	}
+
+	ChooseWeapon(EWeaponState::FIST);
+}
+
+//UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 10);

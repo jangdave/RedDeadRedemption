@@ -117,6 +117,12 @@ public:
 
 	void HorseRide();
 
+	UFUNCTION()
+	void HorseUnRide();
+
+	UFUNCTION()
+	void UnRideAnimEnd();
+
 	void WeaponChangePress();
 
 	void RunPressed();
@@ -152,6 +158,7 @@ public:
 
 	bool bPossessed = true;
 
+	UPROPERTY(EditDefaultsOnly)
 	bool bPressed = false;
 	
 	void FirePistol();
@@ -161,6 +168,9 @@ public:
 	void FireFist();
 
 	void FireBottle();
+
+	UFUNCTION()
+	void SpawnBottle();
 
 	float walkSpeed = 400.0f;
 
@@ -172,7 +182,22 @@ public:
 
 	bool bTarget;
 
+	UPROPERTY(EditAnywhere)
+	int32 HP;
+
+	UPROPERTY(EditAnywhere)
+	int32 MaxHP = 100;
+
 	void SpawnEmitter(UParticleSystem* factory, FTransform transform);
 
 	void PlaySound(USoundBase* sound, FVector location);
+
+	UFUNCTION()
+	void OnDamage(int32 damage);
+	
+	UPROPERTY(EditAnywhere)
+	bool bFire;
+
+	UFUNCTION()
+	void Ride();
 };

@@ -9,7 +9,7 @@ void UHorsePlayerAnim::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
 
-	AHorse* owner = Cast<AHorse>(TryGetPawnOwner());
+	owner = Cast<AHorse>(TryGetPawnOwner());
 	
 	if (owner == nullptr)
 	{
@@ -23,4 +23,22 @@ void UHorsePlayerAnim::NativeUpdateAnimation(float DeltaSeconds)
 	bAir = owner->GetCharacterMovement()->IsFalling();
 
 	state = owner->weaponArm;
+}
+
+void UHorsePlayerAnim::OnRiderAnim(FName sectionName)
+{
+	//owner->playerMesh->PlayAnimMontage(riderMontageFactory, 1, sectionName);
+}
+
+void UHorsePlayerAnim::EndThrow()
+{
+	owner->bottleMeshComp->SetVisibility(false);
+	owner->bottleFireMeshComp->SetVisibility(false);
+	owner->SpawnHorseBottle();
+}
+
+void UHorsePlayerAnim::Throw()
+{
+	owner->bottleMeshComp->SetVisibility(true);
+	owner->bottleFireMeshComp->SetVisibility(true);
 }
