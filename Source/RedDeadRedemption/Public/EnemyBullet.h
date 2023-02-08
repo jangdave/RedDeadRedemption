@@ -20,8 +20,8 @@ public:
 	float Damage = 10.0f;
 
 	// 총알 데미지 함수
-	UFUNCTION(BlueprintCallable)
-	void SetDamage(float ADamage);
+	UFUNCTION()
+		void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 	
 
 

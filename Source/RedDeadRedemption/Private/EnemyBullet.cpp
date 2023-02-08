@@ -5,18 +5,20 @@
 #include "RedPlayer.h"
 #include "Kismet/GameplayStatics.h"
 
-
-void AEnemyBullet::SetDamage(float ADamage)
+void AEnemyBullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	// EnemyBullet이 닿은게 RedPlayer라면
-	if (GetWorld()->GetFirstPlayerController()->GetPawn()->ActorHasTag("RedPlayer"))
+	// 총알이 플레이어에게 맞았을 때
+	if (OtherActor->IsA(ARedPlayer::StaticClass()))
 	{
-		// RedPlayer의 OnHit 함수 실행
-		UGameplayStatics::ApplyDamage(GetWorld()->GetFirstPlayerController()->GetPawn(), ADamage, nullptr, this, nullptr);
-		// RedPlayer 타입으로 캐스팅
-		ARedPlayer* RedPlayer = Cast<ARedPlayer>(GetWorld()->GetFirstPlayerController()->GetPawn());
-		// RedPlayer의 체력을 EnemyBullet의 데미지만큼 감소
-		RedPlayer->HP -= ADamage;
+		// 플레이어 타입으로 캐스팅
+		ARedPlayer* player = Cast<ARedPlayer>(OtherActor);
+		
+		// 만약 닿은게 player라면 OnDamage함수를 실행하고 데미지를 넘겨준다.
+		if (player)
+		{
+			player->OnDamage(Damage);
+		}
+		// 총알 파괴
+		Destroy();
 	}
-	Destroy();
 }
