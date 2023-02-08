@@ -34,11 +34,16 @@ public:
 		UFUNCTION()
 			void AnimNotify_OnHit();
 
-		// Àû °ø°İ ¾Ö´Ï¸ŞÀÌ¼Ç ³ëÆ¼ÆÄÀÌ
+		// ì  ê³µê²© ì• ë‹ˆë©”ì´ì…˜ ë…¸í‹°íŒŒì´
 		UFUNCTION()
 			void AnimNotify_OnAttack();
 
+		UPROPERTY(EditAnywhere)
+		class UAnimMontage* AttackMontage;
 
+		UFUNCTION(BlueprintCallable)
+		void OnMyAttack(FName SectionName);
+	
 		UPROPERTY()
 			class AEnemy* me;
 

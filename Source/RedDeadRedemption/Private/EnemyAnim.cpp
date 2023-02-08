@@ -28,3 +28,8 @@ void UEnemyAnim::AnimNotify_OnAttack()
 	}
 	me->myEnemyFSM->OnAttackEvent();
 }
+
+void UEnemyAnim::OnMyAttack(FName SectionName)
+{
+	me->PlayAnimMontage(AttackMontage, 1.0f, SectionName);
+}

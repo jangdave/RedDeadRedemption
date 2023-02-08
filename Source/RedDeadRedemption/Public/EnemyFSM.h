@@ -7,7 +7,7 @@
 #include <vector>
 #include "EnemyFSM.generated.h"
 
-// »ç¿ëÇÒ »óÅÂ Á¤ÀÇ
+// ì‚¬ìš©í•  ìƒíƒœ ì •ì˜
 UENUM(BlueprintType)
 enum class EEnemyState : uint8
 {
@@ -36,71 +36,71 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 public:
-	// »óÅÂ º¯¼ö
+	// ìƒíƒœ ë³€ìˆ˜
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FSM")
 		EEnemyState mState = EEnemyState::Idle;
 
-	// ´ë±â »óÅÂ
+	// ëŒ€ê¸° ìƒíƒœ
 	void IdleState();
-	// ÀÌµ¿ »óÅÂ
+	// ì´ë™ ìƒíƒœ
 	void MoveState();
-	// °ø°İ »óÅÂ
+	// ê³µê²© ìƒíƒœ
 	void AttackState();
-	// ÇÇ°İ »óÅÂ
+	// í”¼ê²© ìƒíƒœ
 	void DamageState();
-	// »ç¸Á »óÅÂ
+	// ì‚¬ë§ ìƒíƒœ
 	void DeadState();
 
-	// ´ë±â ½Ã°£
+	// ëŒ€ê¸° ì‹œê°„
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "FSM")
 		float IdleDelayTime = 2.0f;
-	// °æ°ú ½Ã°£
+	// ê²½ê³¼ ì‹œê°„
 	float currentTime = 0.0f;
 	bool bAttackPlay = false;
-	// Å¸±ê
+	// íƒ€ê¹ƒ
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "FSM")
 	class APawn* target;
 
-	// ¼ÒÀ¯ ¾×ÅÍ
+	// ì†Œìœ  ì•¡í„°
 	UPROPERTY()
 		class AEnemy* me;
 
-	// °ø°İ ¹üÀ§
+	// ê³µê²© ë²”ìœ„
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FSM")
 		float AttackRange = 400.0f;
 
-	// °ø°İ µô·¹ÀÌ
+	// ê³µê²© ë”œë ˆì´
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FSM")
 		float AttackDelayTime = 1.5f;
 
-	// Àû °È´Â ¼Óµµ
+	// ì  ê±·ëŠ” ì†ë„
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FSM")
 		float EnemyWalkSpeed = 400.0f;
 
-	// Àû ¶Ù´Â ¼Óµµ
+	// ì  ë›°ëŠ” ì†ë„
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FSM")
 		float EnemyRunSpeed = 600.0f;
 
-	// Àû ¶óÀÌÇÃ ºÒ¸´ °øÀå
+	// ì  ë¼ì´í”Œ ë¶ˆë¦¿ ê³µì¥
 	UPROPERTY(EditAnywhere, Category = "FSM")
 		TSubclassOf<class AEnemyBullet> EnemyRifleBulletFactory;
 
-	// Àû ÇÇ½ºÅç ºÒ¸´ °øÀå
+	// ì  í”¼ìŠ¤í†¨ ë¶ˆë¦¿ ê³µì¥
 	UPROPERTY(EditAnywhere, Category = "FSM")
 		TSubclassOf<class AEnemyBullet> EnemyPistolBulletFactory;
 
-	// ÇÇ°İ ¾Ë¸² ÀÌº¥Æ® ÇÔ¼ö
+	// í”¼ê²© ì•Œë¦¼ ì´ë²¤íŠ¸ í•¨ìˆ˜
 	void OnDamageProcess(int32 damage);
 	
-	// °ø°İ ÀÌº¥Æ®
+	// ê³µê²© ì´ë²¤íŠ¸
 	void OnAttackEvent();
 
-	// AI ÄÁÆ®·Ñ·¯
+	// AI ì»¨íŠ¸ë¡¤ëŸ¬
 	UPROPERTY()
 		class AAIController* AI;
 
 public:
-	// Ã¼·ÂÀ» Ç¥Çö ÇÏ°í½Í´Ù.
+	// ì²´ë ¥ì„ í‘œí˜„ í•˜ê³ ì‹¶ë‹¤.
 	int32 EnemyHealth;
 	int32 EnemyMaxHealth = 50;
 

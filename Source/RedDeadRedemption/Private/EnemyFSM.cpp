@@ -74,7 +74,6 @@ void UEnemyFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 			break;
 		}
 		
-		
 	}
 	
 }
@@ -144,8 +143,8 @@ void UEnemyFSM::AttackState()
 	// 2. 공격시간이 경과했는지 확인
 	if (currentTime > AttackDelayTime)
 	{
-		// 적이 플레이어를 공격할때 공격 애니메이션을 재생
-		me->enemyAnim->AnimNotify_OnAttack();
+		// Enemy.cpp에있는 OnFire 함수를 호출
+		me->OnFire();
 		// 3. 공격
 		// Enemy에있는 GunMeshComp를 이용해서 공격
 		FTransform transform = me->GunMeshComp->GetSocketTransform("SK_Wep_Rifle_01_SlideSocket");
@@ -231,7 +230,6 @@ void UEnemyFSM::OnDamageProcess(int32 damage)
 }
 
 void UEnemyFSM::OnAttackEvent()
-{
-	// 적이 플레이어를 공격할때 공격 애니메이션을 재생
-	
+{	
+		
 }
