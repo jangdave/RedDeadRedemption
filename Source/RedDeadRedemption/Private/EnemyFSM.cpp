@@ -81,17 +81,21 @@ void UEnemyFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 // 대기 상태
 void UEnemyFSM::IdleState()
 {
-	// 적의 플레이어 인지범위 생성
-	FCollisionShape shape;
-	shape.SetSphere(3000.0f);
-	// 적의 위치
-	FVector location = me->GetActorLocation();
-	// 적의 위치에서 플레이어 인지범위 생성
-	TArray<FHitResult> hits;
-	// 적의 위치에서 플레이어 인지범위 생성
-	GetWorld()->SweepMultiByChannel(hits, location, location, FQuat::Identity, ECollisionChannel::ECC_Pawn, shape);
-	// 플레이어가 인지범위에 있으면
+	if (IsCanPlayerShoot)
+	{
+		
+		// 적의 플레이어 인지범위 생성
+		FCollisionShape shape;
+		shape.SetSphere(3000.0f);
+		// 적의 위치
+		FVector location = me->GetActorLocation();
+		// 적의 위치에서 플레이어 인지범위 생성
+		TArray<FHitResult> hits;
+		// 적의 위치에서 플레이어 인지범위 생성
+		GetWorld()->SweepMultiByChannel(hits, location, location, FQuat::Identity, ECollisionChannel::ECC_Pawn, shape);
+		// 플레이어가 인지범위에 있으면
 
+	
 	for (auto hit : hits)
 	{
 		// 플레이어 타입으로 캐스팅
@@ -107,7 +111,8 @@ void UEnemyFSM::IdleState()
 			break;
 		}
 		
-	}	
+		}
+	}
 	
 }
 // 이동 상태
