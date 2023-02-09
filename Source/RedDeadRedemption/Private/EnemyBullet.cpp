@@ -25,6 +25,7 @@ void AEnemyBullet::OnHit(UPrimitiveComponent* OverlappedComponent, AActor* Other
 		if (player)
 		{
 			player->OnDamage(Damage);
+			UE_LOG(LogTemp, Warning, TEXT("Hittest"));
 		}
 		// 총알 파괴
 		Destroy();
