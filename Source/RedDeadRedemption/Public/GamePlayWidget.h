@@ -28,4 +28,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float playerMaxRP = 100;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 dCount;
 };

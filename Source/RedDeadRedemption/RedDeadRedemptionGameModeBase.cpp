@@ -6,6 +6,7 @@
 #include "TargetCrossWidget.h"
 #include "DefaultCrossWidget.h"
 #include "BloodWidget.h"
+#include "DeadEyeSpawn.h"
 #include "RedPlayer.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -44,6 +45,10 @@ void ARedDeadRedemptionGameModeBase::Tick(float DeltaTime)
 	play_UI->playerHP = player->HP;
 
 	play_UI->playerRP = player->RP;
+
+	play_UI->dCount = player->deadCount;
+
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ADeadEyeSpawn::StaticClass(), deadeyes);
 }
 
 void ARedDeadRedemptionGameModeBase::OnGamePlayWidget()

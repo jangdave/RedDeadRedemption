@@ -6,6 +6,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Bullet.h"
+#include "DeadEyeSpawn.h"
 #include "Enemy.h"
 #include "EnemyFSM.h"
 #include "FireBottle.h"
@@ -16,6 +17,7 @@
 #include "GamePlayWidget.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "GameFramework/Controller.h"
+#include "RedDeadRedemption/RedDeadRedemptionGameModeBase.h"
 
 // Sets default values
 ARedPlayer::ARedPlayer()
@@ -99,6 +101,8 @@ void ARedPlayer::BeginPlay()
 	HP = MaxHP;
 
 	RP = MaxRP;
+
+	gm = Cast<ARedDeadRedemptionGameModeBase>(GetWorld()->GetAuthGameMode());
 }
 
 // Called every frame
@@ -137,6 +141,32 @@ void ARedPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	PlayerInputComponent->BindAction(TEXT("Crouch"), IE_Released, this, &ARedPlayer::CrouchReleased);
 	PlayerInputComponent->BindAction(TEXT("Target"), IE_Pressed, this, &ARedPlayer::TargetOnPressed);
 	PlayerInputComponent->BindAction(TEXT("Target"), IE_Released, this, &ARedPlayer::TargetOnReleased);
+	PlayerInputComponent->BindAction(TEXT("DeadEye"), IE_Pressed, this, &ARedPlayer::OnDeadEye);
+	PlayerInputComponent->BindAction(TEXT("DeadEye"), IE_Released, this, &ARedPlayer::OffDeadEye);
+}
+
+void ARedPlayer::OnDeadEye()
+{
+	if(armWeapon == EWeaponState::PISTOL || armWeapon == EWeaponState::RIFLE)
+	{
+		if(bTarget != false && deadCount > 0)
+		{
+			bDeadEye = true;
+
+			UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.1);
+
+			deadCount -= 1;
+		}
+	}
+}
+
+void ARedPlayer::OffDeadEye()
+{
+	DestroyEnemy();
+
+	bDeadEye = false;
+
+	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1);
 }
 
 void ARedPlayer::HPRPCharge()
@@ -182,9 +212,9 @@ void ARedPlayer::Jumping()
 
 void ARedPlayer::FirePressed()
 {
-	if(bTarget != false)
+	if(bTarget != false && bDeadEye != true)
 	{
-		bFire = true;
+		//bFire = true;
 		FVector loc = GetActorLocation();
 		switch (armWeapon)
 		{
@@ -209,7 +239,23 @@ void ARedPlayer::FirePressed()
 		default:
 			break;
 		}
-		bFire = false;
+		//bFire = false;
+	}
+	else if(bTarget != false && bDeadEye != false)
+	{
+		switch (armWeapon)
+		{
+		case EWeaponState::PISTOL:
+			DeadEyeTarget();
+			break;
+
+		case EWeaponState::RIFLE:
+			DeadEyeTarget();
+			break;
+
+		default:
+			break;
+		}
 	}
 }
 
@@ -292,12 +338,14 @@ void ARedPlayer::TargetOnReleased()
 
 void ARedPlayer::CrouchPressed()
 {
-	GetCharacterMovement()->MaxWalkSpeed = crouchSpeed;
+	GetCharacterMovement()->MaxWalkSpeedCrouched = crouchSpeed;
+	Crouch();
 }
 
 void ARedPlayer::CrouchReleased()
 {
-	GetCharacterMovement()->MaxWalkSpeed = walkSpeed;
+	GetCharacterMovement()->MaxWalkSpeedCrouched = walkSpeed;
+	UnCrouch();
 }
 
 void ARedPlayer::ChangeFist()
@@ -396,6 +444,41 @@ void ARedPlayer::ChooseWeapon(EWeaponState val)
 	}
 }
 
+void ARedPlayer::DeadEyeTarget()
+{
+	FHitResult deadInfo;
+	FVector start = cameraComp->GetComponentLocation();
+	FVector end = start + cameraComp->GetForwardVector() * 200000.0f;
+	FCollisionObjectQueryParams objParams;
+	objParams.AddObjectTypesToQuery(ECC_GameTraceChannel3);
+
+	bool bEnemyHit = GetWorld()->LineTraceSingleByObjectType(deadInfo, start, end, objParams);
+	if(bEnemyHit)
+	{
+		auto enemy = Cast<AEnemy>(deadInfo.GetActor());
+		enemies.Add(enemy);
+		FVector loc = (deadInfo.GetActor()->GetActorLocation());
+		FVector finLoc = loc + FVector(0, 0, 70.0f);
+		GetWorld()->SpawnActor<ADeadEyeSpawn>(deadFactory, finLoc, FRotator::ZeroRotator);
+	}
+}
+
+void ARedPlayer::DestroyEnemy()
+{
+	for (int i = 0; i < enemies.Num(); i++)
+	{
+		gm->deadeyes[i]->Destroy();
+
+		UEnemyFSM* fsm = Cast<UEnemyFSM>(enemies[i]->GetDefaultSubobjectByName(TEXT("EnemyFSM")));
+
+		fsm->OnDamageProcess(100);
+	}
+
+	enemies.Empty();
+
+	gm->deadeyes.Empty();
+}
+
 void ARedPlayer::FirePistol()
 {
 	FHitResult hitInfo;
@@ -474,7 +557,7 @@ void ARedPlayer::FireRifle()
 
 void ARedPlayer::FireFist()
 {
-
+	
 }
 
 void ARedPlayer::FireBottle()
@@ -546,5 +629,3 @@ void ARedPlayer::Ride()
 
 	ChooseWeapon(EWeaponState::FIST);
 }
-
-//UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 10);

@@ -50,6 +50,9 @@ public:
 	UPROPERTY()
 	class ARedPlayer* player;
 
+	UPROPERTY()
+	TArray<AActor*> deadeyes;
+
 	void OnGamePlayWidget();
 
 	void CrossHairOnOff();

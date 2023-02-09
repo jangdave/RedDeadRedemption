@@ -33,6 +33,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool isTargetOn;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool isCrouching;
+
 	UPROPERTY(EditAnywhere)
 	class UAnimMontage* playerMontageFactory;
 
