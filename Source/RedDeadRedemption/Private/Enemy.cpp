@@ -137,6 +137,7 @@ void AEnemy::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 		myEnemyFSM->OnDamageProcess(20.0f);
 
 		UE_LOG(LogTemp, Warning, TEXT("Hit"));
+		UE_LOG(LogTemp, Warning, TEXT("Hittest"));
 	}
 }
 
