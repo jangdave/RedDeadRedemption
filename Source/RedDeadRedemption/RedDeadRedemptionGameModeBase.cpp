@@ -5,6 +5,8 @@
 #include "GamePlayWidget.h"
 #include "TargetCrossWidget.h"
 #include "DefaultCrossWidget.h"
+#include "BloodWidget.h"
+#include "DeadEyeSpawn.h"
 #include "RedPlayer.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -25,6 +27,8 @@ void ARedDeadRedemptionGameModeBase::BeginPlay()
 
 	default_UI = CreateWidget<UDefaultCrossWidget>(GetWorld(), defaultCrossWidget);
 
+	blood_UI = CreateWidget<UBloodWidget>(GetWorld(), bloodWidget);
+
 	OnGamePlayWidget();
 
 	CrossHairOnOff();
@@ -36,9 +40,15 @@ void ARedDeadRedemptionGameModeBase::Tick(float DeltaTime)
 
 	CrossHairchange();
 
+	OnBlood();
+
 	play_UI->playerHP = player->HP;
 
 	play_UI->playerRP = player->RP;
+
+	play_UI->dCount = player->deadCount;
+
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ADeadEyeSpawn::StaticClass(), deadeyes);
 }
 
 void ARedDeadRedemptionGameModeBase::OnGamePlayWidget()
@@ -72,6 +82,21 @@ void ARedDeadRedemptionGameModeBase::CrossHairchange()
 			default_UI->AddToViewport();
 
 			target_UI->RemoveFromParent();
+		}
+	}
+}
+
+void ARedDeadRedemptionGameModeBase::OnBlood()
+{
+	if(blood_UI != nullptr)
+	{
+		if(player->HP < 50.0f)
+		{
+			blood_UI->AddToViewport();
+		}
+		else if(player->HP > 50.0f)
+		{
+			blood_UI->RemoveFromParent();
 		}
 	}
 }

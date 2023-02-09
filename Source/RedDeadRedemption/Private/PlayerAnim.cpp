@@ -22,6 +22,7 @@ void UPlayerAnim::NativeUpdateAnimation(float DeltaSeconds)
 	forwordVelocity = FVector::DotProduct(velocity, forVelocity);
 	rightVelocity = FVector::DotProduct(velocity, rigVelocity);
 	isInAir = owner->GetCharacterMovement()->IsFalling();
+	isCrouching = owner->GetCharacterMovement()->IsCrouching();
 }
 
 void UPlayerAnim::OnAnim(FName sectionName)

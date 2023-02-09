@@ -161,7 +161,7 @@ public:
 	bool bPossessed = true;
 
 	UPROPERTY(EditDefaultsOnly)
-	bool bPressed = false;
+	bool bPressed;
 	
 	void FirePistol();
 
@@ -170,6 +170,10 @@ public:
 	void FireFist();
 
 	void FireBottle();
+
+	void OnDeadEye();
+
+	void OffDeadEye();
 
 	UFUNCTION()
 	void SpawnBottle();
@@ -205,9 +209,27 @@ public:
 	UFUNCTION()
 	void OnDamage(float damage);
 	
-	UPROPERTY(EditAnywhere)
-	bool bFire;
+	//UPROPERTY(EditAnywhere)
+	//bool bFire;
 
 	UFUNCTION()
 	void Ride();
+
+	bool bDeadEye;
+
+	void DeadEyeTarget();
+
+	UPROPERTY()
+	TArray<AActor*> enemies;
+
+	void DestroyEnemy();
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class ADeadEyeSpawn> deadFactory;
+
+	UPROPERTY()
+	class ARedDeadRedemptionGameModeBase* gm;
+
+	UPROPERTY(EditAnywhere)
+	int32 deadCount = 3;
 };

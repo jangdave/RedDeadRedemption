@@ -181,19 +181,19 @@ void AHorse::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void AHorse::OverlapRide(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (player != nullptr)
+	auto owner = Cast<ARedPlayer>(OtherActor);
+
+	if (owner != nullptr)
 	{
 		player->bPressed = true;
-	}
-	else
-	{
-		return;
 	}
 }
 
 void AHorse::EndRide(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (player != nullptr)
+	auto owner = Cast<ARedPlayer>(OtherActor);
+
+	if (owner != nullptr)
 	{
 		player->bPressed = false;
 	}
@@ -413,7 +413,7 @@ void AHorse::FireBottle()
 {
 	if(horsePlayerAnim != nullptr)
 	{
-		horsePlayerAnim->OnRiderAnim(TEXT("HorseThrow"));
+		horsePlayerAnim->OnRiderAnim();
 	}
 }
 
