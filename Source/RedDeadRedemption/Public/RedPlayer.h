@@ -232,4 +232,25 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	int32 deadCount = 3;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 maxPistolAmmo = 6;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 pistolAmmo;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 holdPistolAmmo;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 maxRifleAmmo = 5;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 rifleAmmo;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 holdRifleAmmo;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 holdBotlleAmmo;
 };
