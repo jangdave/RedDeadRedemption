@@ -105,6 +105,8 @@ public:
 	int32 EnemyHealth;
 	int32 EnemyMaxHealth = 50;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool IsCanPlayerShoot = false;
 
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
 	//	FVector EnemyLocation;
