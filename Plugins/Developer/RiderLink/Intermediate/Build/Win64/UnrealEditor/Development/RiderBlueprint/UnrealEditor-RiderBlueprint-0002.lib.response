@@ -6,6 +6,6 @@
 /NAME:"UnrealEditor-RiderBlueprint-0002.dll"
 /IGNORE:4221
 /NODEFAULTLIB
-"C:\unreal\RedDeadRedemption\Plugins\Developer\RiderLink\Intermediate\Build\Win64\UnrealEditor\Development\RiderBlueprint\Module.RiderBlueprint.cpp.obj"
-"C:\unreal\RedDeadRedemption\Plugins\Developer\RiderLink\Intermediate\Build\Win64\UnrealEditor\Development\RiderBlueprint\Default.rc2.res"
-/OUT:"C:\unreal\RedDeadRedemption\Plugins\Developer\RiderLink\Intermediate\Build\Win64\UnrealEditor\Development\RiderBlueprint\UnrealEditor-RiderBlueprint-0002.lib"
+"D:\UnrealProject\RedDeadRedemption\Plugins\Developer\RiderLink\Intermediate\Build\Win64\UnrealEditor\Development\RiderBlueprint\Module.RiderBlueprint.cpp.obj"
+"D:\UnrealProject\RedDeadRedemption\Plugins\Developer\RiderLink\Intermediate\Build\Win64\UnrealEditor\Development\RiderBlueprint\Default.rc2.res"
+/OUT:"D:\UnrealProject\RedDeadRedemption\Plugins\Developer\RiderLink\Intermediate\Build\Win64\UnrealEditor\Development\RiderBlueprint\UnrealEditor-RiderBlueprint-0002.lib"

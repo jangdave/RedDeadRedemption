@@ -14,13 +14,18 @@ class REDDEADREDEMPTION_API AEnemyBullet : public ABullet
 {
 	GENERATED_BODY()
 
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+	
 public:
 // bullet damage
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemyBullet")
 	float Damage = 10.0f;
 
-	// fuction to set damage
-	UFUNCTION(BlueprintCallable, Category = "EnemyBullet")
-	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
-
+	
+	// 총알 데미지 함수 overlap
+	UFUNCTION()
+		void OnHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	
 };
