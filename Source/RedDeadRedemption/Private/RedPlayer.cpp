@@ -15,6 +15,7 @@
 #include "PlayerAnim.h"
 #include "WeaponWidget.h"
 #include "GamePlayWidget.h"
+#include "WeaponSet.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "GameFramework/Controller.h"
 #include "RedDeadRedemption/RedDeadRedemptionGameModeBase.h"
@@ -143,6 +144,8 @@ void ARedPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 	PlayerInputComponent->BindAction(TEXT("Target"), IE_Released, this, &ARedPlayer::TargetOnReleased);
 	PlayerInputComponent->BindAction(TEXT("DeadEye"), IE_Pressed, this, &ARedPlayer::OnDeadEye);
 	PlayerInputComponent->BindAction(TEXT("DeadEye"), IE_Released, this, &ARedPlayer::OffDeadEye);
+	PlayerInputComponent->BindAction(TEXT("Interaction"), IE_Pressed, this, &ARedPlayer::OnInteraction);
+	PlayerInputComponent->BindAction(TEXT("Reload"), IE_Pressed, this, &ARedPlayer::ReloadAmmo);
 }
 
 void ARedPlayer::OnDeadEye()
@@ -223,13 +226,23 @@ void ARedPlayer::FirePressed()
 			break;
 
 		case EWeaponState::PISTOL:
-			FirePistol();
-			PlaySound(pistolFireSound, loc);
+			if(pistolAmmo > 0)
+			{
+				FirePistol();
+				FireAnim();
+				PlaySound(pistolFireSound, loc);
+				pistolAmmo -= 1;
+			}
 			break;
 
 		case EWeaponState::RIFLE:
-			FireRifle();
-			PlaySound(gunFireSound, loc);
+			if(rifleAmmo > 0)
+			{
+				FireRifle();
+				FireAnim();
+				PlaySound(gunFireSound, loc);
+				rifleAmmo -= 1;
+			}
 			break;
 
 		case EWeaponState::FIREBOTTLE:
@@ -289,8 +302,9 @@ void ARedPlayer::UnRideAnimEnd()
 
 void ARedPlayer::WeaponChangePress()
 {
-	if (weapon_UI && false == weapon_UI->IsInViewport())
+	if (weapon_UI && false == weapon_UI->IsInViewport() && bGetWeapon != false)
 	{
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.1);
 		weapon_UI->AddToViewport();
 		UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetShowMouseCursor(true);
 		GetWorld()->GetFirstPlayerController()->AController::SetIgnoreLookInput(true);
@@ -357,6 +371,7 @@ void ARedPlayer::ChangeFist()
 			weapon_UI->RemoveFromParent();
 			ControllerWidget();
 			ChooseWeapon(EWeaponState::FIST);
+			UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1);
 		}
 	}
 }
@@ -370,6 +385,7 @@ void ARedPlayer::ChangeRifle()
 			weapon_UI->RemoveFromParent();
 			ControllerWidget();
 			ChooseWeapon(EWeaponState::RIFLE);
+			UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1);
 		}
 	}
 }
@@ -381,6 +397,7 @@ void ARedPlayer::ChangePistol()
 		weapon_UI->RemoveFromParent();
 		ControllerWidget();
 		ChooseWeapon(EWeaponState::PISTOL);
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1);
 	}
 }
 
@@ -391,6 +408,7 @@ void ARedPlayer::ChangeBottle()
 		weapon_UI->RemoveFromParent();
 		ControllerWidget();
 		ChooseWeapon(EWeaponState::FIREBOTTLE);
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1);
 	}
 }
 
@@ -477,6 +495,60 @@ void ARedPlayer::DestroyEnemy()
 	enemies.Empty();
 
 	gm->deadeyes.Empty();
+}
+
+void ARedPlayer::OnInteraction()
+{
+	FHitResult hitInfo;
+	FVector startLoc = cameraComp->GetComponentLocation();
+	FVector endLoc = startLoc + cameraComp->GetForwardVector() * 500.0f;
+	FCollisionObjectQueryParams objParams;
+	objParams.AddObjectTypesToQuery(ECC_GameTraceChannel5);
+
+	bool bBoxHit = GetWorld()->LineTraceSingleByObjectType(hitInfo, startLoc, endLoc, objParams);
+	if(bBoxHit)
+	{
+		auto weapon = Cast<AWeaponSet>(hitInfo.GetActor());
+		if(weapon != nullptr)
+		{
+			weapon->DestroySelf();
+
+			bGetWeapon = true;
+
+			AmmoSet();
+		}
+	}
+}
+
+void ARedPlayer::AmmoSet()
+{
+	holdBotlleAmmo = 30;
+	holdPistolAmmo = 120;
+	holdRifleAmmo = 100;
+}
+
+void ARedPlayer::ReloadAmmo()
+{
+	if(playerAnim->isCrouching !=true)
+	{
+		playerAnim->OnShootAnim(TEXT("Reload"));
+	}
+	else
+	{
+		playerAnim->OnShootAnim(TEXT("CrouchReload"));
+	}
+}
+
+void ARedPlayer::FireAnim()
+{
+	if(playerAnim->isCrouching != true)
+	{
+		playerAnim->OnShootAnim(TEXT("Fire"));
+	}
+	else
+	{
+		playerAnim->OnShootAnim(TEXT("CrouchFire"));
+	}
 }
 
 void ARedPlayer::FirePistol()

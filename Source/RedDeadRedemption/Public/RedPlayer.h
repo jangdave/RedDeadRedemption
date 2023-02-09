@@ -253,4 +253,14 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int32 holdBotlleAmmo;
+
+	void OnInteraction();
+
+	bool bGetWeapon;
+
+	void AmmoSet();
+
+	void ReloadAmmo();
+
+	void FireAnim();
 };

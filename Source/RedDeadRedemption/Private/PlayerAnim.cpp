@@ -30,6 +30,11 @@ void UPlayerAnim::OnAnim(FName sectionName)
 	owner->PlayAnimMontage(playerMontageFactory, 1, sectionName);
 }
 
+void UPlayerAnim::OnShootAnim(FName sectionName)
+{
+	owner->PlayAnimMontage(playerShootMontageFactory, 1, sectionName);
+}
+
 void UPlayerAnim::Throw()
 {
 	owner->bottleMeshComp->SetVisibility(false);
@@ -57,5 +62,19 @@ void UPlayerAnim::EndDismount()
 void UPlayerAnim::EndDead()
 {
 
+}
+
+void UPlayerAnim::EndReload()
+{
+	if(owner->armWeapon == EWeaponState::RIFLE)
+	{
+		owner->rifleAmmo += 5;
+		owner->holdRifleAmmo -= 5;
+	}
+	else if(owner->armWeapon == EWeaponState::PISTOL)
+	{
+		owner->pistolAmmo += 6;
+		owner->holdPistolAmmo -= 6;
+	}
 }
 

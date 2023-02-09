@@ -319,6 +319,7 @@ void AHorse::WeaponChangePressed()
 {
 	if (weapon_UI && false == weapon_UI->IsInViewport())
 	{
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.1);
 		weapon_UI->AddToViewport();
 		UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetShowMouseCursor(true);
 		GetWorld()->GetFirstPlayerController()->AController::SetIgnoreLookInput(true);
@@ -429,6 +430,7 @@ void AHorse::ChangeFist()
 		weapon_UI->RemoveFromParent();
 		ControllerWidget();
 		ChooseWeapon(EWeaponArm::FIST);
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1);
 	}
 }
 
@@ -439,6 +441,7 @@ void AHorse::ChangeRifle()
 		weapon_UI->RemoveFromParent();
 		ControllerWidget();
 		ChooseWeapon(EWeaponArm::RIFLE);
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1);
 	}
 }
 
@@ -449,6 +452,7 @@ void AHorse::ChangePistol()
 		weapon_UI->RemoveFromParent();
 		ControllerWidget();
 		ChooseWeapon(EWeaponArm::PISTOL);
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1);
 	}
 }
 
@@ -459,6 +463,7 @@ void AHorse::ChangeBottle()
 		weapon_UI->RemoveFromParent();
 		ControllerWidget();
 		ChooseWeapon(EWeaponArm::FIREBOTTLE);
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1);
 	}
 }
 

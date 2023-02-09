@@ -39,11 +39,17 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UAnimMontage* playerMontageFactory;
 
+	UPROPERTY(EditAnywhere)
+	class UAnimMontage* playerShootMontageFactory;
+
 	UPROPERTY()
 	class ARedPlayer* owner;
 
 	UFUNCTION(BlueprintCallable)
 	void OnAnim(FName sectionName);
+
+	UFUNCTION(BlueprintCallable)
+	void OnShootAnim(FName sectionName);
 
 	UFUNCTION(BlueprintCallable)
 	void EndThrow();
@@ -59,4 +65,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void EndDead();
+
+	UFUNCTION(BlueprintCallable)
+	void EndReload();
 };
