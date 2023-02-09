@@ -4,8 +4,16 @@
 #include "EnemyBullet.h"
 #include "RedPlayer.h"
 #include "Kismet/GameplayStatics.h"
+#include "Bullet.h"
+#include "Components/SphereComponent.h"
 
-void AEnemyBullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+void AEnemyBullet::BeginPlay()
+{
+	Super::BeginPlay();
+	sphereComp->OnComponentBeginOverlap.AddDynamic(this, &AEnemyBullet::OnHit);
+}
+
+void AEnemyBullet::OnHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	// 총알이 플레이어에게 맞았을 때
 	if (OtherActor->IsA(ARedPlayer::StaticClass()))
@@ -22,3 +30,5 @@ void AEnemyBullet::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, 
 		Destroy();
 	}
 }
+
+
