@@ -17,7 +17,6 @@
 #include "EnemyAnim.h"
 
 
-
 // Sets default values for this component's properties
 UEnemyFSM::UEnemyFSM()
 {
@@ -35,14 +34,14 @@ void UEnemyFSM::BeginPlay()
 	Super::BeginPlay();
 
 	// 월드에서 ARedPlayer 타깃 찾기
-	
+
 	// ARedPlayer 타입으로 캐스팅
 	// 소유 객체 가져오기
 	me = Cast<AEnemy>(GetOwner());
 
 	// 태어날때 현재 체력을 최대 체력으로 설정
 	EnemyHealth = EnemyMaxHealth;
-	
+
 	// AAIController 타입으로 캐스팅
 	AI = Cast<AAIController>(me->GetController());
 }
@@ -52,7 +51,6 @@ void UEnemyFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	{
-		
 		target = UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetPawn();
 
 		switch (mState)
@@ -73,43 +71,50 @@ void UEnemyFSM::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
 			DeadState();
 			break;
 		}
-		
 	}
-	
 }
 
 // 대기 상태
 void UEnemyFSM::IdleState()
 {
 	// 적의 플레이어 인지범위 생성
-	FCollisionShape shape;
-	shape.SetSphere(3000.0f);
-	// 적의 위치
-	FVector location = me->GetActorLocation();
-	// 적의 위치에서 플레이어 인지범위 생성
-	TArray<FHitResult> hits;
-	// 적의 위치에서 플레이어 인지범위 생성
-	GetWorld()->SweepMultiByChannel(hits, location, location, FQuat::Identity, ECollisionChannel::ECC_Pawn, shape);
-	// 플레이어가 인지범위에 있으면
+		FCollisionShape shape;
+		shape.SetSphere(3000.0f);
+		// 적의 위치
+		FVector location = me->GetActorLocation();
+		// 적의 위치에서 플레이어 인지범위 생성
+		TArray<FOverlapResult> Overlaps;
+		// 적의 위치에서 플레이어 인지범위 생성
+		GetWorld()->OverlapMultiByChannel(Overlaps, location, FQuat::Identity, ECollisionChannel::ECC_Pawn, shape);
+		// 플레이어가 인지범위에 있으면
 
-	for (auto hit : hits)
-	{
-		// 플레이어 타입으로 캐스팅
-		// 플레이어가 존재하면
-		if (hit.GetActor() == target)
+		// 플레이어가 범위 내에 없으면
+		if (Overlaps.Num() == 0)
 		{
-
-			// 플레이어를 타깃으로 설정
-			// 상태를 이동 상태로 변경
-			mState = EEnemyState::Move;
+			// 상태를 대기 상태로 변경
+			mState = EEnemyState::Idle;
 			me->enemyAnim->State = mState;
 			// 반복문 종료
-			break;
+			return;
 		}
-		
-	}	
-	
+
+		for (auto overlap : Overlaps)
+		{
+			// 플레이어 타입으로 캐스팅
+			// 플레이어가 존재하면
+			if (auto player = Cast<ARedPlayer>(overlap.GetActor()))
+			{
+				target = player;
+				// 플레이어를 타깃으로 설정
+				// 상태를 이동 상태로 변경
+				mState = EEnemyState::Move;
+				me->enemyAnim->State = mState;
+				// 반복문 종료
+				break;
+			}
+		}
 }
+
 // 이동 상태
 void UEnemyFSM::MoveState()
 {
@@ -121,10 +126,10 @@ void UEnemyFSM::MoveState()
 
 	me->GetCharacterMovement()->MaxWalkSpeed = EnemyRunSpeed;
 
-//	me->AddMovementInput(direction.GetSafeNormal());
+	//	me->AddMovementInput(direction.GetSafeNormal());
 
 	AI->MoveToLocation(destination, 300.0f);
-	
+
 	// 타깃과 가까워 지면 공격 상태로 전환하고 싶다.
 	// 1. 만약 거리가 공격 범위 안에 들어오면..
 	if (direction.Size() < AttackRange)
@@ -134,6 +139,7 @@ void UEnemyFSM::MoveState()
 		me->enemyAnim->State = mState;
 	}
 }
+
 // 공격 상태
 void UEnemyFSM::AttackState()
 {
@@ -145,11 +151,12 @@ void UEnemyFSM::AttackState()
 	{
 		// Enemy.cpp에있는 OnFire 함수를 호출
 		me->OnFire();
-		// 3. 공격
+		// 3. 공격소리 재생
 		// Enemy에있는 GunMeshComp를 이용해서 공격
 		FTransform transform = me->GunMeshComp->GetSocketTransform("SK_Wep_Rifle_01_SlideSocket");
 		GetWorld()->SpawnActor<AEnemyBullet>(EnemyRifleBulletFactory, transform);
 
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), me->EnemyAttackSound, me->GetActorLocation(),me->GetActorRotation());
 		// 4. 경과 시간 초기화
 		currentTime = 0.0f;
 
@@ -182,6 +189,7 @@ void UEnemyFSM::AttackState()
 		me->SetActorRotation(FMath::Lerp(me->GetActorRotation(), lookAtRotation, 0.1f));
 	}
 }
+
 // 피격 상태
 void UEnemyFSM::DamageState()
 {
@@ -191,7 +199,7 @@ void UEnemyFSM::DamageState()
 	{
 		// 상태를 이동 상태로 변경
 		mState = EEnemyState::Move;
-		me->enemyAnim->State = mState;	// 경과 시간 초기화
+		me->enemyAnim->State = mState; // 경과 시간 초기화
 		currentTime = 0.0f;
 	}
 }
@@ -201,17 +209,17 @@ void UEnemyFSM::DeadState()
 {
 	currentTime += GetWorld()->GetDeltaSeconds();
 
-	//	// 사망
-	//if (currentTime > 5.0f)
-	//{
-	//// currentTime이 1초가 넘으면 사망
-	//	me->Destroy();
-	//}
+		// 사망
+	if (currentTime > 3.0f)
+	{
+	// currentTime이 1초가 넘으면 사망
+		me->Destroy();
+	}
 }
 
 void UEnemyFSM::OnDamageProcess(int32 damage)
 {
-		EnemyHealth -= damage;
+	EnemyHealth -= damage;
 
 	// 체력이 0이하면
 	if (EnemyHealth <= 0)
@@ -230,6 +238,5 @@ void UEnemyFSM::OnDamageProcess(int32 damage)
 }
 
 void UEnemyFSM::OnAttackEvent()
-{	
-		
+{
 }

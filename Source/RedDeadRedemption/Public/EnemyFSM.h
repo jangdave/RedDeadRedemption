@@ -100,11 +100,14 @@ public:
 	UPROPERTY()
 		class AAIController* AI;
 
+
 public:
 	// 체력을 표현 하고싶다.
 	int32 EnemyHealth;
 	int32 EnemyMaxHealth = 50;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool IsCanPlayerShoot = false;
 
 	//UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
 	//	FVector EnemyLocation;

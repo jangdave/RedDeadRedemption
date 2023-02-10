@@ -52,7 +52,9 @@ public:
 	UFUNCTION()
 		void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bBFromSweep, const FHitResult& SweepResult);
 
-
+	//공격사운드
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FSM")
+	USoundBase* EnemyAttackSound;
 
 	// 총 메쉬
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "EnemySettings")
