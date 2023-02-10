@@ -5,8 +5,11 @@
 #include "GamePlayWidget.h"
 #include "TargetCrossWidget.h"
 #include "DefaultCrossWidget.h"
+#include "PistolBulletWidget.h"
+#include "RifleBulletWidget.h"
 #include "BloodWidget.h"
 #include "DeadEyeSpawn.h"
+#include "Horse.h"
 #include "RedPlayer.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -19,19 +22,15 @@ void ARedDeadRedemptionGameModeBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	player = Cast<ARedPlayer>(UGameplayStatics::GetActorOfClass(GetWorld(), ARedPlayer::StaticClass()));
-
-	play_UI = CreateWidget<UGamePlayWidget>(GetWorld(), gamePlayWidget);
-
-	target_UI = CreateWidget<UTargetCrossWidget>(GetWorld(), targetCrossWidget);
-
-	default_UI = CreateWidget<UDefaultCrossWidget>(GetWorld(), defaultCrossWidget);
-
-	blood_UI = CreateWidget<UBloodWidget>(GetWorld(), bloodWidget);
+	CastFun();
 
 	OnGamePlayWidget();
 
 	CrossHairOnOff();
+
+	HP = MaxHP;
+
+	RP = MaxRP;
 }
 
 void ARedDeadRedemptionGameModeBase::Tick(float DeltaTime)
@@ -42,13 +41,28 @@ void ARedDeadRedemptionGameModeBase::Tick(float DeltaTime)
 
 	OnBlood();
 
-	play_UI->playerHP = player->HP;
-
-	play_UI->playerRP = player->RP;
-
-	play_UI->dCount = player->deadCount;
+	HPRPCharge();
 
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ADeadEyeSpawn::StaticClass(), deadeyes);
+}
+
+void ARedDeadRedemptionGameModeBase::CastFun()
+{
+	horse = Cast<AHorse>(UGameplayStatics::GetActorOfClass(GetWorld(), ARedPlayer::StaticClass()));
+
+	player = Cast<ARedPlayer>(UGameplayStatics::GetActorOfClass(GetWorld(), ARedPlayer::StaticClass()));
+
+	play_UI = CreateWidget<UGamePlayWidget>(GetWorld(), gamePlayWidget);
+
+	target_UI = CreateWidget<UTargetCrossWidget>(GetWorld(), targetCrossWidget);
+
+	default_UI = CreateWidget<UDefaultCrossWidget>(GetWorld(), defaultCrossWidget);
+
+	blood_UI = CreateWidget<UBloodWidget>(GetWorld(), bloodWidget);
+
+	pBullet_UI = CreateWidget<UPistolBulletWidget>(GetWorld(), pistolBulletWidget);
+
+	rBullet_UI = CreateWidget<URifleBulletWidget>(GetWorld(), rifleBulletWidget);
 }
 
 void ARedDeadRedemptionGameModeBase::OnGamePlayWidget()
@@ -57,6 +71,40 @@ void ARedDeadRedemptionGameModeBase::OnGamePlayWidget()
 	{
 		play_UI->AddToViewport();
 	}	
+}
+
+void ARedDeadRedemptionGameModeBase::PlayerBulletSet()
+{
+	if(pBullet_UI != nullptr && player->armWeapon == EWeaponState::PISTOL)
+	{
+		pBullet_UI->AddToViewport();
+	}
+	else if(rBullet_UI != nullptr && player->armWeapon == EWeaponState::RIFLE)
+	{
+		rBullet_UI->AddToViewport();
+	}
+}
+
+void ARedDeadRedemptionGameModeBase::PlayerBulletOff()
+{
+	if (pBullet_UI != nullptr && player->armWeapon == EWeaponState::PISTOL)
+	{
+		pBullet_UI->RemoveFromParent();
+	}
+	else if (rBullet_UI != nullptr && player->armWeapon == EWeaponState::RIFLE)
+	{
+		rBullet_UI->RemoveFromParent();
+	}
+}
+
+void ARedDeadRedemptionGameModeBase::HorseBulletSet()
+{
+
+}
+
+void ARedDeadRedemptionGameModeBase::HorseBulletOff()
+{
+
 }
 
 void ARedDeadRedemptionGameModeBase::CrossHairOnOff()
@@ -90,13 +138,41 @@ void ARedDeadRedemptionGameModeBase::OnBlood()
 {
 	if(blood_UI != nullptr)
 	{
-		if(player->HP < 50.0f)
+		if(HP < 50.0f)
 		{
 			blood_UI->AddToViewport();
 		}
-		else if(player->HP > 50.0f)
+		else if(HP > 50.0f)
 		{
 			blood_UI->RemoveFromParent();
 		}
 	}
+}
+
+void ARedDeadRedemptionGameModeBase::HPRPCharge()
+{
+	if (HP <= 100)
+	{
+		HP += 0.05;
+	}
+	if (RP <= 100)
+	{
+		RP += 0.05;
+	}
+
+	play_UI->playerHP = HP;
+
+	play_UI->playerRP = RP;
+
+	play_UI->dCount = deadCount;
+
+	play_UI->bottleAmmo = holdBottleAmmo;
+
+	pBullet_UI->pisAmmo = pistolAmmo;
+
+	pBullet_UI->pisHoldAmmo = holdPistolAmmo;
+
+	rBullet_UI->rifAmmo = rifleAmmo;
+
+	rBullet_UI->rifHoldAmmo = holdRifleAmmo;
 }

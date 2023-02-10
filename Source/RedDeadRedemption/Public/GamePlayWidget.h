@@ -31,4 +31,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int32 dCount;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 bottleAmmo;
 };

@@ -99,10 +99,6 @@ void ARedPlayer::BeginPlay()
 
 	playerAnim->isTargetOn = false;
 
-	HP = MaxHP;
-
-	RP = MaxRP;
-
 	gm = Cast<ARedDeadRedemptionGameModeBase>(GetWorld()->GetAuthGameMode());
 }
 
@@ -110,9 +106,7 @@ void ARedPlayer::BeginPlay()
 void ARedPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	HPRPCharge();
-
+	
 	FTransform trans(GetControlRotation());
 	FVector resultDirection = trans.TransformVector(direction);
 	resultDirection.Z = 0;
@@ -152,13 +146,13 @@ void ARedPlayer::OnDeadEye()
 {
 	if(armWeapon == EWeaponState::PISTOL || armWeapon == EWeaponState::RIFLE)
 	{
-		if(bTarget != false && deadCount > 0)
+		if(bTarget != false && gm->deadCount > 0)
 		{
 			bDeadEye = true;
 
 			UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.1);
 
-			deadCount -= 1;
+			gm->deadCount -= 1;
 		}
 	}
 }
@@ -171,19 +165,6 @@ void ARedPlayer::OffDeadEye()
 
 	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1);
 }
-
-void ARedPlayer::HPRPCharge()
-{
-	if (HP <= 100)
-	{
-		HP += 0.05;
-	}
-	if (RP <= 100)
-	{
-		RP += 0.05;
-	}
-}
-
 
 void ARedPlayer::Horizontal(float value)
 {
@@ -226,22 +207,22 @@ void ARedPlayer::FirePressed()
 			break;
 
 		case EWeaponState::PISTOL:
-			if(pistolAmmo > 0)
+			if(gm->pistolAmmo > 0)
 			{
 				FirePistol();
 				FireAnim();
 				PlaySound(pistolFireSound, loc);
-				pistolAmmo -= 1;
+				gm->pistolAmmo -= 1;
 			}
 			break;
 
 		case EWeaponState::RIFLE:
-			if(rifleAmmo > 0)
+			if(gm->rifleAmmo > 0)
 			{
 				FireRifle();
 				FireAnim();
 				PlaySound(gunFireSound, loc);
-				rifleAmmo -= 1;
+				gm->rifleAmmo -= 1;
 			}
 			break;
 
@@ -259,11 +240,19 @@ void ARedPlayer::FirePressed()
 		switch (armWeapon)
 		{
 		case EWeaponState::PISTOL:
-			DeadEyeTarget();
+			if(gm->pistolAmmo >= 1)
+			{
+				gm->pistolAmmo -= 1;
+				DeadEyeTarget();
+			}
 			break;
 
 		case EWeaponState::RIFLE:
-			DeadEyeTarget();
+			if(gm->rifleAmmo >= 1)
+			{
+				gm->rifleAmmo -= 1;
+				DeadEyeTarget();
+			}
 			break;
 
 		default:
@@ -314,11 +303,11 @@ void ARedPlayer::WeaponChangePress()
 
 void ARedPlayer::RunPressed()
 {
-	if (playerAnim->isTargetOn == false && RP >= 0)
+	if (playerAnim->isTargetOn == false && gm->RP >= 0)
 	{
 		GetCharacterMovement()->MaxWalkSpeed = runSpeed;
 
-		RP -= 10.0f;
+		gm->RP -= 10.0f;
 
 		FTimerHandle runTimer;
 		GetWorld()->GetTimerManager().SetTimer(runTimer, this, &ARedPlayer::RunTime, 5.0f, false);
@@ -364,29 +353,32 @@ void ARedPlayer::CrouchReleased()
 
 void ARedPlayer::ChangeFist()
 {
-	if(bIsRide != true)
+	if (weapon_UI != nullptr && true == weapon_UI->IsInViewport())
 	{
-		if (weapon_UI != nullptr && true == weapon_UI->IsInViewport())
+		if(armWeapon == EWeaponState::RIFLE || armWeapon == EWeaponState::PISTOL)
 		{
-			weapon_UI->RemoveFromParent();
-			ControllerWidget();
-			ChooseWeapon(EWeaponState::FIST);
-			UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1);
+			gm->PlayerBulletOff();
 		}
+		weapon_UI->RemoveFromParent();
+		ControllerWidget();
+		ChooseWeapon(EWeaponState::FIST);
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1);
 	}
 }
 
 void ARedPlayer::ChangeRifle()
 {
-	if(bIsRide != true)
+	if (weapon_UI != nullptr && true == weapon_UI->IsInViewport())
 	{
-		if (weapon_UI != nullptr && true == weapon_UI->IsInViewport())
+		if (armWeapon == EWeaponState::RIFLE || armWeapon == EWeaponState::PISTOL)
 		{
-			weapon_UI->RemoveFromParent();
-			ControllerWidget();
-			ChooseWeapon(EWeaponState::RIFLE);
-			UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1);
+			gm->PlayerBulletOff();
 		}
+		weapon_UI->RemoveFromParent();
+		ControllerWidget();
+		ChooseWeapon(EWeaponState::RIFLE);
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1);
+		gm->PlayerBulletSet();
 	}
 }
 
@@ -394,10 +386,15 @@ void ARedPlayer::ChangePistol()
 {
 	if (weapon_UI != nullptr && true == weapon_UI->IsInViewport())
 	{
+		if (armWeapon == EWeaponState::RIFLE || armWeapon == EWeaponState::PISTOL)
+		{
+			gm->PlayerBulletOff();
+		}
 		weapon_UI->RemoveFromParent();
 		ControllerWidget();
 		ChooseWeapon(EWeaponState::PISTOL);
 		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1);
+		gm->PlayerBulletSet();
 	}
 }
 
@@ -405,6 +402,10 @@ void ARedPlayer::ChangeBottle()
 {
 	if(weapon_UI != nullptr && true == weapon_UI->IsInViewport())
 	{
+		if (armWeapon == EWeaponState::RIFLE || armWeapon == EWeaponState::PISTOL)
+		{
+			gm->PlayerBulletOff();
+		}
 		weapon_UI->RemoveFromParent();
 		ControllerWidget();
 		ChooseWeapon(EWeaponState::FIREBOTTLE);
@@ -486,7 +487,7 @@ void ARedPlayer::DestroyEnemy()
 	for (int i = 0; i < enemies.Num(); i++)
 	{
 		gm->deadeyes[i]->Destroy();
-
+		
 		UEnemyFSM* fsm = Cast<UEnemyFSM>(enemies[i]->GetDefaultSubobjectByName(TEXT("EnemyFSM")));
 
 		fsm->OnDamageProcess(100);
@@ -522,20 +523,34 @@ void ARedPlayer::OnInteraction()
 
 void ARedPlayer::AmmoSet()
 {
-	holdBotlleAmmo = 30;
-	holdPistolAmmo = 120;
-	holdRifleAmmo = 100;
+	gm->holdBottleAmmo = 2;
+	gm->holdPistolAmmo = 10;
+	gm->holdRifleAmmo = 10;
 }
 
 void ARedPlayer::ReloadAmmo()
 {
 	if(playerAnim->isCrouching !=true)
 	{
-		playerAnim->OnShootAnim(TEXT("Reload"));
+		if(gm->holdRifleAmmo > 0 && armWeapon == EWeaponState::RIFLE)
+		{
+			playerAnim->OnShootAnim(TEXT("Reload"));
+		}
+		else if(gm->holdPistolAmmo > 0 && armWeapon == EWeaponState::PISTOL)
+		{
+			playerAnim->OnShootAnim(TEXT("Reload"));
+		}
 	}
 	else
 	{
-		playerAnim->OnShootAnim(TEXT("CrouchReload"));
+		if (gm->holdRifleAmmo > 0 && armWeapon == EWeaponState::RIFLE)
+		{
+			playerAnim->OnShootAnim(TEXT("CrouchReload"));
+		}
+		else if (gm->holdPistolAmmo > 0 && armWeapon == EWeaponState::PISTOL)
+		{
+			playerAnim->OnShootAnim(TEXT("CrouchReload"));
+		}
 	}
 }
 
@@ -634,10 +649,11 @@ void ARedPlayer::FireFist()
 
 void ARedPlayer::FireBottle()
 {
-	if(playerAnim != nullptr)
+	if(playerAnim != nullptr && gm->holdBottleAmmo > 0)
 	{
 		playerAnim->OnAnim(TEXT("Throw"));
 		GetCharacterMovement()->MaxWalkSpeed = 0.0f;
+		gm->holdBottleAmmo -= 1;
 	}
 }
 
@@ -658,15 +674,11 @@ void ARedPlayer::PlaySound(USoundBase* sound, FVector location)
 
 void ARedPlayer::OnDamage(float damage)
 {
-	HP -= damage;
+	gm->HP -= damage;
 
-	if(HP <= 0)
+	if(gm->HP <= 0)
 	{
 		playerAnim->OnAnim(TEXT("Dead"));
-	}
-	else
-	{
-		HP -= damage;
 	}
 }
 
