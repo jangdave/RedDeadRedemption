@@ -101,6 +101,12 @@ public:
 	UPROPERTY(EditAnywhere)
 	class USoundBase* enemyImpactSound;
 
+	UPROPERTY(EditAnywhere)
+	class USoundBase* pistolReloadSound;
+
+	UPROPERTY(EditAnywhere)
+	class USoundBase* rifleReloadSound;
+
 	void Horizontal(float value);
 
 	void Vertical(float value);
@@ -195,9 +201,6 @@ public:
 	UFUNCTION()
 	void OnDamage(float damage);
 	
-	//UPROPERTY(EditAnywhere)
-	//bool bFire;
-
 	UFUNCTION()
 	void Ride();
 
@@ -205,7 +208,7 @@ public:
 
 	void DeadEyeTarget();
 
-	UPROPERTY()
+	UPROPERTY(EditAnywhere)
 	TArray<AActor*> enemies;
 
 	void DestroyEnemy();
@@ -225,4 +228,6 @@ public:
 	void ReloadAmmo();
 
 	void FireAnim();
+
+	void SetRagdoll();
 };

@@ -7,6 +7,7 @@
 #include "DefaultCrossWidget.h"
 #include "PistolBulletWidget.h"
 #include "RifleBulletWidget.h"
+#include "GameOverWidget.h"
 #include "BloodWidget.h"
 #include "DeadEyeSpawn.h"
 #include "Horse.h"
@@ -48,7 +49,7 @@ void ARedDeadRedemptionGameModeBase::Tick(float DeltaTime)
 
 void ARedDeadRedemptionGameModeBase::CastFun()
 {
-	horse = Cast<AHorse>(UGameplayStatics::GetActorOfClass(GetWorld(), ARedPlayer::StaticClass()));
+	horse = Cast<AHorse>(UGameplayStatics::GetActorOfClass(GetWorld(), AHorse::StaticClass()));
 
 	player = Cast<ARedPlayer>(UGameplayStatics::GetActorOfClass(GetWorld(), ARedPlayer::StaticClass()));
 
@@ -63,6 +64,8 @@ void ARedDeadRedemptionGameModeBase::CastFun()
 	pBullet_UI = CreateWidget<UPistolBulletWidget>(GetWorld(), pistolBulletWidget);
 
 	rBullet_UI = CreateWidget<URifleBulletWidget>(GetWorld(), rifleBulletWidget);
+
+	gameover_UI = CreateWidget<UGameOverWidget>(GetWorld(), gameOverWidget);
 }
 
 void ARedDeadRedemptionGameModeBase::OnGamePlayWidget()
@@ -99,12 +102,26 @@ void ARedDeadRedemptionGameModeBase::PlayerBulletOff()
 
 void ARedDeadRedemptionGameModeBase::HorseBulletSet()
 {
-
+	if(pBullet_UI != nullptr && horse->weaponArm == EWeaponArm::PISTOL)
+	{
+		pBullet_UI->AddToViewport();
+	}
+	else if(rBullet_UI != nullptr && horse->weaponArm == EWeaponArm::RIFLE)
+	{
+		rBullet_UI->AddToViewport();
+	}
 }
 
 void ARedDeadRedemptionGameModeBase::HorseBulletOff()
 {
-
+	if (pBullet_UI != nullptr && horse->weaponArm == EWeaponArm::PISTOL)
+	{
+		pBullet_UI->RemoveFromParent();
+	}
+	else if (rBullet_UI != nullptr && horse->weaponArm == EWeaponArm::RIFLE)
+	{
+		rBullet_UI->RemoveFromParent();
+	}
 }
 
 void ARedDeadRedemptionGameModeBase::CrossHairOnOff()
@@ -175,4 +192,12 @@ void ARedDeadRedemptionGameModeBase::HPRPCharge()
 	rBullet_UI->rifAmmo = rifleAmmo;
 
 	rBullet_UI->rifHoldAmmo = holdRifleAmmo;
+}
+
+void ARedDeadRedemptionGameModeBase::GameOver()
+{
+	if(gameover_UI != nullptr)
+	{
+		gameover_UI->AddToViewport();
+	}
 }

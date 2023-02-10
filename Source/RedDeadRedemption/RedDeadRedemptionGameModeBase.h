@@ -59,6 +59,12 @@ public:
 	UPROPERTY()
 	class URifleBulletWidget* rBullet_UI;
 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UGameOverWidget> gameOverWidget;
+
+	UPROPERTY()
+	class UGameOverWidget* gameover_UI;
+
 	UPROPERTY()
 	class ARedPlayer* player;
 
@@ -87,6 +93,8 @@ public:
 	void HorseBulletOff();
 
 	void HPRPCharge();
+	
+	void GameOver();
 
 	UPROPERTY(EditAnywhere)
 	float HP;

@@ -17,6 +17,7 @@
 #include "GamePlayWidget.h"
 #include "WeaponSet.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/Controller.h"
 #include "RedDeadRedemption/RedDeadRedemptionGameModeBase.h"
 
@@ -198,7 +199,6 @@ void ARedPlayer::FirePressed()
 {
 	if(bTarget != false && bDeadEye != true)
 	{
-		//bFire = true;
 		FVector loc = GetActorLocation();
 		switch (armWeapon)
 		{
@@ -233,7 +233,6 @@ void ARedPlayer::FirePressed()
 		default:
 			break;
 		}
-		//bFire = false;
 	}
 	else if(bTarget != false && bDeadEye != false)
 	{
@@ -242,7 +241,6 @@ void ARedPlayer::FirePressed()
 		case EWeaponState::PISTOL:
 			if(gm->pistolAmmo >= 1)
 			{
-				gm->pistolAmmo -= 1;
 				DeadEyeTarget();
 			}
 			break;
@@ -250,7 +248,6 @@ void ARedPlayer::FirePressed()
 		case EWeaponState::RIFLE:
 			if(gm->rifleAmmo >= 1)
 			{
-				gm->rifleAmmo -= 1;
 				DeadEyeTarget();
 			}
 			break;
@@ -474,6 +471,14 @@ void ARedPlayer::DeadEyeTarget()
 	bool bEnemyHit = GetWorld()->LineTraceSingleByObjectType(deadInfo, start, end, objParams);
 	if(bEnemyHit)
 	{
+		if(armWeapon == EWeaponState::RIFLE)
+		{
+			gm->rifleAmmo -= 1;
+		}
+		else if(armWeapon == EWeaponState::PISTOL)
+		{
+			gm->pistolAmmo -= 1;
+		}
 		auto enemy = Cast<AEnemy>(deadInfo.GetActor());
 		enemies.Add(enemy);
 		FVector loc = (deadInfo.GetActor()->GetActorLocation());
@@ -491,6 +496,18 @@ void ARedPlayer::DestroyEnemy()
 		UEnemyFSM* fsm = Cast<UEnemyFSM>(enemies[i]->GetDefaultSubobjectByName(TEXT("EnemyFSM")));
 
 		fsm->OnDamageProcess(100);
+
+		FVector loc = GetActorLocation();
+
+		if(armWeapon == EWeaponState::PISTOL)
+		{
+			FTimerHandle time;
+			PlaySound(pistolFireSound, loc);
+		}
+		else if(armWeapon == EWeaponState::RIFLE)
+		{
+			PlaySound(gunFireSound, loc);
+		}
 	}
 
 	enemies.Empty();
@@ -535,10 +552,12 @@ void ARedPlayer::ReloadAmmo()
 		if(gm->holdRifleAmmo > 0 && armWeapon == EWeaponState::RIFLE)
 		{
 			playerAnim->OnShootAnim(TEXT("Reload"));
+			PlaySound(rifleReloadSound, GetActorLocation());
 		}
 		else if(gm->holdPistolAmmo > 0 && armWeapon == EWeaponState::PISTOL)
 		{
 			playerAnim->OnShootAnim(TEXT("Reload"));
+			PlaySound(pistolReloadSound, GetActorLocation());
 		}
 	}
 	else
@@ -546,10 +565,12 @@ void ARedPlayer::ReloadAmmo()
 		if (gm->holdRifleAmmo > 0 && armWeapon == EWeaponState::RIFLE)
 		{
 			playerAnim->OnShootAnim(TEXT("CrouchReload"));
+			PlaySound(rifleReloadSound, GetActorLocation());
 		}
 		else if (gm->holdPistolAmmo > 0 && armWeapon == EWeaponState::PISTOL)
 		{
 			playerAnim->OnShootAnim(TEXT("CrouchReload"));
+			PlaySound(pistolReloadSound, GetActorLocation());
 		}
 	}
 }
@@ -678,8 +699,24 @@ void ARedPlayer::OnDamage(float damage)
 
 	if(gm->HP <= 0)
 	{
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+		FTimerHandle timer;
+		GetWorld()->GetTimerManager().SetTimer(timer, this, &ARedPlayer::SetRagdoll, 0.5f, false);
+
+		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.2);
+		
 		playerAnim->OnAnim(TEXT("Dead"));
+
+		gm->GameOver();
 	}
+}
+
+void ARedPlayer::SetRagdoll()
+{
+	GetMesh()->SetCollisionProfileName(TEXT("Ragdoll"));
+
+	GetMesh()->SetSimulatePhysics(true);
 }
 
 void ARedPlayer::Ride()

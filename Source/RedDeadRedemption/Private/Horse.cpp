@@ -9,6 +9,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include <Components/SkeletalMeshComponent.h>
+#include "DeadEyeSpawn.h"
 #include "Enemy.h"
 #include "EnemyFSM.h"
 #include "FireBottle.h"
@@ -181,6 +182,8 @@ void AHorse::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAction(TEXT("HorseWeaponChange"), IE_Pressed, this, &AHorse::WeaponChangePressed);
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &AHorse::ActionJump);
 	PlayerInputComponent->BindAction(TEXT("Reload"), IE_Pressed, this, &AHorse::Reload);
+	PlayerInputComponent->BindAction(TEXT("DeadEye"), IE_Pressed, this, &AHorse::OnHorseDeadEye);
+	PlayerInputComponent->BindAction(TEXT("DeadEye"), IE_Released, this, &AHorse::OffHorseDeadEye);
 }
 
 void AHorse::OverlapRide(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -294,48 +297,159 @@ void AHorse::Reload()
 	{
 		horsePlayerAnim->ReloadAnim();
 	}
+	if(weaponArm == EWeaponArm::PISTOL)
+	{
+		player->PlaySound(player->rifleReloadSound, GetActorLocation());
+	}
+	else if(weaponArm == EWeaponArm::PISTOL)
+	{
+		player->PlaySound(player->pistolReloadSound, GetActorLocation());
+	}
+}
+
+void AHorse::OnHorseDeadEye()
+{
+	if (weaponArm == EWeaponArm::PISTOL || weaponArm == EWeaponArm::RIFLE)
+	{
+		if (gmH->deadCount > 0)
+		{
+			bHorseDeadEye = true;
+
+			UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.1);
+
+			gmH->deadCount -= 1;
+		}
+	}
+}
+
+void AHorse::OffHorseDeadEye()
+{
+	HDestroyEnemy();
+
+	bHorseDeadEye = false;
+
+	UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1);
+}
+
+void AHorse::HDestroyEnemy()
+{
+	for (int i = 0; i < player->enemies.Num(); i++)
+	{
+		gmH->deadeyes[i]->Destroy();
+
+		UEnemyFSM* fsm = Cast<UEnemyFSM>(player->enemies[i]->GetDefaultSubobjectByName(TEXT("EnemyFSM")));
+
+		fsm->OnDamageProcess(100);
+
+		FVector locf = GetActorLocation();
+
+		if (weaponArm == EWeaponArm::PISTOL)
+		{
+			player->PlaySound(pistolFireSound, locf);
+		}
+		else if (weaponArm == EWeaponArm::RIFLE)
+		{
+			player->PlaySound(gunFireSound, locf);
+		}
+	}
+
+	player->enemies.Empty();
+
+	gmH->deadeyes.Empty();
+}
+
+void AHorse::HorseDeadEyeTarget()
+{
+	FHitResult deadInfo;
+	FVector start = cameraComp->GetComponentLocation();
+	FVector end = start + cameraComp->GetForwardVector() * 200000.0f;
+	FCollisionObjectQueryParams objParams;
+	objParams.AddObjectTypesToQuery(ECC_GameTraceChannel3);
+
+	bool bEnemyHit = GetWorld()->LineTraceSingleByObjectType(deadInfo, start, end, objParams);
+	if (bEnemyHit)
+	{
+		if(weaponArm == EWeaponArm::PISTOL)
+		{
+			gmH->pistolAmmo -= 1;
+		}
+		else if(weaponArm == EWeaponArm::RIFLE)
+		{
+			gmH->rifleAmmo -= 1;
+		}
+		auto enemy = Cast<AEnemy>(deadInfo.GetActor());
+		player->enemies.Add(enemy);
+		FVector loc = (deadInfo.GetActor()->GetActorLocation());
+		FVector finLoc = loc + FVector(0, 0, 70.0f);
+		GetWorld()->SpawnActor<ADeadEyeSpawn>(player->deadFactory, finLoc, FRotator::ZeroRotator);
+	}
 }
 
 void AHorse::FirePressed()
 {
-	FVector locf = GetActorLocation();
-	switch (weaponArm)
+	if(bHorseDeadEye != true)
 	{
-	case EWeaponState::FIST:
-		break;
-
-	case EWeaponState::PISTOL:
-		if(gmH->pistolAmmo > 0)
+		FVector loch = GetActorLocation();
+		switch (weaponArm)
 		{
-			if (horsePlayerAnim != nullptr)
-			{
-				horsePlayerAnim->FireAnim();
-			}
-			player->PlaySound(pistolFireSound, locf);
-			FirePistol();
-			gmH->pistolAmmo -= 1;
-		}
-		break;
+		case EWeaponState::FIST:
+			break;
 
-	case EWeaponState::RIFLE:
-		if(gmH->rifleAmmo > 0)
+		case EWeaponState::PISTOL:
+			if (gmH->pistolAmmo > 0)
+			{
+				if (horsePlayerAnim != nullptr)
+				{
+					horsePlayerAnim->FireAnim();
+				}
+				player->PlaySound(pistolFireSound, loch);
+				FirePistol();
+				gmH->pistolAmmo -= 1;
+			}
+			break;
+
+		case EWeaponState::RIFLE:
+			if (gmH->rifleAmmo > 0)
+			{
+				if (horsePlayerAnim != nullptr)
+				{
+					horsePlayerAnim->FireAnim();
+				}
+				player->PlaySound(gunFireSound, loch);
+				FireRifle();
+				gmH->rifleAmmo -= 1;
+			}
+			break;
+
+		case EWeaponState::FIREBOTTLE:
+			FireBottle();
+			break;
+
+		default:
+			break;
+		}
+	}
+	else if (bHorseDeadEye != false)
+	{
+		switch (weaponArm)
 		{
-			if (horsePlayerAnim != nullptr)
+		case EWeaponState::PISTOL:
+			if (gmH->pistolAmmo >= 1)
 			{
-				horsePlayerAnim->FireAnim();
+				HorseDeadEyeTarget();
 			}
-			player->PlaySound(gunFireSound, locf);
-			FireRifle();
-			gmH->rifleAmmo -= 1;
+			break;
+
+		case EWeaponState::RIFLE:
+			if (gmH->rifleAmmo >= 1)
+			{
+				HorseDeadEyeTarget();
+			}
+			break;
+
+		default:
+			break;
 		}
-		break;
-
-	case EWeaponState::FIREBOTTLE:
-		FireBottle();
-		break;
-
-	default:
-		break;
 	}
 }
 
@@ -436,9 +550,10 @@ void AHorse::FireRifle()
 
 void AHorse::FireBottle()
 {
-	if(horsePlayerAnim != nullptr)
+	if(horsePlayerAnim != nullptr && gmH->holdBottleAmmo > 0)
 	{
 		horsePlayerAnim->OnRiderAnim();
+		gmH->holdBottleAmmo -= 1;
 	}
 }
 
@@ -451,6 +566,10 @@ void AHorse::ChangeFist()
 {
 	if (weapon_UI && true == weapon_UI->IsInViewport())
 	{
+		if(weaponArm == EWeaponArm::RIFLE || weaponArm == EWeaponArm::PISTOL)
+		{
+			gmH->HorseBulletOff();
+		}
 		weapon_UI->RemoveFromParent();
 		ControllerWidget();
 		ChooseWeapon(EWeaponArm::FIST);
@@ -462,10 +581,15 @@ void AHorse::ChangeRifle()
 {
 	if (weapon_UI && true == weapon_UI->IsInViewport())
 	{
+		if (weaponArm == EWeaponArm::RIFLE || weaponArm == EWeaponArm::PISTOL)
+		{
+			gmH->HorseBulletOff();
+		}
 		weapon_UI->RemoveFromParent();
 		ControllerWidget();
 		ChooseWeapon(EWeaponArm::RIFLE);
 		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1);
+		gmH->HorseBulletSet();
 	}
 }
 
@@ -473,10 +597,15 @@ void AHorse::ChangePistol()
 {
 	if (weapon_UI && true == weapon_UI->IsInViewport())
 	{
+		if (weaponArm == EWeaponArm::RIFLE || weaponArm == EWeaponArm::PISTOL)
+		{
+			gmH->HorseBulletOff();
+		}
 		weapon_UI->RemoveFromParent();
 		ControllerWidget();
 		ChooseWeapon(EWeaponArm::PISTOL);
 		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 1);
+		gmH->HorseBulletSet();
 	}
 }
 
@@ -484,6 +613,10 @@ void AHorse::ChangeBottle()
 {
 	if (weapon_UI && true == weapon_UI->IsInViewport())
 	{
+		if (weaponArm == EWeaponArm::RIFLE || weaponArm == EWeaponArm::PISTOL)
+		{
+			gmH->HorseBulletOff();
+		}
 		weapon_UI->RemoveFromParent();
 		ControllerWidget();
 		ChooseWeapon(EWeaponArm::FIREBOTTLE);

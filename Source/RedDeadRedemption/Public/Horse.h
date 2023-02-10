@@ -199,4 +199,14 @@ public:
 	void UnRide();
 
 	void Reload();
+
+	void OnHorseDeadEye();
+
+	void OffHorseDeadEye();
+
+	void HDestroyEnemy();
+
+	void HorseDeadEyeTarget();
+
+	bool bHorseDeadEye;
 };
