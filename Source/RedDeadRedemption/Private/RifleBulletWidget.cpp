@@ -3,3 +3,7 @@
 
 #include "RifleBulletWidget.h"
 
+void URifleBulletWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+}

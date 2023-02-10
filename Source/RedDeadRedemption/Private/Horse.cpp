@@ -16,6 +16,7 @@
 #include "HorsePlayerAnim.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "WeaponWidget.h"
+#include "RedDeadRedemption/RedDeadRedemptionGameModeBase.h"
 
 // Sets default values
 AHorse::AHorse()
@@ -122,6 +123,8 @@ void AHorse::BeginPlay()
 
 	horsePlayerAnim = Cast<UHorsePlayerAnim>(playerMesh->GetAnimInstance());
 
+	gmH = Cast<ARedDeadRedemptionGameModeBase>(GetWorld()->GetAuthGameMode());
+
 	ChooseWeapon(EWeaponArm::FIST);
 }
 
@@ -177,6 +180,7 @@ void AHorse::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAction(TEXT("FireBullet"), IE_Pressed, this, &AHorse::FirePressed);
 	PlayerInputComponent->BindAction(TEXT("HorseWeaponChange"), IE_Pressed, this, &AHorse::WeaponChangePressed);
 	PlayerInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &AHorse::ActionJump);
+	PlayerInputComponent->BindAction(TEXT("Reload"), IE_Pressed, this, &AHorse::Reload);
 }
 
 void AHorse::OverlapRide(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -267,10 +271,6 @@ void AHorse::ChangeMesh(bool bChange)
 	{
 		playerMesh->SetVisibility(true);
 	}
-	else
-	{
-		return;
-	}
 }
 
 void AHorse::UnRide()
@@ -288,6 +288,14 @@ void AHorse::UnRide()
 	GetCharacterMovement()->MaxWalkSpeed = 0;
 }
 
+void AHorse::Reload()
+{
+	if (horsePlayerAnim != nullptr)
+	{
+		horsePlayerAnim->ReloadAnim();
+	}
+}
+
 void AHorse::FirePressed()
 {
 	FVector locf = GetActorLocation();
@@ -297,13 +305,29 @@ void AHorse::FirePressed()
 		break;
 
 	case EWeaponState::PISTOL:
-		FirePistol();
-		player->PlaySound(pistolFireSound, locf);
+		if(gmH->pistolAmmo > 0)
+		{
+			if (horsePlayerAnim != nullptr)
+			{
+				horsePlayerAnim->FireAnim();
+			}
+			player->PlaySound(pistolFireSound, locf);
+			FirePistol();
+			gmH->pistolAmmo -= 1;
+		}
 		break;
 
 	case EWeaponState::RIFLE:
-		player->PlaySound(gunFireSound, locf);
-		FireRifle();
+		if(gmH->rifleAmmo > 0)
+		{
+			if (horsePlayerAnim != nullptr)
+			{
+				horsePlayerAnim->FireAnim();
+			}
+			player->PlaySound(gunFireSound, locf);
+			FireRifle();
+			gmH->rifleAmmo -= 1;
+		}
 		break;
 
 	case EWeaponState::FIREBOTTLE:
@@ -317,7 +341,7 @@ void AHorse::FirePressed()
 
 void AHorse::WeaponChangePressed()
 {
-	if (weapon_UI && false == weapon_UI->IsInViewport())
+	if (weapon_UI && false == weapon_UI->IsInViewport() && player->bGetWeapon != false)
 	{
 		UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.1);
 		weapon_UI->AddToViewport();

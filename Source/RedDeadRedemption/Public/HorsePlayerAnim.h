@@ -40,10 +40,22 @@ public:
 	float horsePitch;
 
 	UPROPERTY(EditAnywhere)
-	class UAnimMontage* riderMontageFactory;
+	class UAnimMontage* ThrowMontage;
+
+	UPROPERTY(EditAnywhere)
+	class UAnimMontage* FireMontage;
+
+	UPROPERTY(EditAnywhere)
+	class UAnimMontage* ReloadMontage;
+
+	void OnRiderAnim();
+
+	void FireAnim();
+
+	void ReloadAnim();
 
 	UFUNCTION(BlueprintCallable)
-	void OnRiderAnim();
+	void EndReload();
 
 	UFUNCTION(BlueprintCallable)
 	void EndThrow();

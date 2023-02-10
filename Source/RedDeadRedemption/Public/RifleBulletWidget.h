@@ -13,5 +13,13 @@ UCLASS()
 class REDDEADREDEMPTION_API URifleBulletWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
+public:
+	virtual void NativeConstruct() override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 rifAmmo;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 rifHoldAmmo;
 };

@@ -3,3 +3,7 @@
 
 #include "PistolBulletWidget.h"
 
+void UPistolBulletWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+}
