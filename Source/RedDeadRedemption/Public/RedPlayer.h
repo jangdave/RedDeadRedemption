@@ -107,6 +107,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	class USoundBase* rifleReloadSound;
 
+	UPROPERTY(EditAnywhere)
+	class USoundBase* noBulletSound;
+
 	void Horizontal(float value);
 
 	void Vertical(float value);

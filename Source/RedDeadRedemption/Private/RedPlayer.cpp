@@ -214,6 +214,10 @@ void ARedPlayer::FirePressed()
 				PlaySound(pistolFireSound, loc);
 				gm->pistolAmmo -= 1;
 			}
+			else
+			{
+				PlaySound(noBulletSound, loc);
+			}
 			break;
 
 		case EWeaponState::RIFLE:
@@ -223,6 +227,10 @@ void ARedPlayer::FirePressed()
 				FireAnim();
 				PlaySound(gunFireSound, loc);
 				gm->rifleAmmo -= 1;
+			}
+			else
+			{
+				PlaySound(noBulletSound, loc);
 			}
 			break;
 

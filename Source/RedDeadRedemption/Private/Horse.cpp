@@ -406,6 +406,10 @@ void AHorse::FirePressed()
 				FirePistol();
 				gmH->pistolAmmo -= 1;
 			}
+			else
+			{
+				player->PlaySound(player->noBulletSound, loch);
+			}
 			break;
 
 		case EWeaponState::RIFLE:
@@ -418,6 +422,10 @@ void AHorse::FirePressed()
 				player->PlaySound(gunFireSound, loch);
 				FireRifle();
 				gmH->rifleAmmo -= 1;
+			}
+			else
+			{
+				player->PlaySound(player->noBulletSound, loch);
 			}
 			break;
 
