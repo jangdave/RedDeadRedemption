@@ -100,6 +100,7 @@ public:
 	UPROPERTY()
 		class AAIController* AI;
 
+
 public:
 	// 체력을 표현 하고싶다.
 	int32 EnemyHealth;

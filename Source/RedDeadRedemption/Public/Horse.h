@@ -69,6 +69,9 @@ public:
 	class ARedPlayer* player;
 
 	UPROPERTY(EditAnywhere)
+	class ARedDeadRedemptionGameModeBase* gmH;
+
+	UPROPERTY(EditAnywhere)
 	TSubclassOf<class APlayerPistolBullet> pistolBulletFactory;
 
 	UPROPERTY(EditAnywhere)
@@ -194,4 +197,6 @@ public:
 
 	UFUNCTION()
 	void UnRide();
+
+	void Reload();
 };

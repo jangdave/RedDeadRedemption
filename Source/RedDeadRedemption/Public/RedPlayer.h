@@ -188,20 +188,6 @@ public:
 
 	bool bTarget;
 	
-	UPROPERTY(EditAnywhere)
-	float HP;
-
-	UPROPERTY(EditAnywhere)
-	float MaxHP = 100.0f;
-
-	UPROPERTY(EditAnywhere)
-	float RP;
-
-	UPROPERTY(EditAnywhere)
-	float MaxRP = 100.0f;
-
-	void HPRPCharge();
-
 	void SpawnEmitter(UParticleSystem* factory, FTransform transform);
 
 	void PlaySound(USoundBase* sound, FVector location);
@@ -229,30 +215,6 @@ public:
 
 	UPROPERTY()
 	class ARedDeadRedemptionGameModeBase* gm;
-
-	UPROPERTY(EditAnywhere)
-	int32 deadCount = 3;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	int32 maxPistolAmmo = 6;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	int32 pistolAmmo;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	int32 holdPistolAmmo;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	int32 maxRifleAmmo = 5;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	int32 rifleAmmo;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	int32 holdRifleAmmo;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	int32 holdBotlleAmmo;
 
 	void OnInteraction();
 

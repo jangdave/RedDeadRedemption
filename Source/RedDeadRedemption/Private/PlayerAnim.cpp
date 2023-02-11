@@ -4,6 +4,7 @@
 #include "PlayerAnim.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
+#include "RedDeadRedemption/RedDeadRedemptionGameModeBase.h"
 
 void UPlayerAnim::NativeUpdateAnimation(float DeltaSeconds)
 {
@@ -66,15 +67,36 @@ void UPlayerAnim::EndDead()
 
 void UPlayerAnim::EndReload()
 {
+	auto gm = Cast<ARedDeadRedemptionGameModeBase>(GetWorld()->GetAuthGameMode());
 	if(owner->armWeapon == EWeaponState::RIFLE)
 	{
-		owner->rifleAmmo += 5;
-		owner->holdRifleAmmo -= 5;
+		int32 rSetbul = gm->maxRifleAmmo - gm->rifleAmmo;
+
+		if(gm->holdRifleAmmo < rSetbul)
+		{
+			gm->rifleAmmo += gm->holdRifleAmmo;
+			gm->holdRifleAmmo -= gm->holdRifleAmmo;
+		}
+		else
+		{
+			gm->rifleAmmo += rSetbul;
+			gm->holdRifleAmmo -= rSetbul;
+		}
 	}
-	else if(owner->armWeapon == EWeaponState::PISTOL)
+	else if (owner->armWeapon == EWeaponState::PISTOL)
 	{
-		owner->pistolAmmo += 6;
-		owner->holdPistolAmmo -= 6;
+		int32 pSetbul = gm->maxPistolAmmo - gm->pistolAmmo;
+
+		if(gm->holdPistolAmmo < pSetbul)
+		{
+			gm->pistolAmmo += gm->holdPistolAmmo;
+			gm->holdPistolAmmo -= gm->holdPistolAmmo;
+		}
+		else
+		{
+			gm->pistolAmmo += pSetbul;
+			gm->holdPistolAmmo -= pSetbul;
+		}
 	}
 }
 

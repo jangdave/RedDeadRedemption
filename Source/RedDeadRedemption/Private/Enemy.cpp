@@ -73,7 +73,16 @@ AEnemy::AEnemy()
 		GetMesh()->SetAnimInstanceClass(TempAnim.Class);
 	}
 
+	// 애너미에님 컨스트럭터헬퍼스
+	ConstructorHelpers::FClassFinder<UAnimInstance> TempAnim2(TEXT("/Script/Engine.AnimBlueprint'/Game/Blueprint/Enemy/ABP_Enemy2.ABP_Enemy2_C'"));
+	if (TempAnim.Succeeded())
+	{
+		GetMesh()->SetAnimInstanceClass(TempAnim2.Class);
+	}
+
 	GetCharacterMovement()->bOrientRotationToMovement = true;
+
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 
 
@@ -84,6 +93,7 @@ void AEnemy::OnDeath()
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	RevolverMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GunMeshComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	
 }
 
 // Called when the game starts or when spawned
