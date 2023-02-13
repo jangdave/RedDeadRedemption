@@ -118,12 +118,12 @@ void UEnemyFSM::IdleState()
 			// 반복문 종료
 			return;
 		}
-
+		auto player = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
 		for (auto overlap : Overlaps)
 		{
 			// 플레이어 타입으로 캐스팅
 			// 플레이어가 존재하면
-			if (auto player = Cast<ARedPlayer>(overlap.GetActor()))
+			if (overlap.GetActor() == player)
 			{
 				target = player;
 				// 플레이어를 타깃으로 설정
