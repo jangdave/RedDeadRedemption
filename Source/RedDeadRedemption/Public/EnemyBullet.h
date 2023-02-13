@@ -28,5 +28,7 @@ public:
 	UFUNCTION()
 		void OnHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	
+	// 총알 지나갈때 사운드
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EnemyBullet")
+		class USoundBase* BulletPewPewSound;
 };

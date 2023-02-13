@@ -100,7 +100,21 @@ public:
 	UPROPERTY()
 		class AAIController* AI;
 
+	// 적이 죽었는가
+	UPROPERTY(EditAnyWhere,BlueprintReadWrite, Category = "FSM")	
+	bool bIsDead = false;
+	// spawntokill에 쓸 변수
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "FSM")
+		int NumEnemies;
+	// 적이 죽을때, spawner의 numEnemy를 감수시키는 함수
+	UFUNCTION()
+	void MinusNumEnemies();
+	UPROPERTY()
+		TArray<class AEnemySpawnToKill*> enemySpawns;
 
+	UPROPERTY()
+	TArray<AActor*> bpEnemySpawner;
+	
 public:
 	// 체력을 표현 하고싶다.
 	int32 EnemyHealth;

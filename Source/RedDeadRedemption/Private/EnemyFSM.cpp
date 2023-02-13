@@ -15,6 +15,7 @@
 #include "AIController.h"
 #include "NavigationSystem.h"
 #include "EnemyAnim.h"
+#include "EnemySpawnToKill.h"
 
 
 // Sets default values for this component's properties
@@ -44,6 +45,26 @@ void UEnemyFSM::BeginPlay()
 
 	// AAIController 타입으로 캐스팅
 	AI = Cast<AAIController>(me->GetController());
+
+
+	
+	// 애너미 소환
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AEnemySpawnToKill::StaticClass(), bpEnemySpawner);
+	for (int i = 0; i < bpEnemySpawner.Num(); i++)
+	{
+		AEnemySpawnToKill* emptySpawner = nullptr;
+		enemySpawns.Add(emptySpawner);
+	}
+
+	for (int i = 0; i < bpEnemySpawner.Num(); i++)
+	{
+		auto spawn = Cast<AEnemySpawnToKill>(bpEnemySpawner[i]);
+		enemySpawns[i] = spawn;
+		if (enemySpawns[i]->NumEnemy == 0)
+		{
+			enemySpawns[i]->isSpawn = true;
+		}
+	}
 }
 
 // Called every frame
@@ -97,12 +118,12 @@ void UEnemyFSM::IdleState()
 			// 반복문 종료
 			return;
 		}
-
+		auto player = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
 		for (auto overlap : Overlaps)
 		{
 			// 플레이어 타입으로 캐스팅
 			// 플레이어가 존재하면
-			if (auto player = Cast<ARedPlayer>(overlap.GetActor()))
+			if (overlap.GetActor() == player)
 			{
 				target = player;
 				// 플레이어를 타깃으로 설정
@@ -212,6 +233,15 @@ void UEnemyFSM::DeadState()
 		// 사망
 	if (currentTime > 3.0f)
 	{
+		for (int i = 0; i < bpEnemySpawner.Num(); i++)
+		{
+			enemySpawns[i]->NumEnemy--;
+
+			if (enemySpawns[i]->NumEnemy <= 0)
+			{
+				enemySpawns[i]->isSpawn = true;
+			}
+		}
 	// currentTime이 1초가 넘으면 사망
 		me->Destroy();
 	}
@@ -225,6 +255,7 @@ void UEnemyFSM::OnDamageProcess(int32 damage)
 	if (EnemyHealth <= 0)
 	{
 		// 상태를 사망 상태로 변경
+		bIsDead = true;
 		me->OnDeath();
 		mState = EEnemyState::Dead;
 		me->enemyAnim->State = mState;
@@ -239,4 +270,17 @@ void UEnemyFSM::OnDamageProcess(int32 damage)
 
 void UEnemyFSM::OnAttackEvent()
 {
+}
+
+void UEnemyFSM::MinusNumEnemies()
+{
+	AEnemySpawnToKill* EnemySpawner = Cast<AEnemySpawnToKill>(UGameplayStatics::GetActorOfClass(GetWorld(), AEnemySpawnToKill::StaticClass()));
+	// 만약 EnemySpawnToKill에서 NumEnemy가 감소되면
+	if (EnemySpawner)
+	{
+		if (EnemySpawner->NumEnemy <= 0)
+		{
+			
+		}
+	}
 }

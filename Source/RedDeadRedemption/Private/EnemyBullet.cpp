@@ -11,6 +11,7 @@ void AEnemyBullet::BeginPlay()
 {
 	Super::BeginPlay();
 	sphereComp->OnComponentBeginOverlap.AddDynamic(this, &AEnemyBullet::OnHit);
+
 }
 
 void AEnemyBullet::OnHit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -30,6 +31,13 @@ void AEnemyBullet::OnHit(UPrimitiveComponent* OverlappedComponent, AActor* Other
 		// 총알 파괴
 		Destroy();
 	}
+	else
+	{
+		// 총알 사운드 재생
+		UGameplayStatics::PlaySoundAtLocation(this, BulletPewPewSound, GetActorLocation());
+	}
+	
+	
 }
 
 
