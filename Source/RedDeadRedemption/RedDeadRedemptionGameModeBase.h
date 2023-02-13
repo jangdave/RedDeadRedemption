@@ -148,6 +148,4 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int32 holdBottleAmmo;
-
-	UAudioComponent* BGM;
 };

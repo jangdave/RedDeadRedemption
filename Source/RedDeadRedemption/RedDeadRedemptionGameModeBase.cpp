@@ -72,16 +72,14 @@ void ARedDeadRedemptionGameModeBase::CastFun()
 	start_UI = CreateWidget<UStartWidget>(GetWorld(), startWidget);
 
 	deadEye_UI = CreateWidget<UDeadEyeWidget>(GetWorld(), deadEyeWidget);
-
-	BGM = Cast<UAudioComponent>(UGameplayStatics::SpawnSound2D(GetWorld(), gameBGM));
-
-	BGM->Stop();
 }
 
 void ARedDeadRedemptionGameModeBase::OnGamePlayWidget()
 {
 	if(play_UI != nullptr)
 	{
+		auto BGM = Cast<UAudioComponent>(UGameplayStatics::SpawnSound2D(GetWorld(), gameBGM));
+
 		BGM->Activate();
 
 		play_UI->AddToViewport();
@@ -210,7 +208,9 @@ void ARedDeadRedemptionGameModeBase::GameOver()
 {
 	if(gameover_UI != nullptr)
 	{
+		auto BGM = Cast<UAudioComponent>(UGameplayStatics::SpawnSound2D(GetWorld(), gameBGM));
 		BGM->Stop();
+
 		UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetShowMouseCursor(true);
 		GetWorld()->GetFirstPlayerController()->AController::SetIgnoreLookInput(true);
 		gameover_UI->AddToViewport();
