@@ -9,9 +9,13 @@
 #include "RifleBulletWidget.h"
 #include "GameOverWidget.h"
 #include "BloodWidget.h"
+#include "StartWidget.h"
+#include "DeadEyeWidget.h"
 #include "DeadEyeSpawn.h"
 #include "Horse.h"
 #include "RedPlayer.h"
+#include "Blueprint/WidgetBlueprintLibrary.h"
+#include "Components/AudioComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 ARedDeadRedemptionGameModeBase::ARedDeadRedemptionGameModeBase()
@@ -25,9 +29,7 @@ void ARedDeadRedemptionGameModeBase::BeginPlay()
 
 	CastFun();
 
-	OnGamePlayWidget();
-
-	CrossHairOnOff();
+	GameStart();
 
 	HP = MaxHP;
 
@@ -66,12 +68,22 @@ void ARedDeadRedemptionGameModeBase::CastFun()
 	rBullet_UI = CreateWidget<URifleBulletWidget>(GetWorld(), rifleBulletWidget);
 
 	gameover_UI = CreateWidget<UGameOverWidget>(GetWorld(), gameOverWidget);
+
+	start_UI = CreateWidget<UStartWidget>(GetWorld(), startWidget);
+
+	deadEye_UI = CreateWidget<UDeadEyeWidget>(GetWorld(), deadEyeWidget);
+
+	BGM = Cast<UAudioComponent>(UGameplayStatics::SpawnSound2D(GetWorld(), gameBGM));
+
+	BGM->Stop();
 }
 
 void ARedDeadRedemptionGameModeBase::OnGamePlayWidget()
 {
 	if(play_UI != nullptr)
 	{
+		BGM->Activate();
+
 		play_UI->AddToViewport();
 	}	
 }
@@ -198,6 +210,21 @@ void ARedDeadRedemptionGameModeBase::GameOver()
 {
 	if(gameover_UI != nullptr)
 	{
+		BGM->Stop();
+		UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetShowMouseCursor(true);
+		GetWorld()->GetFirstPlayerController()->AController::SetIgnoreLookInput(true);
 		gameover_UI->AddToViewport();
 	}
+}
+
+void ARedDeadRedemptionGameModeBase::GameStart()
+{
+	if(start_UI != nullptr)
+	{
+		start_UI->AddToViewport();
+	}
+
+	UGameplayStatics::SetGamePaused(GetWorld(), true);
+
+	GetWorld()->GetFirstPlayerController()->SetShowMouseCursor(true);
 }

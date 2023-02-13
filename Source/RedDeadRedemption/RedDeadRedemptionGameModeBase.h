@@ -65,6 +65,18 @@ public:
 	UPROPERTY()
 	class UGameOverWidget* gameover_UI;
 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UStartWidget> startWidget;
+
+	UPROPERTY()
+	class UStartWidget* start_UI;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UDeadEyeWidget> deadEyeWidget;
+
+	UPROPERTY()
+	class UDeadEyeWidget* deadEye_UI;
+
 	UPROPERTY()
 	class ARedPlayer* player;
 
@@ -73,6 +85,9 @@ public:
 
 	UPROPERTY()
 	TArray<AActor*> deadeyes;
+
+	UPROPERTY(EditAnywhere)
+	class USoundBase* gameBGM;
 
 	void OnGamePlayWidget();
 
@@ -95,6 +110,8 @@ public:
 	void HPRPCharge();
 	
 	void GameOver();
+
+	void GameStart();
 
 	UPROPERTY(EditAnywhere)
 	float HP;
@@ -132,4 +149,5 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int32 holdBottleAmmo;
 
+	UAudioComponent* BGM;
 };

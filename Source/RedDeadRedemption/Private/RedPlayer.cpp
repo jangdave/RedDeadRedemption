@@ -7,6 +7,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Bullet.h"
 #include "DeadEyeSpawn.h"
+#include "DeadEyeWidget.h"
 #include "Enemy.h"
 #include "EnemyFSM.h"
 #include "FireBottle.h"
@@ -14,7 +15,6 @@
 #include "Horse.h"
 #include "PlayerAnim.h"
 #include "WeaponWidget.h"
-#include "GamePlayWidget.h"
 #include "WeaponSet.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Components/CapsuleComponent.h"
@@ -149,6 +149,8 @@ void ARedPlayer::OnDeadEye()
 	{
 		if(bTarget != false && gm->deadCount > 0)
 		{
+			gm->deadEye_UI->AddToViewport();
+
 			bDeadEye = true;
 
 			UGameplayStatics::SetGlobalTimeDilation(GetWorld(), 0.1);
@@ -160,6 +162,8 @@ void ARedPlayer::OnDeadEye()
 
 void ARedPlayer::OffDeadEye()
 {
+	gm->deadEye_UI->RemoveFromParent();
+
 	DestroyEnemy();
 
 	bDeadEye = false;
